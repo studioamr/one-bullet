@@ -1,0 +1,184 @@
+//@version=5
+// ============================================================================
+//  ONE BULLET · TOOLKIT
+//  Session liquidity (Asia / London / New York highs & lows) · ORB · EMAs · FVG
+//
+//  • Each session's HIGH and LOW are drawn as LINES (no shading):
+//        Asia = red · London = blue · New York = green
+//  • Untaken levels extend to the right forever (they are live liquidity).
+//  • The moment price TAKES a level, its line STOPS at that bar.
+//  • Guided by the ICT / LuxAlgo layouts — clean lines, labels, ORB range.
+// ============================================================================
+indicator("ONE BULLET · Toolkit", "1BULLET", overlay = true, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+
+// ------------------------------ palette -------------------------------------
+color C_ASIA = #F23645   // Asia   — red
+color C_LON  = #3d86cf   // London — blue
+color C_NY   = #089981   // NY     — green
+color C_ORB  = #B2B5BE   // opening range — light gray
+color C_UP   = #089981
+color C_DN   = #F23645
+color C_E1   = #3d86cf   // EMA 14  — blue
+color C_E2   = #EDEBE6   // EMA 50  — bone
+color C_E3   = #C9A24B   // EMA 200 — amber
+
+// ------------------------------ inputs --------------------------------------
+gG = "General"
+tz = input.string("America/New_York", "Timezone", group = gG)
+
+gS = "Session Liquidity"
+showSess  = input.bool(true,  "Show session highs & lows", group = gS)
+keepN     = input.int(2, "Sessions kept (each market)", 1, 5, group = gS, tooltip = "How many recent sessions to keep per market")
+hideTaken = input.bool(false, "Hide levels once taken", group = gS, tooltip = "Off: the line stops at the bar it was taken.  On: it disappears.")
+showTags  = input.bool(true,  "Labels", group = gS)
+useAsia   = input.bool(true,  "Asia",     inline = "A", group = gS)
+asiaSess  = input.session("2000-0000", "", inline = "A", group = gS)
+useLon    = input.bool(true,  "London",   inline = "L", group = gS)
+lonSess   = input.session("0200-0500", "", inline = "L", group = gS)
+useNy     = input.bool(true,  "New York", inline = "N", group = gS)
+nySess    = input.session("0930-1100", "", inline = "N", group = gS)
+
+gO = "Opening Range"
+showORB = input.bool(true, "Show opening range", group = gO)
+orbSess = input.session("0930-0945", "ORB window", group = gO)
+
+gE = "EMAs"
+showEma = input.bool(true, "Show EMAs 14 / 50 / 200", group = gE)
+
+gF = "Fair Value Gaps"
+showFVG = input.bool(true, "Show FVGs", group = gF)
+fvgKeep = input.int(6, "Max FVGs kept", 1, group = gF)
+
+// ------------------------------ EMAs ----------------------------------------
+plot(showEma ? ta.ema(close, 14)  : na, "EMA 14",  C_E1, 2)
+plot(showEma ? ta.ema(close, 50)  : na, "EMA 50",  C_E2, 1)
+plot(showEma ? ta.ema(close, 200) : na, "EMA 200", C_E3, 2)
+
+// ------------------------------ Session liquidity ---------------------------
+type lvl
+    line  ln
+    label lb
+    float price
+    bool  isHigh
+    bool  taken = false
+
+type sess
+    string name
+    string tag
+    string s
+    color  col
+    float  hi = na
+    float  lo = na
+    array<lvl> lvls
+
+var array<sess> SESS = array.new<sess>()
+if barstate.isfirst
+    if useAsia
+        SESS.push(sess.new("Asia",     "AS", asiaSess, C_ASIA, na, na, array.new<lvl>()))
+    if useLon
+        SESS.push(sess.new("London",   "LO", lonSess,  C_LON,  na, na, array.new<lvl>()))
+    if useNy
+        SESS.push(sess.new("New York", "NY", nySess,   C_NY,   na, na, array.new<lvl>()))
+
+pushLvl(sess z, float price, bool isHigh) =>
+    ln = line.new(bar_index, price, bar_index + 1, price, color = z.col, width = 1, extend = extend.right)
+    label lb = na
+    if showTags
+        lb := label.new(bar_index, price, z.tag + (isHigh ? "H" : "L"), style = isHigh ? label.style_label_down : label.style_label_up, color = color(na), textcolor = z.col, size = size.tiny)
+    z.lvls.push(lvl.new(ln, lb, price, isHigh, false))
+    while z.lvls.size() > keepN * 2
+        old = z.lvls.shift()
+        old.ln.delete()
+        if not na(old.lb)
+            old.lb.delete()
+
+method run(sess z) =>
+    t       = not na(time(timeframe.period, z.s, tz))
+    started = t and not t[1]
+    ended   = not t and t[1]
+    if started
+        z.hi := high
+        z.lo := low
+    else if t
+        z.hi := math.max(z.hi, high)
+        z.lo := math.min(z.lo, low)
+    if ended
+        pushLvl(z, z.hi, true)
+        pushLvl(z, z.lo, false)
+    for l in z.lvls
+        if not l.taken
+            taken = (l.isHigh and high > l.price) or (not l.isHigh and low < l.price)
+            if taken
+                l.taken := true
+                if hideTaken
+                    l.ln.delete()
+                    if not na(l.lb)
+                        l.lb.delete()
+                else
+                    l.ln.set_extend(extend.none)
+                    l.ln.set_x2(bar_index)
+                    if not na(l.lb)
+                        l.lb.set_x(bar_index)
+            else if not na(l.lb)
+                l.lb.set_x(bar_index)
+
+if showSess
+    for z in SESS
+        z.run()
+
+// ------------------------------ Opening Range -------------------------------
+var float orbHi = na
+var float orbLo = na
+var box   orbBx = na
+var line  orbLH = na
+var line  orbLL = na
+var line  orbLM = na
+var label orbTH = na
+var label orbTL = na
+inORB    = not na(time(timeframe.period, orbSess, tz))
+orbStart = inORB and not inORB[1]
+orbEnd   = not inORB and inORB[1]
+if showORB and orbStart
+    if not na(orbBx)
+        orbBx.delete()
+        orbLH.delete()
+        orbLL.delete()
+        orbLM.delete()
+        orbTH.delete()
+        orbTL.delete()
+    orbHi := high
+    orbLo := low
+    orbBx := box.new(bar_index, high, bar_index, low, border_color = color.new(C_ORB, 55), bgcolor = color.new(C_ORB, 92))
+else if showORB and inORB
+    orbHi := math.max(orbHi, high)
+    orbLo := math.min(orbLo, low)
+    orbBx.set_top(orbHi)
+    orbBx.set_bottom(orbLo)
+    orbBx.set_right(bar_index)
+if showORB and orbEnd
+    orbMid = math.avg(orbHi, orbLo)
+    orbLH := line.new(bar_index, orbHi,  bar_index + 1, orbHi,  color = C_ORB, width = 1, extend = extend.right)
+    orbLL := line.new(bar_index, orbLo,  bar_index + 1, orbLo,  color = C_ORB, width = 1, extend = extend.right)
+    orbLM := line.new(bar_index, orbMid, bar_index + 1, orbMid, color = color.new(C_ORB, 35), style = line.style_dashed, extend = extend.right)
+    orbTH := label.new(bar_index, orbHi, "ORH", style = label.style_label_left, color = color(na), textcolor = C_ORB, size = size.tiny)
+    orbTL := label.new(bar_index, orbLo, "ORL", style = label.style_label_left, color = color(na), textcolor = C_ORB, size = size.tiny)
+if showORB and not na(orbLH) and not inORB
+    orbTH.set_x(bar_index)
+    orbTL.set_x(bar_index)
+
+// ------------------------------ Fair Value Gaps -----------------------------
+var box[] fvgs = array.new_box()
+pushFVG(float top, float bot, color c) =>
+    b = box.new(bar_index - 1, top, bar_index + 8, bot, border_color = color.new(c, 50), bgcolor = color.new(c, 86))
+    array.push(fvgs, b)
+    if array.size(fvgs) > fvgKeep
+        box.delete(array.shift(fvgs))
+if showFVG and low > high[2]
+    pushFVG(low, high[2], C_UP)
+if showFVG and high < low[2]
+    pushFVG(low[2], high, C_DN)
+
+// ---------------------------------------------------------------------------
+//  ONE BULLET — one planned trade a session. The toolkit draws the liquidity
+//  map (session highs/lows) and the opening range. Discipline is yours.
+// ---------------------------------------------------------------------------

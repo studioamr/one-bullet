@@ -1,0 +1,12 @@
+# Whitelist: everything ignored except the public app files
+/*
+!index.html
+!landing.html
+!manifest.json
+!.gitignore
+!assets
+!indicators
+assets/*
+!assets/icon_192.png
+!assets/icon_512.png
+!assets/icon_1024.png
