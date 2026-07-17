@@ -5,9 +5,12 @@
 !manifest.json
 !.gitignore
 !assets
+!vendor
 !indicators
 !download
 assets/*
+vendor/*
+!vendor/three.min.js
 !assets/icon_192.png
 !assets/icon_512.png
 !assets/icon_1024.png

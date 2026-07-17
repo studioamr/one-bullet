@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ONE BULLET — Tradea conmigo. Una bala por sesión.</title>
-<meta name="description" content="El sistema que uso para pasar evaluaciones y cobrar payouts: una bala por sesión, 90 minutos al día. Acceso a tradear conmigo en vivo + la plataforma de escritorio. $14,000 MXN, pago único.">
+<title>SPOTTER — AI Trading Assistant · Aprende a operar conmigo, todos los días</title>
+<meta name="description" content="Una escuela de trading con mentor en vivo: aprende a operar futuros con cuentas de empresas fondeadoras — no con tu dinero. Clases diarias en la apertura de Nueva York, simulador, comunidad y torneos. $14,000 MXN, pago único.">
 <meta name="theme-color" content="#070709">
-<meta property="og:title" content="ONE BULLET — Tradea conmigo">
-<meta property="og:description" content="Una bala por sesión. De cero a tu primer payout. $14,000 MXN, de por vida.">
+<meta property="og:title" content="SPOTTER · AI Trading Assistant — Aprende. Opera. Cobra.">
+<meta property="og:description" content="Escuela de trading con mentor en vivo todos los días. $14,000 MXN, de por vida.">
 <style>
   :root{
     --bg:#070709; --panel:#0E0E12; --line:rgba(237,235,230,.09); --line2:rgba(237,235,230,.18);
@@ -26,6 +26,11 @@
   a{color:inherit;text-decoration:none}
   ::selection{background:var(--acc);color:#070709}
   #mkt{position:fixed;inset:0;z-index:0}
+#shade{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(120% 90% at 26% 42%,rgba(5,6,12,.52),transparent 56%),linear-gradient(to top,rgba(5,6,12,.55),transparent 26%)}
+#tape{position:fixed;left:0;right:0;bottom:0;z-index:1;pointer-events:none;background:rgba(9,9,13,.6);backdrop-filter:blur(5px);border-top:1px solid rgba(237,235,230,.08);overflow:hidden;white-space:nowrap;padding:9px 0;font:500 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#9c988e;letter-spacing:.06em;transition:opacity .3s}
+#tape .lbl{position:absolute;left:14px;top:-22px;color:#c9a24b;font-size:9.5px;letter-spacing:.14em;background:rgba(9,9,13,.75);padding:4px 9px;border-radius:3px}
+#tape .roll{display:inline-block;animation:tapeRoll 80s linear infinite;will-change:transform}
+@keyframes tapeRoll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
   .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
   .wrap{position:relative;z-index:2;width:min(1140px,100% - clamp(28px,7vw,110px));margin-inline:auto}
@@ -54,9 +59,9 @@
     display:inline-flex;align-items:center;gap:12px;margin-bottom:clamp(20px,4vw,36px)}
   .eyebrow .tick{width:6px;height:6px;border-radius:50%;background:var(--dn);animation:pulse 1.8s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
-  h1.display{font-size:clamp(3.4rem,13vw,10rem);line-height:.9;letter-spacing:-.035em;font-weight:700;text-transform:uppercase}
+  h1.display{font-size:clamp(3.2rem,12vw,9.4rem);line-height:.92;letter-spacing:-.035em;font-weight:700;text-transform:uppercase}
   h1.display em{font-style:italic;font-family:var(--serif);font-weight:400;color:var(--acc);text-transform:none;letter-spacing:-.01em}
-  .hero-sub{max-width:46ch;color:var(--dim);font-size:clamp(1.02rem,1.7vw,1.25rem);line-height:1.6;margin-top:clamp(24px,4vw,40px)}
+  .hero-sub{max-width:48ch;color:var(--dim);font-size:clamp(1.02rem,1.7vw,1.25rem);line-height:1.65;margin-top:clamp(24px,4vw,40px)}
   .hero-sub b{color:var(--text);font-weight:600}
   .hero-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px;align-items:center}
   .hero-price{font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;color:var(--faint)}
@@ -65,13 +70,13 @@
   @keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
 
   /* ---- scrollytelling chapters ---- */
-  .chapter{height:190vh;position:relative;z-index:2}
-  .ch-sticky{position:sticky;top:0;height:100svh;display:grid;place-items:center;text-align:center;padding:0 20px}
-  .ch-k{font-family:var(--mono);font-size:10.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--acc);display:block;margin-bottom:22px}
-  .ch-h{font-size:clamp(2.4rem,7.4vw,5.6rem);line-height:1;letter-spacing:-.03em;font-weight:700;text-transform:uppercase;max-width:16ch;margin:0 auto}
+  .chapter{height:260vh;position:relative;z-index:2}
+  .ch-sticky{position:sticky;top:0;height:100svh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 20px}
+  .ch-k{font-family:var(--mono);font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--acc);display:block;margin-bottom:14px}
+  .ch-h{font-size:clamp(2rem,5.6vw,4.2rem);line-height:1;letter-spacing:-.03em;font-weight:700;text-transform:uppercase;max-width:18ch;margin:0 auto}
   .ch-h em{font-style:italic;font-family:var(--serif);font-weight:400;text-transform:none;letter-spacing:-.01em}
   .ch-h em.red{color:var(--dn)} .ch-h em.blue{color:var(--acc)} .ch-h em.green{color:var(--up)} .ch-h em.gold{color:var(--gold)}
-  .ch-p{color:var(--dim);font-size:clamp(1rem,1.6vw,1.2rem);line-height:1.65;max-width:46ch;margin:24px auto 0}
+  .ch-p{color:var(--dim);font-size:clamp(.95rem,1.4vw,1.1rem);line-height:1.65;max-width:52ch;margin:18px auto 0}
   .ch-p b{color:var(--text);font-weight:600}
   .ch-h .w{display:inline-block;opacity:0;transform:translateY(30px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
   .in .ch-h .w{opacity:1;transform:none}
@@ -80,65 +85,173 @@
   .in .ch-h .w:nth-child(6){transition-delay:.3s}.in .ch-h .w:nth-child(7){transition-delay:.36s}
   .ch-p,.ch-k{opacity:0;transform:translateY(20px);transition:opacity .8s var(--ease) .3s,transform .8s var(--ease) .3s}
   .in .ch-p,.in .ch-k{opacity:1;transform:none}
+  /* tarjeta de capítulo: el copy SIEMPRE legible sobre cualquier escena */
+  .ch-inner{background:rgba(7,7,9,.66);backdrop-filter:blur(10px);border:1px solid var(--line);
+    border-radius:16px;padding:clamp(22px,3.5vw,38px) clamp(22px,4vw,52px);max-width:740px;
+    box-shadow:0 30px 80px rgba(0,0,0,.5);display:grid}
+  /* dos tiempos por capítulo: sale el título → el título se va → entra lo nuevo */
+  .beat-a,.beat-b{grid-area:1/1;transition:opacity .5s var(--ease),transform .5s var(--ease)}
+  .beat-b{opacity:0;transform:translateY(30px);pointer-events:none}
+  .chapter[data-beat="2"] .beat-a{opacity:0;transform:translateY(-30px) scale(.97);pointer-events:none}
+  .chapter[data-beat="2"] .beat-b{opacity:1;transform:none;transition-delay:.18s}
+  .chapter[data-beat="1"] .beat-a{transition-delay:.18s}
+  .beat-b .ch-p{opacity:1;transform:none;transition:none}
+  .beat-b .mk-chat{max-width:520px;margin:26px auto 0;text-align:left}
+  h1.display,.hero-sub,.eyebrow,.hero-price{text-shadow:0 2px 26px rgba(5,6,12,.9),0 1px 3px rgba(5,6,12,.95)}
+  .spot-hl{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:20px}
+  .spot-hl span{font-family:var(--mono);font-size:.7rem;letter-spacing:.05em;color:var(--acc2);
+    border:1px solid rgba(74,144,217,.35);background:rgba(74,144,217,.08);border-radius:99px;padding:7px 13px}
+  /* listas de errores / antídotos dentro del capítulo */
+  /* la oferta: cinco piezas del paquete */
+  .offer{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:38px}
+  @media(max-width:1020px){.offer{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.offer{grid-template-columns:1fr}}
+  .ocard{border:1px solid var(--line);border-radius:8px;background:rgba(14,14,18,.72);padding:22px 18px;
+    transition:border-color .3s,transform .4s var(--ease)}
+  .ocard:hover{border-color:rgba(74,144,217,.5);transform:translateY(-4px)}
+  .ocard .n{font-family:var(--mono);font-size:.68rem;color:var(--acc);letter-spacing:.16em;display:block;margin-bottom:10px}
+  .ocard b{display:block;font-size:1.02rem;margin-bottom:7px}
+  .ocard p{color:var(--dim);font-size:.84rem;line-height:1.55}
+  /* secuencias de las etapas: cada línea entra a su tiempo, grande */
+  .seq{display:flex;flex-direction:column;gap:13px;margin:24px auto 0;max-width:540px;text-align:left}
+  .seq .it{display:flex;gap:16px;align-items:baseline;font-size:clamp(1.02rem,1.6vw,1.26rem);line-height:1.45;color:var(--text);
+    opacity:.08;transform:translateY(14px);transition:opacity .55s var(--ease),transform .55s var(--ease)}
+  .seq .it i{font-style:normal;font-family:var(--mono);font-weight:700;flex:none;font-size:.95em}
+  .seq.bad .it i{color:var(--dn)} .seq.good .it i{color:var(--up)}
+  .seq .it b{font-weight:600}
+  .seq.bad .it b{color:#ffb3ad} .seq.good .it b{color:#8ee7c4}
+  .seq .it.on{opacity:1;transform:none}
+  .shots.two{grid-template-columns:1fr 1fr}
+  @media(max-width:900px){.shots.two{grid-template-columns:1fr}}
+  /* mock: chat del spotter */
+  .mk-chat{display:flex;flex-direction:column;gap:9px}
+  .mk-msg{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.82rem;color:var(--dim);line-height:1.5}
+  .mk-msg.ai{background:rgba(74,144,217,.08);border-color:rgba(74,144,217,.35)}
+  .mk-msg.ai b{color:var(--acc2);font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:4px}
+  .mk-msg.ok{border-color:rgba(8,153,129,.4);background:rgba(8,153,129,.07);color:var(--text)}
+  .mk-shot-thumb{display:flex;gap:4px;align-items:flex-end;height:36px;margin-top:8px;padding:6px;border:1px dashed rgba(74,144,217,.4);border-radius:6px}
+  .mk-shot-thumb i{flex:1;background:var(--up);border-radius:2px}
+  .mk-shot-thumb i.d{background:var(--dn)}
+  /* mock: duelo 1v1 */
+  .mk-duel{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:14px}
+  .mk-duel .pl{text-align:center;border:1px solid var(--line);border-radius:10px;padding:12px 8px}
+  .mk-duel .pl.win{border-color:rgba(8,153,129,.45)}
+  .mk-duel .pl b{display:block;font-size:.88rem;margin-bottom:4px}
+  .mk-duel .pl span{font-family:var(--serif);font-size:1.25rem}
+  .mk-duel .vs{font-family:var(--mono);color:var(--faint);font-size:.68rem;letter-spacing:.2em}
+  /* mock: plan por fases */
+  .mk-phases{display:flex;flex-direction:column;gap:8px}
+  .mk-ph{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:.8rem;color:var(--dim)}
+  .mk-ph b{color:var(--text)} .mk-ph .amt{font-family:var(--serif);color:var(--gold)}
+  .mk-ph.on{border-color:rgba(74,144,217,.5);background:rgba(74,144,217,.06)}
+  /* mock: reparto del pago */
+  .mk-split{display:flex;flex-direction:column;gap:10px}
+  .mk-sp{display:grid;grid-template-columns:88px 1fr auto;gap:10px;align-items:center;font-size:.78rem;color:var(--dim)}
+  .mk-sp .bar2{height:10px;border-radius:99px;background:rgba(237,235,230,.07);overflow:hidden}
+  .mk-sp .bar2 i{display:block;height:100%;border-radius:99px}
+  .mk-sp b{font-family:var(--serif);color:var(--text)}
 
   /* ---- sections ---- */
   section.block{position:relative;z-index:2;padding:clamp(90px,15vh,170px) 0}
   .sec-k{font-family:var(--mono);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--acc);display:block;margin-bottom:18px}
-  .sec-h{font-size:clamp(2.2rem,5.6vw,4rem);line-height:1;letter-spacing:-.025em;font-weight:700;margin-bottom:18px}
+  .sec-h{font-size:clamp(2.2rem,5.6vw,4rem);line-height:1.02;letter-spacing:-.025em;font-weight:700;margin-bottom:18px}
   .sec-h em{font-style:italic;font-family:var(--serif);font-weight:400;color:var(--acc)}
-  .sec-p{color:var(--dim);font-size:clamp(1rem,1.5vw,1.16rem);line-height:1.65;max-width:58ch}
+  .sec-p{color:var(--dim);font-size:clamp(1rem,1.5vw,1.16rem);line-height:1.7;max-width:58ch}
   .sec-p b{color:var(--text);font-weight:600}
   .reveal{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
   .reveal.in{opacity:1;transform:none}
 
-  /* tradea conmigo */
-  .with-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:40px}
+  /* mentor */
+  .mentor{display:grid;grid-template-columns:auto 1fr;gap:clamp(26px,5vw,60px);align-items:start;margin-top:14px}
+  @media(max-width:760px){.mentor{grid-template-columns:1fr}}
+  .m-face{width:clamp(120px,16vw,170px);height:clamp(120px,16vw,170px);border-radius:22px;flex:none;
+    display:grid;place-items:center;font-family:var(--serif);font-size:clamp(3.4rem,7vw,5rem);color:var(--text);
+    background:radial-gradient(130% 130% at 30% 20%,rgba(74,144,217,.4),rgba(14,14,18,.9));border:1px solid var(--line2)}
+  .with-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:34px}
   @media(max-width:820px){.with-grid{grid-template-columns:1fr}}
-  .wcard{border:1px solid var(--line);border-radius:6px;background:rgba(14,14,18,.72);backdrop-filter:blur(6px);padding:26px}
-  .wcard .n{font-family:var(--mono);font-size:11px;color:var(--acc);letter-spacing:.14em;margin-bottom:16px;display:block}
-  .wcard b{font-size:1.25rem;font-weight:600;display:block;margin-bottom:9px;letter-spacing:-.01em}
-  .wcard p{color:var(--dim);font-size:.92rem;line-height:1.6}
+  .wcard{border:1px solid var(--line);border-radius:6px;background:rgba(14,14,18,.72);backdrop-filter:blur(6px);padding:24px}
+  .wcard .n{font-family:var(--mono);font-size:10.5px;color:var(--acc);letter-spacing:.14em;margin-bottom:14px;display:block;text-transform:uppercase}
+  .wcard b{font-size:1.15rem;font-weight:600;display:block;margin-bottom:8px;letter-spacing:-.01em}
+  .wcard p{color:var(--dim);font-size:.9rem;line-height:1.6}
   .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--dn);margin-right:8px;animation:pulse 1.6s infinite}
 
-  /* app grid */
-  .app-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:40px}
-  @media(max-width:820px){.app-grid{grid-template-columns:1fr}}
-  .acell{background:var(--bg);padding:26px;transition:background .3s}
-  .acell:hover{background:var(--panel)}
-  .acell .k{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:12px}
-  .acell b{font-size:1.06rem;font-weight:600;display:block;margin-bottom:6px}
-  .acell p{color:var(--dim);font-size:.86rem;line-height:1.55}
+  /* ---- app showcase (mockups) ---- */
+  .shots{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:44px;align-items:start}
+  @media(max-width:900px){.shots{grid-template-columns:1fr}}
+  .shot{border:1px solid var(--line2);border-radius:10px;background:#0B0B0F;overflow:hidden;
+    box-shadow:0 30px 60px rgba(0,0,0,.5);transition:transform .5s var(--ease),border-color .3s}
+  .shot:hover{transform:translateY(-6px);border-color:rgba(74,144,217,.5)}
+  .shot .bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line)}
+  .shot .bar i{width:9px;height:9px;border-radius:50%;background:rgba(237,235,230,.14)}
+  .shot .bar i:first-child{background:rgba(242,54,69,.5)}
+  .shot .bar span{margin-left:auto;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+  .shot .body{padding:20px}
+  .shot .cap{padding:14px 18px;border-top:1px solid var(--line);color:var(--dim);font-size:.84rem;line-height:1.55}
+  .shot .cap b{color:var(--text)}
+  /* mock: sesión */
+  .mk-rules{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+  .mk-rule{border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center}
+  .mk-rule span{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:5px}
+  .mk-rule b{font-family:var(--serif);font-size:1.15rem;font-weight:400}
+  .mk-fire{display:block;width:100%;text-align:center;background:var(--acc);color:#070709;border:none;border-radius:8px;
+    padding:13px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+  .mk-note{margin-top:12px;font-size:.72rem;color:var(--faint);text-align:center}
+  /* mock: journal */
+  .mk-score{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+  .mk-ring{width:74px;height:74px;border-radius:50%;flex:none;display:grid;place-items:center;
+    background:conic-gradient(var(--acc) 0 75%,rgba(237,235,230,.08) 75% 100%)}
+  .mk-ring b{width:58px;height:58px;border-radius:50%;background:#0B0B0F;display:grid;place-items:center;
+    font-family:var(--serif);font-size:1.3rem;font-weight:400}
+  .mk-net{font-family:var(--serif);font-size:1.7rem;color:var(--up)}
+  .mk-net small{display:block;font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-top:3px}
+  .mk-bars{display:flex;gap:5px;align-items:flex-end;height:56px}
+  .mk-bars i{flex:1;border-radius:3px 3px 0 0;background:var(--up)}
+  .mk-bars i.d{background:var(--dn)}
+  /* mock: comunidad */
+  .mk-lane{margin-bottom:13px}
+  .mk-lane .who{display:flex;justify-content:space-between;font-size:.76rem;color:var(--dim);margin-bottom:6px}
+  .mk-lane .who b{color:var(--text)}
+  .mk-track{position:relative;height:22px;border-radius:999px;border:1px solid var(--line);
+    background:linear-gradient(90deg,rgba(201,162,75,.1),rgba(74,144,217,.1) 50%,rgba(8,153,129,.14))}
+  .mk-run{position:absolute;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;
+    display:grid;place-items:center;font-size:.5rem;font-weight:700;color:#070709}
 
-  /* mapa 4 fases */
-  .map-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px}
-  @media(max-width:960px){.map-grid{grid-template-columns:1fr 1fr}}
-  @media(max-width:600px){.map-grid{grid-template-columns:1fr}}
-  .mstep{border:1px solid var(--line);border-radius:6px;background:rgba(14,14,18,.72);padding:22px}
-  .mstep .fs{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc);margin-bottom:12px}
-  .mstep h4{font-size:1.35rem;font-weight:600;margin-bottom:14px}
-  .mstep .fr{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:.82rem}
-  .mstep .fr span{color:var(--faint);font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;align-self:center}
-  .mstep .fr b{font-weight:500;font-variant-numeric:tabular-nums;text-align:right}
-  .mstep .fr b.g{color:#3ddc84}
-  .fnote{margin-top:22px;color:var(--faint);font-size:.8rem;font-family:var(--mono);letter-spacing:.03em;line-height:1.7;max-width:88ch}
+  /* educación */
+  .edu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:38px}
+  @media(max-width:920px){.edu-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.edu-grid{grid-template-columns:1fr}}
+  .ecard{border:1px solid var(--line);border-radius:6px;background:rgba(14,14,18,.72);padding:22px}
+  .ecard .big{font-family:var(--serif);font-size:2rem;color:var(--acc);line-height:1;margin-bottom:12px}
+  .ecard b{font-size:1rem;display:block;margin-bottom:7px}
+  .ecard p{color:var(--dim);font-size:.86rem;line-height:1.6}
+
+  /* camino (3 pasos) */
+  .path{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:14px;align-items:stretch;margin-top:40px}
+  @media(max-width:820px){.path{grid-template-columns:1fr}.path .arr{transform:rotate(90deg);justify-self:center}}
+  .pstep{border:1px solid var(--line);border-radius:6px;background:rgba(14,14,18,.72);padding:26px;text-align:center}
+  .pstep .n{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--acc);text-transform:uppercase;display:block;margin-bottom:12px}
+  .pstep b{font-size:1.3rem;display:block;margin-bottom:10px}
+  .pstep p{color:var(--dim);font-size:.9rem;line-height:1.6}
+  .path .arr{font-family:var(--serif);font-size:1.8rem;color:var(--faint);align-self:center}
+  .fnote{margin-top:24px;color:var(--faint);font-size:.8rem;font-family:var(--mono);letter-spacing:.03em;line-height:1.7;max-width:88ch}
 
   /* precio */
-  .price-wrap{max-width:660px;margin:0 auto;text-align:center}
-  .price-card{border:1px solid var(--acc);border-radius:10px;background:linear-gradient(180deg,rgba(74,144,217,.09),rgba(14,14,18,.9) 60%);
+  .price-wrap{max-width:680px;margin:0 auto;text-align:center}
+  .price-card{border:1px solid var(--acc);border-radius:10px;background:linear-gradient(180deg,rgba(74,144,217,.09),rgba(14,14,18,.92) 60%);
     padding:clamp(34px,6vw,60px);backdrop-filter:blur(8px)}
   .p-k{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--acc);margin-bottom:22px}
   .p-amount{font-size:clamp(3.2rem,9vw,5.6rem);font-weight:700;letter-spacing:-.04em;line-height:1}
   .p-amount small{font-size:.32em;font-weight:600;letter-spacing:.06em;color:var(--dim);vertical-align:super}
-  .p-sub{color:var(--dim);font-size:.9rem;margin:14px 0 30px;font-family:var(--mono);letter-spacing:.05em}
-  .p-list{list-style:none;text-align:left;max-width:430px;margin:0 auto 30px;display:flex;flex-direction:column;gap:12px}
-  .p-list li{display:flex;gap:12px;align-items:baseline;color:var(--dim);font-size:.96rem;line-height:1.5}
-  .p-list li::before{content:"→";color:var(--acc);font-family:var(--mono);flex:none}
-  .p-list li b{color:var(--text);font-weight:600}
-  .p-fine{margin-top:22px;color:var(--faint);font-family:var(--mono);font-size:.74rem;letter-spacing:.04em;line-height:1.7}
-  .p-anchor{margin:0 auto 30px;max-width:46ch;color:var(--dim);font-size:.95rem;line-height:1.6}
+  .p-sub{color:var(--dim);font-size:.9rem;margin:14px 0 28px;font-family:var(--mono);letter-spacing:.05em}
+  .p-anchor{margin:0 auto 30px;max-width:48ch;color:var(--dim);font-size:.98rem;line-height:1.65}
   .p-anchor b{color:var(--text)}
+  .p-list{list-style:none;text-align:left;max-width:460px;margin:0 auto 30px;display:flex;flex-direction:column;gap:12px}
+  .p-list li{display:flex;gap:12px;align-items:baseline;color:var(--dim);font-size:.96rem;line-height:1.55}
+  .p-list li::before{content:"✓";color:var(--up);font-family:var(--mono);flex:none;font-weight:700}
+  .p-list li b{color:var(--text);font-weight:600}
+  .p-fine{margin-top:22px;color:var(--faint);font-family:var(--mono);font-size:.74rem;letter-spacing:.04em;line-height:1.8}
 
-  /* lista / en vivos */
+  /* lista */
   .list-card{max-width:620px;margin:0 auto;text-align:center}
   .reg-form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:28px}
   .reg-form input{background:var(--panel);border:1px solid var(--line2);border-radius:2px;color:var(--text);
@@ -147,6 +260,65 @@
   .reg-ok{font-size:1rem;color:var(--dim);line-height:1.6;padding:20px 0}
   .reg-ok b{color:var(--text)}
 
+  /* dolores del trader frustrado */
+  .pains{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:38px}
+  @media(max-width:900px){.pains{grid-template-columns:1fr}}
+  .pain{border:1px solid var(--line);border-left:3px solid var(--dn);border-radius:6px;background:rgba(14,14,18,.72);padding:20px;color:var(--dim);font-size:.94rem;line-height:1.6}
+  .pain b{color:var(--text)}
+  .pains-close{margin-top:28px;font-size:1.08rem;color:var(--text);max-width:52ch}
+  .pains-close b{color:var(--acc2)}
+  /* perder vs ganar */
+  .versus{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:38px}
+  @media(max-width:820px){.versus{grid-template-columns:1fr}}
+  .vs-col{border:1px solid var(--line);border-radius:10px;padding:26px;background:rgba(14,14,18,.72)}
+  .vs-col.bad{border-color:rgba(242,54,69,.35)}
+  .vs-col.good{border-color:rgba(8,153,129,.4);background:linear-gradient(180deg,rgba(8,153,129,.06),rgba(14,14,18,.8))}
+  .vs-col h3{font-size:1.2rem;margin-bottom:16px}
+  .vs-col.bad h3{color:var(--dn)} .vs-col.good h3{color:var(--up)}
+  .vs-col ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+  .vs-col li{display:flex;gap:11px;color:var(--dim);font-size:.93rem;line-height:1.55;align-items:baseline}
+  .vs-col li::before{font-family:var(--mono);font-weight:700;flex:none}
+  .vs-col.bad li::before{content:"✗";color:var(--dn)}
+  .vs-col.good li::before{content:"✓";color:var(--up)}
+  .vs-col li b{color:var(--text)}
+  /* la historia del mentor */
+  .story{display:flex;flex-direction:column;margin-top:34px;max-width:660px}
+  .st{display:grid;grid-template-columns:24px 1fr;gap:16px;padding:0 0 26px;position:relative}
+  .st::before{content:"";position:absolute;left:11px;top:26px;bottom:2px;width:1px;background:var(--line2)}
+  .st:last-child::before{display:none}
+  .st i{width:24px;height:24px;border-radius:50%;border:1px solid var(--line2);background:var(--panel);display:grid;place-items:center;font-size:.58rem;font-family:var(--mono);font-style:normal;color:var(--acc)}
+  .st.red i{border-color:rgba(242,54,69,.55);color:var(--dn)}
+  .st.gold i{border-color:rgba(201,162,75,.6);color:var(--gold)}
+  .st.green i{border-color:rgba(8,153,129,.6);color:var(--up)}
+  .st b{display:block;margin-bottom:4px}
+  .st p{color:var(--dim);font-size:.93rem;line-height:1.65}
+  /* primera semana */
+  .week{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:36px}
+  @media(max-width:900px){.week{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.week{grid-template-columns:1fr}}
+  .day{border:1px solid var(--line);border-radius:6px;background:rgba(14,14,18,.72);padding:20px}
+  .day .n{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--acc);text-transform:uppercase;display:block;margin-bottom:9px}
+  .day b{display:block;margin-bottom:6px;font-size:.98rem}
+  .day p{color:var(--dim);font-size:.84rem;line-height:1.55}
+  /* preguntas directas */
+  .faq{max-width:760px;margin:36px auto 0;display:flex;flex-direction:column;gap:10px}
+  .faq details{border:1px solid var(--line);border-radius:8px;background:rgba(14,14,18,.72);padding:0 20px;transition:border-color .3s}
+  .faq details[open]{border-color:rgba(74,144,217,.4)}
+  .faq summary{cursor:pointer;list-style:none;padding:17px 0;font-weight:600;font-size:.98rem;display:flex;justify-content:space-between;align-items:center;gap:14px}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+";font-family:var(--mono);color:var(--acc);font-size:1.15rem;transition:transform .3s;flex:none}
+  .faq details[open] summary::after{transform:rotate(45deg)}
+  .faq .a{color:var(--dim);font-size:.92rem;line-height:1.65;padding:0 0 18px}
+  .faq .a b{color:var(--text)}
+  /* el cierre: dos caminos */
+  .fork{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:38px}
+  @media(max-width:760px){.fork{grid-template-columns:1fr}}
+  .fk{border:1px solid var(--line);border-radius:10px;padding:28px;background:rgba(14,14,18,.72)}
+  .fk.b{border-color:rgba(74,144,217,.5);background:linear-gradient(180deg,rgba(74,144,217,.09),rgba(14,14,18,.82))}
+  .fk .t{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:12px}
+  .fk.b .t{color:var(--acc)}
+  .fk p{color:var(--dim);line-height:1.65;font-size:.96rem}
+  .fk p b{color:var(--text)}
   footer{border-top:1px solid var(--line);padding:40px 0;position:relative;z-index:2}
   .foot-in{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
   .foot-links{display:flex;gap:22px;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
@@ -157,152 +329,348 @@
 </head>
 <body>
 <canvas id="mkt" aria-hidden="true"></canvas>
+<div id="shade" aria-hidden="true"></div>
+<div id="tape" aria-hidden="true"><span class="lbl">HISTORIA REAL DEL MERCADO</span><div class="roll"><span>1987 · LUNES NEGRO: EL DOW CAE 22.6% EN UN DÍA &nbsp;·&nbsp; 2008 · QUIEBRA LEHMAN BROTHERS &nbsp;·&nbsp; 2010 · PAGAN UNA PIZZA CON 10,000 BITCOINS &nbsp;·&nbsp; 2018 · SPACEX LANZA UN TESLA AL ESPACIO 🚀 &nbsp;·&nbsp; 2020 · COVID: EL DOW CAE 2,997 PUNTOS EN UN DÍA &nbsp;·&nbsp; 2020 · TESLA SUBE +743% EN EL AÑO &nbsp;·&nbsp; 2021 · GAMESTOP +1,700% EN UN MES &nbsp;·&nbsp; 2021 · BITCOIN TOCA $69,000 &nbsp;·&nbsp; 2024 · NVIDIA VALE 3 BILLONES DE DÓLARES &nbsp;·&nbsp; </span><span>1987 · LUNES NEGRO: EL DOW CAE 22.6% EN UN DÍA &nbsp;·&nbsp; 2008 · QUIEBRA LEHMAN BROTHERS &nbsp;·&nbsp; 2010 · PAGAN UNA PIZZA CON 10,000 BITCOINS &nbsp;·&nbsp; 2018 · SPACEX LANZA UN TESLA AL ESPACIO 🚀 &nbsp;·&nbsp; 2020 · COVID: EL DOW CAE 2,997 PUNTOS EN UN DÍA &nbsp;·&nbsp; 2020 · TESLA SUBE +743% EN EL AÑO &nbsp;·&nbsp; 2021 · GAMESTOP +1,700% EN UN MES &nbsp;·&nbsp; 2021 · BITCOIN TOCA $69,000 &nbsp;·&nbsp; 2024 · NVIDIA VALE 3 BILLONES DE DÓLARES &nbsp;·&nbsp; </span></div></div>
 <div class="grain" aria-hidden="true"></div>
 
 <nav class="top" id="topnav"><div class="wrap nav-in">
-  <div class="brand">ONE <i>BULLET</i></div>
+  <div class="brand">SPOTTER <i>AI</i></div>
   <div class="nav-links">
-    <a href="#historia">La historia</a><a href="#conmigo">Tradea conmigo</a><a href="#app">La app</a><a href="#mapa">El mapa</a><a href="#precio">Precio</a>
+    <a href="#historia">La historia</a><a href="#oferta">La oferta</a><a href="#mentor">Tu mentor</a><a href="#spotter">El software</a><a href="#precio">Precio</a>
   </div>
-  <div class="nav-r"><a class="btn acc" href="#precio">Quiero mi lugar</a></div>
+  <div class="nav-r"><a class="btn acc" href="#precio">Quiero entrar</a></div>
 </div></nav>
 
 <!-- HERO -->
 <header class="hero"><div class="wrap">
-  <div class="eyebrow reveal"><span class="tick"></span>En vivo cada apertura de Nueva York</div>
-  <h1 class="display reveal">Una bala.<br>Un <em>payout.</em></h1>
-  <p class="hero-sub reveal">El mercado no te está esperando. Yo tampoco esperé: <b>una bala por sesión, 90 minutos al día</b>, y las prop firms me pagan. Este es el sistema completo — y vas a tradearlo <b>conmigo, en vivo</b>.</p>
+  <div class="eyebrow reveal"><span class="tick"></span>En vivo · cada mañana en la apertura de Nueva York · 7:00 AM</div>
+  <h1 class="display reveal">Aprende.<br>Opera. <em>Cobra.</em></h1>
+  <p class="hero-sub reveal">Aprende a operar futuros con el <b>dinero de empresas fondeadoras — no el tuyo</b>. Mentor en vivo, la plataforma <b>Spotter AI</b> y una comunidad activa. Un pago, acceso de por vida.</p>
   <div class="hero-cta reveal">
-    <a class="btn acc lg" href="#precio">Entrar por $14,000 MXN →</a>
-    <span class="hero-price">pago único · de por vida</span>
+    <a class="btn acc lg" href="#precio">Inscribirme · $14,000 MXN →</a>
+    <span class="hero-price">pago único · acceso de por vida</span>
   </div>
 </div>
-<div class="hero-scroll">baja — te cuento la historia</div>
+<div class="hero-scroll">baja — te cuento cómo funciona</div>
 </header>
 
-<!-- CAP 1 · el mercado no perdona -->
-<section class="chapter" id="historia" data-ch="1"><div class="ch-sticky"><div class="ch-inner">
-  <span class="ch-k">Capítulo 01</span>
-  <h2 class="ch-h"><span class="w">El</span> <span class="w">mercado</span> <span class="w">no</span> <span class="w"><em class="red">perdona.</em></span></h2>
-  <p class="ch-p">No perdiste tus cuentas por la estrategia. Las perdiste por la <b>cuarta revancha</b> — ese trade que tomaste caliente, sin plan, para "recuperar". Todos lo hemos hecho. El mercado vive de eso.</p>
+<!-- ETAPA 1 -->
+<section class="chapter" id="historia" data-ch="1" data-beat="1"><div class="ch-sticky"><div class="ch-inner">
+  <div class="beat-a">
+    <span class="ch-k">Etapa 1 · la verdad</span>
+    <h2 class="ch-h"><span class="w">Así</span> <span class="w">se</span> <span class="w"><em class="red">pierde.</em></span></h2>
+  </div>
+  <div class="beat-b">
+    <p class="ch-p">No pierdes por falta de talento. Pierdes por esto — y le pasa al <b>90%</b>:</p>
+    <div class="seq bad">
+      <div class="it"><i>✗</i><span>Operar <b>sin un plan</b> escrito</span></div>
+      <div class="it"><i>✗</i><span>No poner un <b>límite de pérdida</b></span></div>
+      <div class="it"><i>✗</i><span>Querer <b>vengarte</b> del mercado</span></div>
+      <div class="it"><i>✗</i><span>Operar <b>todo el día</b>, sin parar</span></div>
+      <div class="it"><i>✗</i><span>Copiar <b>señales que no entiendes</b></span></div>
+      <div class="it"><i>✗</i><span>No anotar nada — <b>no aprender nada</b></span></div>
+    </div>
+  </div>
 </div></div></section>
 
-<!-- CAP 2 · una regla -->
-<section class="chapter" data-ch="2"><div class="ch-sticky"><div class="ch-inner">
-  <span class="ch-k">Capítulo 02</span>
-  <h2 class="ch-h"><span class="w">Una</span> <span class="w">regla</span> <span class="w">lo</span> <span class="w">cambia</span> <span class="w"><em class="blue">todo.</em></span></h2>
-  <p class="ch-p"><b>Una bala por sesión.</b> Un solo trade planeado: Opening Range Breakout hacia la liquidez de Asia y Londres, dentro de la killzone de Nueva York. Si no es tu A+, no disparas. El caos se vuelve orden.</p>
+<!-- ETAPA 2 -->
+<section class="chapter" data-ch="2" data-beat="1"><div class="ch-sticky"><div class="ch-inner">
+  <div class="beat-a">
+    <span class="ch-k">Etapa 2 · la salida</span>
+    <h2 class="ch-h"><span class="w">Así</span> <span class="w">se</span> <span class="w"><em class="green">gana.</em></span></h2>
+  </div>
+  <div class="beat-b">
+    <p class="ch-p">No es suerte ni un truco. Es justo lo contrario, repetido <b>cada mañana</b>:</p>
+    <div class="seq good">
+      <div class="it"><i>✓</i><span>Un <b>plan escrito</b> antes de abrir</span></div>
+      <div class="it"><i>✓</i><span>Un <b>límite</b> que no se negocia</span></div>
+      <div class="it"><i>✓</i><span><b>Una operación al día</b> — la mejor, o ninguna</span></div>
+      <div class="it"><i>✓</i><span>Un <b>diario</b> de cada operación</span></div>
+      <div class="it"><i>✓</i><span>Un <b>mentor</b> que ya recorrió el camino</span></div>
+    </div>
+  </div>
 </div></div></section>
 
-<!-- CAP 3 · el disparo -->
-<section class="chapter" data-ch="3"><div class="ch-sticky"><div class="ch-inner">
-  <span class="ch-k">Capítulo 03</span>
-  <h2 class="ch-h"><span class="w">El</span> <span class="w"><em class="green">disparo.</em></span></h2>
-  <p class="ch-p">Cuando todo se alinea, disparas <b>una vez</b>. ¿Ganaste? Cierras la plataforma en verde. ¿Perdiste? Mañana hay otra sesión — sin revancha, sin sangrar la cuenta. Así se pasa una evaluación en 3 días.</p>
-</div></div></section>
-
-<!-- CAP 4 · la subida -->
-<section class="chapter" data-ch="4"><div class="ch-sticky"><div class="ch-inner">
-  <span class="ch-k">Capítulo 04</span>
-  <h2 class="ch-h"><span class="w">De</span> <span class="w">cero</span> <span class="w">al</span> <span class="w"><em class="gold">Edén.</em></span></h2>
-  <p class="ch-p">Pasas el eval → te fondean → llegas al <b>Edén: la zona donde retiras dinero cada ciclo</b> (~10 días hábiles). Y cada payout financia la siguiente tanda de cuentas. Eso es escalar.</p>
-</div></div></section>
-
-<!-- TRADEA CONMIGO -->
-<section class="block" id="conmigo"><div class="wrap">
-  <span class="sec-k reveal">La diferencia</span>
-  <h2 class="sec-h reveal">No compras un curso.<br>Entras a <em>mi mesa.</em></h2>
-  <p class="sec-p reveal">Los cursos te dejan solo con 40 videos. Aquí <b>tradeas conmigo</b>: cada mañana tomo la apertura de Nueva York en vivo, marco mis zonas, tomo mi bala y la documento — ganada o perdida. Tú operas a mi lado hasta que el sistema sea tuyo.</p>
-  <div class="with-grid reveal">
-    <div class="wcard"><span class="n"><span class="live-dot"></span>01 · EN VIVO</span><b>La apertura de NY, juntos</b><p>Premarket 7:00, sesgo del día, zonas marcadas y la bala en tiempo real. No es grabación: es mi cuenta, en vivo.</p></div>
-    <div class="wcard"><span class="n">02 · MIS TRADES</span><b>Cada trade, documentado</b><p>Subo mis entradas, mis stops y mis resultados — los verdes y los rojos. Sin cherry-picking: el journal completo.</p></div>
-    <div class="wcard"><span class="n">03 · LA SALA</span><b>La comunidad que escala</b><p>Sesgo diario, la carrera al payout entre miembros, retos 1v1 y una sala que te empuja a sellar tu disciplina.</p></div>
+<!-- LA OFERTA -->
+<section class="block" id="oferta"><div class="wrap">
+  <span class="sec-k reveal">Lo que estás comprando en realidad</span>
+  <h2 class="sec-h reveal">No es un curso.<br>Es <em>el paquete completo.</em></h2>
+  <p class="sec-p reveal">Cinco piezas que trabajan juntas — todo lo que necesitas para pasar de cero a tu primer pago:</p>
+  <div class="offer reveal">
+    <a class="ocard" href="#mentor"><span class="n">01 · TU MENTOR</span><b>Mentor en vivo</b><p>Trading en vivo cada mañana, con las operaciones del día publicadas sin filtro — las buenas y las malas.</p></a>
+    <a class="ocard" href="#sistema"><span class="n">02 · EL SISTEMA</span><b>Un método probado</b><p>Reglas simples que caben en una tarjeta — y por eso se cumplen.</p></a>
+    <a class="ocard" href="#spotter"><span class="n">03 · EL SOFTWARE</span><b>La plataforma</b><p>Software de escritorio para traders — con Spotter AI, tu copiloto de IA, adentro.</p></a>
+    <a class="ocard" href="#comunidad"><span class="n">04 · LA COMUNIDAD</span><b>No estás solo</b><p>Sala en vivo, torneos 1 contra 1 y la carrera al primer pago.</p></a>
+    <a class="ocard" href="#extras"><span class="n">05 · EL PLAN</span><b>El mapa completo</b><p>Del simulador a cobrar — y qué hacer con cada pago.</p></a>
   </div>
 </div></section>
 
-<!-- LA APP -->
+<!-- MENTOR -->
+<section class="block" id="mentor"><div class="wrap">
+  <span class="sec-k reveal">Lo que recibes · 01 — el mentor</span>
+  <h2 class="sec-h reveal">No estudias solo.<br>Operas <em>conmigo.</em></h2>
+  <div class="mentor reveal">
+    <div class="m-face">A</div>
+    <div>
+      <p class="sec-p">Soy <b>André</b>, trader de futuros. No soy un gurú con un Lamborghini rentado: <b>yo fui el de la pantalla en rojo</b>, y salí. Por eso puedo enseñarte a hacerlo.</p>
+      <div class="story reveal">
+        <div class="st red"><i>01</i><div><b>El trader frustrado</b><p>Operaba por impulso, con el corazón. Ganaba tres días y lo devolvía en uno. Probé indicadores, señales, hasta un robot que operaba solo — y los números no mintieron: nada de eso funcionaba.</p></div></div>
+        <div class="st gold"><i>02</i><div><b>El punto de quiebre</b><p>Dejé de buscar atajos. Una sola operación al día, reglas escritas antes de abrir el mercado, un límite que no se negocia y un diario de cada operación. Aburrido — y fue lo primero que funcionó.</p></div></div>
+        <div class="st green"><i>03</i><div><b>El otro lado</b><p>Con disciplina llegaron los exámenes de las fondeadoras y las cuentas que no eran mi dinero. Hoy opero la apertura de Nueva York cada mañana y <b>publico todas mis operaciones — las buenas y las malas</b>, sin filtro.</p></div></div>
+        <div class="st"><i>04</i><div><b>Por eso existe esto</b><p>Construí la plataforma y el método que me hubieran ahorrado años y dinero. Ahora te acompaño cada mañana, hasta que lo hagas tú solo.</p></div></div>
+      </div>
+      <div class="with-grid">
+        <div class="wcard"><span class="n"><span class="live-dot"></span>En vivo diario</span><b>La apertura, juntos</b><p>Todos los días a las 7:00 AM (NY): análisis del día, el plan, y la operación en tiempo real.</p></div>
+        <div class="wcard"><span class="n">Clases recurrentes</span><b>Escuela paso a paso</b><p>El curso completo en video dentro de la app + clases semanales para resolver tus dudas en vivo.</p></div>
+        <div class="wcard"><span class="n">Comunidad activa</span><b>Eventos y torneos</b><p>Retos 1 contra 1 en mercados históricos, tabla de posiciones, eventos en vivo y una sala que no te deja rendirte.</p></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- EL SISTEMA -->
+<section class="block" id="sistema"><div class="wrap">
+  <span class="sec-k reveal">Lo que recibes · 02 — el sistema</span>
+  <h2 class="sec-h reveal">Un sistema simple. <em>Que sí se cumple.</em></h2>
+  <p class="sec-p reveal">Nada de veinte indicadores ni señales mágicas. Un método probado que cabe en una tarjeta — el detalle exacto lo aprendes adentro, paso a paso:</p>
+  <div class="edu-grid reveal">
+    <div class="ecard"><div class="big">◇</div><b>Simple</b><p>Cabe en una tarjeta. Fácil de entender, fácil de repetir cada mañana — por eso funciona.</p></div>
+    <div class="ecard"><div class="big">◇</div><b>Con reglas claras</b><p>Sabes qué hacer antes de que abra el mercado. Decides en frío, ejecutas en caliente.</p></div>
+    <div class="ecard"><div class="big">◇</div><b>Sin dramas</b><p>Pensado para perder pequeño cuando toca — y nunca devolver una semana buena en una tarde mala.</p></div>
+    <div class="ecard"><div class="big">◇</div><b>Que se enseña</b><p>En video y en vivo, paso a paso, hasta que lo ejecutas tú solo. El método completo, adentro.</p></div>
+  </div>
+</div></section>
+
+<!-- EL SPOTTER -->
+<section class="block" id="spotter"><div class="wrap">
+  <span class="sec-k reveal">Lo que recibes · 03 — el software</span>
+  <h2 class="sec-h reveal">Software para traders — <em>con IA adentro.</em></h2>
+  <p class="sec-p reveal">Una <b>aplicación de escritorio completa para traders</b> — sesión guiada, diario, simulador, entrenador. Y su joya es el Spotter: mientras tú operas, <b>ve tu pantalla</b>, captura tus operaciones, te habla con voz y <b>escribe todo por ti</b>. Al cerrar, tu diario ya está lleno.</p>
+  <div class="shots two reveal">
+    <div class="shot">
+      <div class="bar"><i></i><i></i><i></i><span>Durante la sesión</span></div>
+      <div class="body"><div class="mk-chat">
+        <div class="mk-msg ai"><b>● Spotter</b>Apertura de Nueva York en 5 minutos. Tu plan de hoy está listo y tu límite, fijado.</div>
+        <div class="mk-msg ai"><b>● Spotter</b>Entraste. Capturé tu operación 📸<div class="mk-shot-thumb"><i style="height:40%"></i><i style="height:65%"></i><i class="d" style="height:30%"></i><i style="height:80%"></i><i style="height:95%"></i></div></div>
+        <div class="mk-msg ai"><b>● Spotter</b>Llegaste a tu objetivo. Buen trabajo — cierro el resumen.</div>
+      </div></div>
+      <div class="cap"><b>Te acompaña en vivo.</b> Toma capturas de pantalla de cada operación y arma el resumen mientras tú te concentras en operar.</div>
+    </div>
+    <div class="shot">
+      <div class="bar"><i></i><i></i><i></i><span>Al terminar</span></div>
+      <div class="body"><div class="mk-chat">
+        <div class="mk-msg ok">✓ Resumen de la operación guardado</div>
+        <div class="mk-msg ok">✓ Capturas anexadas al diario</div>
+        <div class="mk-msg ok">✓ Diario del día llenado — no escribiste nada</div>
+        <div class="mk-msg ai"><b>● Spotter</b>Sesión cerrada: +$180, plan respetado. Nos vemos mañana a las 7:00 AM.</div>
+      </div></div>
+      <div class="cap"><b>Tu diario se llena solo.</b> Lo que a otros les toma 30 minutos de escribir, aquí queda registrado automáticamente al cerrar la sesión.</div>
+    </div>
+  </div>
+  <div class="fnote reveal">El Spotter usa tu propia cuenta de Claude (inteligencia artificial de Anthropic, ~$20 USD/mes, se contrata aparte). Es opcional: la plataforma completa funciona sin él.</div>
+</div></section>
+
+<!-- JOURNAL + AI COACH -->
 <section class="block" id="app"><div class="wrap">
-  <span class="sec-k reveal">La plataforma</span>
-  <h2 class="sec-h reveal">Una app de escritorio que <em>no te deja romperte.</em></h2>
-  <p class="sec-p reveal">Instalable, tuya de por vida. Corre tu sesión en 3 fases, registra cada trade en un journal de nivel profesional, y te coachea con tus propios datos.</p>
-  <div class="app-grid reveal">
-    <div class="acell"><div class="k">Sesión</div><b>Una bala · 3 fases</b><p>Disparas, sellas GANADA o PERDIDA, y recibes tu resumen. Tus reglas, fijadas en frío antes de la apertura.</p></div>
-    <div class="acell"><div class="k">Práctica</div><b>Cuenta SIM</b><p>$50K virtuales para entrenar la rutina completa cualquier día — sin tocar tu progreso real.</p></div>
-    <div class="acell"><div class="k">Journal</div><b>Bullet Score</b><p>Radar de tu disciplina, win rate, profit factor, curva de equity y calendario P&L. Tu verdad, medida.</p></div>
-    <div class="acell"><div class="k">IA</div><b>AI Coach + Spotter</b><p>Aprende de cada trade que registras y convierte tu historial en reglas. El Spotter vigila tu pantalla en vivo con tu propio Claude.</p></div>
-    <div class="acell"><div class="k">Curso</div><b>TJR Boot Camp · 30 días</b><p>La serie pública completa de TJR curada en orden: un día, una lección, aplicada en tu siguiente sesión.</p></div>
-    <div class="acell"><div class="k">Batallas</div><b>1v1 · mismo replay</b><p>Mismo mercado histórico, mismo capital: el mejor P&L se lleva el Elo. Demuestra el edge.</p></div>
+  <span class="sec-k reveal">El software · tu diario y tu entrenador</span>
+  <h2 class="sec-h reveal">Tu diario y tu <em>entrenador personal.</em></h2>
+  <p class="sec-p reveal">Cada operación queda registrada con números reales. Y un <b>entrenador de inteligencia artificial</b> los estudia y te dice — con datos, no con opiniones — qué estás haciendo bien y qué te está costando dinero.</p>
+  <div class="shots two reveal">
+    <div class="shot">
+      <div class="bar"><i></i><i></i><i></i><span>Tu diario</span></div>
+      <div class="body">
+        <div class="mk-score">
+          <div class="mk-ring"><b>75</b></div>
+          <div class="mk-net">+$620<small>ganancia del mes</small></div>
+        </div>
+        <div class="mk-bars"><i style="height:40%"></i><i style="height:62%"></i><i class="d" style="height:30%"></i><i style="height:75%"></i><i style="height:52%"></i><i class="d" style="height:24%"></i><i style="height:88%"></i><i style="height:66%"></i></div>
+      </div>
+      <div class="cap"><b>Tu boleta de calificaciones.</b> Disciplina, rachas y un calendario con tu resultado de cada día — todo medido y a la vista, como un estado de cuenta.</div>
+    </div>
+    <div class="shot">
+      <div class="bar"><i></i><i></i><i></i><span>Tu entrenador</span></div>
+      <div class="body"><div class="mk-chat">
+        <div class="mk-msg ai"><b>● Coach</b>Analicé tus últimas 20 operaciones. Cuando respetas tu plan, ganas el 68% de las veces.</div>
+        <div class="mk-msg ai"><b>● Coach</b>Tu error más caro: entrar tarde los lunes. Te ha costado $340 este mes.</div>
+        <div class="mk-msg ok">Sugerencia: esta semana, solo opera tu señal exacta. Yo te aviso si te desvías.</div>
+      </div></div>
+      <div class="cap"><b>Consejos con tus propios números.</b> El entrenador lee tu diario y convierte tus datos en instrucciones claras para mejorar.</div>
+    </div>
   </div>
 </div></section>
 
-<!-- EL MAPA -->
-<section class="block" id="mapa"><div class="wrap">
-  <span class="sec-k reveal">El mapa de escalado</span>
-  <h2 class="sec-h reveal">Cuatro fases. <em>Un plan.</em></h2>
-  <p class="sec-p reveal">Cada fase financia la siguiente. "Red Pill" y "50K" son las cuentas de evaluación de las firmas. Un ciclo corre ~10 días hábiles.</p>
-  <div class="map-grid reveal">
-    <div class="mstep"><div class="fs">Fase 1 · Tradeify</div><h4>×1 Red Pill</h4>
-      <div class="fr"><span>Costo</span><b>$1,750</b></div><div class="fr"><span>Proceso</span><b>3d eval + 2d buffer</b></div><div class="fr"><span>Primer pago</span><b class="g">$17,500</b></div></div>
-    <div class="mstep"><div class="fs">Fase 2 · Tradeify</div><h4>×5 Red Pills</h4>
-      <div class="fr"><span>Costo</span><b>$8,800</b></div><div class="fr"><span>Proceso</span><b>3d eval + 2d buffer</b></div><div class="fr"><span>Primer pago</span><b class="g">$80,000</b></div></div>
-    <div class="mstep"><div class="fs">Fase 3 · Apex</div><h4>×20 50Ks</h4>
-      <div class="fr"><span>Costo</span><b>$37,500</b></div><div class="fr"><span>Proceso</span><b>1–3d + 2–5d</b></div><div class="fr"><span>Primer pago</span><b class="g">$700,000</b></div></div>
-    <div class="mstep"><div class="fs">Fase 4 · 3 firmas</div><h4>×30 50Ks</h4>
-      <div class="fr"><span>Costo</span><b>$55,000</b></div><div class="fr"><span>Proceso</span><b>1–3d + 2–5d</b></div><div class="fr"><span>Primer pago</span><b class="g">$945,000</b></div></div>
+<!-- COMUNIDAD -->
+<section class="block" id="comunidad"><div class="wrap">
+  <span class="sec-k reveal">Lo que recibes · 04 — la comunidad</span>
+  <h2 class="sec-h reveal">Nadie llega solo. <em>Tú tampoco.</em></h2>
+  <p class="sec-p reveal">La disciplina se entrena mejor acompañado. Ves a todos avanzar en tiempo real — y eso <b>te jala hacia adelante</b> los días que quieres rendirte.</p>
+  <div class="shots two reveal">
+    <div class="shot">
+      <div class="bar"><i></i><i></i><i></i><span>Duelos 1 contra 1</span></div>
+      <div class="body">
+        <div class="mk-duel">
+          <div class="pl win"><b>Tú</b><span style="color:var(--up)">+$430</span></div>
+          <span class="vs">VS</span>
+          <div class="pl"><b>Marco</b><span style="color:var(--dn)">−$120</span></div>
+        </div>
+        <div class="mk-note">Mismo mercado histórico · mismo capital · gana el más disciplinado</div>
+      </div>
+      <div class="cap"><b>Retos 1 contra 1.</b> Los dos operan el mismo día histórico del mercado con el mismo dinero virtual. Gana quien opere mejor — y subes en la tabla.</div>
+    </div>
+    <div class="shot">
+      <div class="bar"><i></i><i></i><i></i><span>La carrera al primer pago</span></div>
+      <div class="body">
+        <div class="mk-lane"><div class="who"><b>Marco</b><span>examen · 82%</span></div><div class="mk-track"><span class="mk-run" style="left:30%;background:var(--gold)">M</span></div></div>
+        <div class="mk-lane"><div class="who"><b>Lucía</b><span>fondeada ✓</span></div><div class="mk-track"><span class="mk-run" style="left:55%;background:var(--acc)">L</span></div></div>
+        <div class="mk-lane"><div class="who"><b>Diego</b><span>ya cobra 💰</span></div><div class="mk-track"><span class="mk-run" style="left:86%;background:var(--up)">D</span></div></div>
+      </div>
+      <div class="cap"><b>La carrera al primer pago.</b> Ves el avance de todos: quién va en el examen, quién ya tiene cuenta fondeada y quién ya cobra. Motivación real, de personas reales.</div>
+    </div>
   </div>
-  <div class="fnote reveal">Cifras en USD. Los "primeros pagos" son los objetivos del plan si cada cuenta pasa — es el mapa, no una promesa. Operar futuros implica riesgo real de pérdida.</div>
+</div></section>
+
+<!-- EXTRAS: MONEY PLAN + PAYOUTS -->
+<section class="block" id="extras"><div class="wrap">
+  <span class="sec-k reveal">Lo que recibes · 05 — el plan</span>
+  <h2 class="sec-h reveal">Y cuando ya cobras: <em>orden con tu dinero.</em></h2>
+  <p class="sec-p reveal">Ganar es la mitad del juego. La otra mitad es <b>qué haces con lo que cobras</b>. La plataforma también te ordena eso.</p>
+  <div class="shots two reveal">
+    <div class="shot">
+      <div class="bar"><i></i><i></i><i></i><span>Tu plan de crecimiento</span></div>
+      <div class="body"><div class="mk-phases">
+        <div class="mk-ph on"><span><b>Fase 1</b> · tu primera cuenta</span><span class="amt">meta $1,750</span></div>
+        <div class="mk-ph"><span><b>Fase 2</b> · varias cuentas a la vez</span><span class="amt">meta $8,800</span></div>
+        <div class="mk-ph"><span><b>Fase 3</b> · escala en serio</span><span class="amt">meta $37,500</span></div>
+        <div class="mk-ph"><span><b>Fase 4</b> · nivel profesional</span><span class="amt">meta $55,000</span></div>
+      </div></div>
+      <div class="cap"><b>Un mapa, no una apuesta.</b> Sabes exactamente cuál es tu siguiente paso y cuánto falta. (Es el mapa del camino — no una promesa de resultados.)</div>
+    </div>
+    <div class="shot">
+      <div class="bar"><i></i><i></i><i></i><span>Tu pago, repartido</span></div>
+      <div class="body"><div class="mk-split">
+        <div style="font-family:var(--serif);font-size:1.4rem;color:var(--up);margin-bottom:4px">Cobraste $1,250</div>
+        <div class="mk-sp"><span>Para ti</span><div class="bar2"><i style="width:50%;background:var(--up)"></i></div><b>$625</b></div>
+        <div class="mk-sp"><span>Reinvertir</span><div class="bar2"><i style="width:30%;background:var(--acc)"></i></div><b>$375</b></div>
+        <div class="mk-sp"><span>Guardar</span><div class="bar2"><i style="width:20%;background:var(--gold)"></i></div><b>$250</b></div>
+      </div></div>
+      <div class="cap"><b>Cada pago con destino.</b> Escribes cuánto cobraste y la app reparte: tu bolsillo, crecer, guardar — y una vista de inversiones para poner a trabajar lo que guardas.</div>
+    </div>
+  </div>
+</div></section>
+
+<!-- EL CAMINO -->
+<section class="block" id="camino"><div class="wrap">
+  <span class="sec-k reveal">El plan · tres pasos</span>
+  <h2 class="sec-h reveal">Tres pasos hasta <em>tu primer pago.</em></h2>
+  <div class="path reveal">
+    <div class="pstep"><span class="n">Paso 1</span><b>Aprende y practica</b><p>El curso en video + el simulador. Dominas la rutina completa sin arriesgar un peso.</p></div>
+    <span class="arr">→</span>
+    <div class="pstep"><span class="n">Paso 2</span><b>Pasa el examen</b><p>La fondeadora te evalúa. Si operas con disciplina, te presta una cuenta de $50,000 USD.</p></div>
+    <span class="arr">→</span>
+    <div class="pstep"><span class="n">Paso 3</span><b>Opera y cobra</b><p>Generas ganancias con el dinero de la empresa — y te las pagan a ti, cada ciclo.</p></div>
+  </div>
+  <div class="fnote reveal">Honestidad primero: operar en la bolsa tiene riesgo y nadie puede garantizarte ganancias. Por eso empiezas en simulador, después con exámenes de fondeadoras — y nunca con tus ahorros. Los resultados dependen de tu disciplina.</div>
+</div></section>
+
+<!-- EDUCACIÓN -->
+<section class="block" id="educacion"><div class="wrap">
+  <span class="sec-k reveal">Lo que realmente compras</span>
+  <h2 class="sec-h reveal">No es un gasto. Es tu <em>educación.</em></h2>
+  <p class="sec-p reveal">Esto no es un casino ni un "hazte rico". Es una <b>escuela de una habilidad real</b> — con simulador para practicar sin arriesgar un peso, un mentor en vivo y herramientas de nivel profesional.</p>
+  <div class="edu-grid reveal">
+    <div class="ecard"><div class="big">30</div><b>Lecciones en video</b><p>El curso completo en 4 módulos, curado paso a paso: del primer concepto a tu primera operación bien hecha.</p></div>
+    <div class="ecard"><div class="big">$0</div><b>De riesgo al practicar</b><p>Cuenta simulador con $50,000 virtuales: entrenas la rutina completa sin tocar dinero real.</p></div>
+    <div class="ecard"><div class="big">365</div><b>Días de mentor</b><p>En vivo cada mañana de mercado, clases recurrentes y las operaciones del día documentadas.</p></div>
+    <div class="ecard"><div class="big">∞</div><b>Acceso de por vida</b><p>La plataforma, el curso y cada actualización futura. Pagas una vez.</p></div>
+  </div>
+</div></section>
+
+<!-- TU PRIMERA SEMANA -->
+<section class="block" id="semana"><div class="wrap">
+  <span class="sec-k reveal">Sin vueltas</span>
+  <h2 class="sec-h reveal">Tu primera <em>semana.</em></h2>
+  <div class="week reveal">
+    <div class="day"><span class="n">Hoy</span><b>Entras</b><p>Pagas, recibes tu acceso el mismo día e instalas la app en tu computadora. Defines tu perfil y tus reglas.</p></div>
+    <div class="day"><span class="n">Días 1–3</span><b>Aprendes lo esencial</b><p>Primeras lecciones del curso y conoces la sala. Tu primera mañana viéndome operar en vivo.</p></div>
+    <div class="day"><span class="n">Días 4–6</span><b>Practicas sin riesgo</b><p>Tus primeras sesiones en el simulador con $50,000 virtuales — con el Spotter llenando tu diario.</p></div>
+    <div class="day"><span class="n">Día 7</span><b>Tu primera revisión</b><p>El entrenador de IA revisa tu semana con números reales y sales con un plan claro para la siguiente.</p></div>
+  </div>
+</div></section>
+
+<!-- PREGUNTAS -->
+<section class="block" id="faq"><div class="wrap">
+  <span class="sec-k reveal" style="display:block;text-align:center">Lo que todos preguntan</span>
+  <h2 class="sec-h reveal" style="text-align:center">Respuestas <em>directas.</em></h2>
+  <div class="faq reveal">
+    <details><summary>¿Necesito mucho dinero para empezar?</summary><div class="a">No. Practicas en el <b>simulador con $0 de riesgo</b>. Cuando estés listo, el examen de una fondeadora cuesta aproximadamente lo que una salida al cine al mes — y desde ahí operas <b>su</b> dinero, nunca tus ahorros.</div></details>
+    <details><summary>No sé nada de trading. ¿Puedo entrar?</summary><div class="a">Sí. El curso empieza desde cero: qué es un futuro, cómo se lee una gráfica, y de ahí hasta tu primera operación bien hecha. <b>Está diseñado para entenderse aunque nunca hayas operado.</b></div></details>
+    <details><summary>¿Cuánto tiempo necesito al día?</summary><div class="a"><b>Unos 90 minutos por la mañana</b> — la apertura de Nueva York — más el estudio que tú decidas. Una sola operación al día: esto no es estar pegado a la pantalla 8 horas.</div></details>
+    <details><summary>¿Esto es una apuesta? ¿Me hago rico rápido?</summary><div class="a">No y no. Es una <b>habilidad que se entrena</b>, con riesgo real y sin garantías — quien te prometa lo contrario te está mintiendo. Por eso empiezas en simulador y nunca arriesgas tus ahorros.</div></details>
+    <details><summary>¿Qué necesito para las clases en vivo?</summary><div class="a">Una computadora, internet y ganas de madrugar: la apertura de Nueva York cae <b>temprano en la mañana de México</b>. Y si un día no llegas, la sesión queda documentada.</div></details>
+    <details><summary>¿El asistente de inteligencia artificial va incluido?</summary><div class="a">La plataforma completa es tuya de por vida con el pago único. El <b>Spotter es opcional</b> y usa tu propia cuenta de Claude (~$20 USD al mes, se contrata aparte). Todo lo demás funciona sin él.</div></details>
+  </div>
+</div></section>
+
+<!-- EL CIERRE -->
+<section class="block" id="cierre"><div class="wrap">
+  <span class="sec-k reveal">Piénsalo así</span>
+  <h2 class="sec-h reveal">Dentro de un año, <em>¿dónde estás?</em></h2>
+  <div class="fork reveal">
+    <div class="fk"><span class="t">Camino A</span><p>Sigues igual: operando por impulso, viendo videos sueltos a las 2 AM, jurando "es la última vez" — <b>un año más viejo, con la misma cuenta en rojo.</b></p></div>
+    <div class="fk b"><span class="t">Camino B</span><p>Llevas un año con un sistema, un diario lleno, un mentor cada mañana y tu examen de fondeadora en marcha — <b>construyendo la habilidad que te paga.</b></p></div>
+  </div>
 </div></section>
 
 <!-- PRECIO -->
 <section class="block" id="precio"><div class="wrap"><div class="price-wrap">
   <div class="price-card reveal">
-    <div class="p-k">Acceso completo · cupo limitado</div>
+    <div class="p-k">Inscripción · acceso el mismo día</div>
     <div class="p-amount">$14,000<small>MXN</small></div>
-    <div class="p-sub">pago único · acceso de por vida · sin mensualidades</div>
-    <p class="p-anchor">Una sola evaluación quemada por indisciplina te cuesta más. Esto es <b>el sistema + mi mesa + la plataforma</b>, para siempre.</p>
+    <div class="p-sub">pago único · sin mensualidades · acceso de por vida</div>
+    <p class="p-anchor">Un pago, para siempre. Menos que un semestre de universidad — por una <b>habilidad que te puede pagar toda la vida</b>, con un mentor a tu lado cada mañana.</p>
     <ul class="p-list">
-      <li><b>Tradea conmigo en vivo</b> — cada apertura de Nueva York</li>
-      <li>Mis trades documentados — verdes y rojos, sin filtro</li>
-      <li>La <b>app de escritorio</b> — sesión 3 fases, journal Bullet Score, cuenta SIM · de por vida</li>
-      <li><b>TJR Boot Camp</b> de 30 días, curado en orden dentro de la app</li>
-      <li>El <b>mapa de escalado</b> de 4 fases + setup de gráficos en nuestros colores</li>
-      <li>La sala: carrera al payout, sesgo diario y batallas 1v1</li>
-      <li><b>Spotter IA</b> con tu propia suscripción de Claude (eso va por tu cuenta)</li>
+      <li><b>El mentor en vivo</b> — trading contigo cada mañana, con las operaciones del día publicadas sin filtro</li>
+      <li><b>El sistema completo</b> — el método + las 30 lecciones en video, a tu ritmo</li>
+      <li><b>La plataforma</b> — software de escritorio con Spotter AI, diario automático y simulador</li>
+      <li><b>La comunidad</b> — sala activa, torneos 1 contra 1 y la carrera al primer pago</li>
+      <li><b>El plan</b> — el mapa de fases: del simulador a cobrar, y qué hacer con cada pago</li>
+      <li><b>Todas las actualizaciones futuras</b>, incluidas para siempre</li>
     </ul>
-    <a class="btn acc lg" id="wa-btn" target="_blank" rel="noopener">Aparta tu lugar por WhatsApp →</a>
-    <p class="p-fine">Te respondo yo. Pago por transferencia · acceso el mismo día. El Spotter IA requiere tu suscripción de Claude (~$20 USD/mes, directo con claude.ai).</p>
+    <a class="btn acc lg" id="wa-btn" target="_blank" rel="noopener">Apartar mi lugar por WhatsApp →</a>
+    <p class="p-fine">Te respondo yo personalmente. Pago por transferencia · acceso el mismo día.<br>El asistente de inteligencia artificial es opcional y usa tu propia cuenta de Claude (~$20 USD/mes, se contrata aparte en claude.ai).</p>
   </div>
 </div></div></section>
 
-<!-- LISTA / EN VIVOS -->
+<!-- LISTA -->
 <section class="block" id="lista"><div class="wrap"><div class="list-card">
-  <span class="sec-k reveal">¿Todavía no?</span>
-  <h2 class="sec-h reveal">Mira mis trades <em>primero.</em></h2>
-  <p class="sec-p reveal" style="margin-inline:auto">Déjame tu correo y te aviso de cada <b>en vivo</b> y te comparto mis trades documentados. Cuando veas el sistema funcionar, tú decides.</p>
+  <span class="sec-k reveal">¿Todavía lo estás pensando?</span>
+  <h2 class="sec-h reveal">Primero míralo. <em>Después decides.</em></h2>
+  <p class="sec-p reveal" style="margin-inline:auto">Déjame tu correo y te aviso de la próxima <b>clase en vivo gratuita</b> — con operaciones reales, en el momento. Ve el sistema funcionando antes de pagar un peso.</p>
   <form class="reg-form reveal" id="reg-form">
     <input type="text" id="reg-name" placeholder="Tu nombre" autocomplete="name" required>
     <input type="email" id="reg-email" placeholder="tu@correo.com" autocomplete="email" required>
     <button class="btn acc" type="submit" id="reg-btn">Avísame →</button>
   </form>
-  <div class="reg-ok" id="reg-ok" hidden>📬 <b>Estás en la lista.</b> Te llega un correo de confirmación — y nos vemos en el próximo en vivo.</div>
+  <div class="reg-ok" id="reg-ok" hidden>📬 <b>Listo, estás en la lista.</b> Te llega un correo de confirmación — nos vemos en el próximo en vivo.</div>
 </div></div></section>
 
 <footer><div class="wrap foot-in">
-  <div class="brand">ONE <i>BULLET</i></div>
+  <div class="brand">SPOTTER <i>AI</i></div>
   <div class="foot-links">
     <a id="foot-disc" target="_blank" rel="noopener">Discord</a>
     <a id="foot-app">Plataforma</a>
     <a href="#precio">Precio</a>
   </div>
-  <div class="foot-c">© <span id="yr"></span> ONE BULLET · Una bala por sesión.</div>
+  <div class="foot-c">© <span id="yr"></span> SPOTTER AI · Aprende. Opera. Cobra.</div>
 </div></footer>
 
+<script src="vendor/three.min.js"></script>
 <script>
 (function(){
   const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
   const CFG={
     whatsapp:"524434405815",
-    waText:"Hola André, quiero mi lugar en ONE BULLET ($14,000 MXN).",
+    waText:"Hola André, quiero mi lugar en SPOTTER AI ($14,000 MXN).",
     discord:"https://discord.gg/vu3dRzAXd",
     app:"./index.html",
     email:"andremacouzetruiz@gmail.com"
@@ -311,14 +679,28 @@
   $("#foot-disc").href=CFG.discord; $("#foot-app").href=CFG.app;
   $("#yr").textContent=new Date().getFullYear();
 
-  // reveals + chapter word reveals
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");}}),{threshold:.25});
   $$(".reveal,.ch-inner").forEach(el=>io.observe(el));
 
-  // hide nav on scroll down
-  let ly=0; addEventListener("scroll",()=>{const y=scrollY;const n=$("#topnav");n.style.transform=(y>ly&&y>240)?"translateY(-110%)":"none";ly=y;},{passive:true});
+  let ly=0;
+  const chapters=[...$$(".chapter")];
+  function beats(){
+    for(const ch of chapters){
+      const r=ch.getBoundingClientRect();
+      const t=-r.top/((r.height-innerHeight)||1); // 0→1 dentro del capítulo
+      // histéresis: entra al beat 2 en .40, solo regresa al título si subes de vuelta (.30)
+      if(ch.dataset.beat!=="2"){ if(t>=.40)ch.dataset.beat="2"; }
+      else if(t<.30)ch.dataset.beat="1";
+      // cada línea de la secuencia entra a su tiempo, al ritmo del scroll
+      const its=ch.querySelectorAll(".seq .it");
+      its.forEach((el,i)=>{
+        const thr=.42+i*(.46/Math.max(1,its.length-1));
+        el.classList.toggle("on",t>=thr);});
+    }
+  }
+  addEventListener("scroll",()=>{const y=scrollY;const n=$("#topnav");n.style.transform=(y>ly&&y>240)?"translateY(-110%)":"none";ly=y;beats();},{passive:true});
+  beats();
 
-  // lead list → FormSubmit
   const regForm=$("#reg-form");
   if(regForm)regForm.addEventListener("submit",async e=>{
     e.preventDefault();
@@ -327,111 +709,264 @@
     try{
       await fetch("https://formsubmit.co/ajax/"+CFG.email,{method:"POST",
         headers:{"Content-Type":"application/json",Accept:"application/json"},
-        body:JSON.stringify({name,email,_subject:"👀 Lead ONE BULLET (lista): "+name,_template:"table",_captcha:"false",
-          _autoresponse:"¡Estás dentro, "+name+"! 🎯\n\nTe voy a avisar de cada EN VIVO en la apertura de Nueva York y te compartiré mis trades documentados — los verdes y los rojos.\n\nMientras tanto, la sala vive aquí: "+CFG.discord+"\n\nY cuando quieras tu lugar en ONE BULLET ($14,000 MXN, pago único, de por vida): responde este correo o escríbeme por WhatsApp.\n\n— André · ONE BULLET"})});
+        body:JSON.stringify({name,email,_subject:"👀 Lead SPOTTER AI (lista): "+name,_template:"table",_captcha:"false",
+          _autoresponse:"¡Estás dentro, "+name+"! 🎯\n\nTe voy a avisar de cada CLASE EN VIVO en la apertura de Nueva York y te compartiré mis operaciones reales — las buenas y las malas.\n\nMientras tanto, la comunidad vive aquí: "+CFG.discord+"\n\nY cuando quieras tu lugar en SPOTTER AI ($14,000 MXN, pago único, de por vida): responde este correo o escríbeme por WhatsApp.\n\n— André · SPOTTER AI"})});
     }catch(err){}
     regForm.hidden=true; $("#reg-ok").hidden=false;
   });
 
-  /* ================= scroll-driven market canvas ================= */
-  const cv=$("#mkt"),cx=cv.getContext("2d");
-  let W,H,DPR,frame=0,P=0,Pt=0; // P = smoothed scroll progress
-  let candles=[],parts=[];
-  function rz(){DPR=Math.min(2,devicePixelRatio||1);W=cv.width=innerWidth*DPR;H=cv.height=innerHeight*DPR;
-    cv.style.width=innerWidth+"px";cv.style.height=innerHeight+"px";
-    // candle field
-    candles=[];const n=Math.min(90,Math.floor(innerWidth/14));
-    let p=0.5;
-    for(let i=0;i<n;i++){const o=p;let c=o+(Math.random()-.5)*.16;c=Math.max(.08,Math.min(.92,c));
-      candles.push({o,c,h:Math.max(o,c)+Math.random()*.07,l:Math.min(o,c)-Math.random()*.07,ph:Math.random()*6.28,sp:.4+Math.random()*.9});p=c;}
-    parts=Array.from({length:70},()=>({x:Math.random(),y:Math.random(),s:.4+Math.random()*1.4,v:.0004+Math.random()*.0012}));
-  }
+/* ============ FONDO 3D · estilo GOAL ACHIEVER, la historia en partículas ============
+     Un solo sistema de 7,000 partículas hueso que MORFEA con el scroll:
+     el caos del mercado → LA CAÍDA (así se pierde) → LA ESCALERA (así se gana)
+     → LA ÓRBITA (tu rutina, un día tras otro) → LA ESPIRAL que asciende (el pago).
+     Mono + un acento dorado. Niebla, polvo lejano, parallax de mouse. */
+  let frame=0,spin=0;
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   const smooth=(a,b,v)=>{const t=clamp((v-a)/(b-a),0,1);return t*t*(3-2*t);};
-  function draw(){
+  const tape=$("#tape");
+  function boot3D(){
+  const T=THREE;
+  const renderer=new T.WebGLRenderer({canvas:$("#mkt"),antialias:true});
+  renderer.setPixelRatio(Math.min(2,devicePixelRatio||1));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.setClearColor(0x070709,1);
+  const scene=new T.Scene();
+  scene.fog=new T.FogExp2(0x070709,.016);
+  const cam=new T.PerspectiveCamera(60,innerWidth/innerHeight,.1,300);
+  cam.position.set(0,0,24);
+  let sd=7;const rnd=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;};
+  const gauss=()=>(rnd()+rnd()+rnd()-1.5)/1.5;
+  const N=7000;
+  /* ---- las cinco formaciones de la historia ---- */
+  const F={};
+  { // la red: una mente que piensa — filamentos orgánicos, no ruido suelto
+    const a=new Float32Array(N*3);
+    let cx=0,cy=0,cz=0;
+    for(let i=0;i<N;i++){
+      cx=(cx+gauss()*1.1)*.985;cy=(cy+gauss()*.55)*.985;cz=(cz+gauss()*.8)*.985;
+      a[i*3]=cx;a[i*3+1]=cy;a[i*3+2]=cz;}
+    // normaliza: centrada y con la extensión de una mente grande
+    const mean=[0,0,0],sd2=[0,0,0];
+    for(let i=0;i<N;i++)for(let k=0;k<3;k++)mean[k]+=a[i*3+k]/N;
+    for(let i=0;i<N;i++)for(let k=0;k<3;k++){const d=a[i*3+k]-mean[k];sd2[k]+=d*d/N;}
+    const tgt=[7.5,3.6,5];
+    for(let i=0;i<N;i++)for(let k=0;k<3;k++)
+      a[i*3+k]=(a[i*3+k]-mean[k])/Math.sqrt(sd2[k]||1)*tgt[k];
+    F.chaos=a;}
+  { // la caída: un precio que se desangra, quebrado
+    const a=new Float32Array(N*3);
+    const px=[],py=[];let y=6.2;
+    for(let k=0;k<=9;k++){px.push(-15+k*30/9);py.push(y);
+      y-=.4+rnd()*1.9;if(rnd()<.3)y+=.9*rnd();}
+    for(let i=0;i<N;i++){const t=i/N*9,k=Math.floor(t),f=t-k;
+      const x=px[k]+(px[Math.min(k+1,9)]-px[k])*f;
+      const yy=py[k]+(py[Math.min(k+1,9)]-py[k])*f;
+      a[i*3]=x+gauss()*.4;a[i*3+1]=yy+gauss()*.4;a[i*3+2]=gauss()*1.7;}
+    F.fall=a;}
+  { // la escalera: orden, un peldaño a la vez
+    const a=new Float32Array(N*3);
+    for(let i=0;i<N;i++){const t=i/N;
+      const stepN=Math.floor(t*7),lf=Math.min(1,((t*7)%1)*2);
+      const yy=-5.5+(stepN+lf)/7*11;
+      a[i*3]=-15+t*30+gauss()*.22;a[i*3+1]=yy+gauss()*.22;a[i*3+2]=gauss()*1.1;}
+    F.rise=a;}
+  { // la órbita: tu rutina, un día tras otro (el anillo)
+    const a=new Float32Array(N*3);
+    const ct=Math.cos(1.05),st=Math.sin(1.05);
+    for(let i=0;i<N;i++){const an=(i/N)*Math.PI*2+gauss()*.02,r=11+gauss()*1.9;
+      const x=Math.cos(an)*r,z=Math.sin(an)*r,yy=gauss()*.8;
+      a[i*3]=x;a[i*3+1]=yy*ct-z*st;a[i*3+2]=yy*st+z*ct;}
+    F.orbit=a;}
+  { // la espiral: asciende hasta la cima — el pago
+    const a=new Float32Array(N*3);
+    for(let i=0;i<N;i++){const t=i/N,an=t*Math.PI*9,r=(1-t)*8.5+.4;
+      a[i*3]=Math.cos(an)*r+gauss()*.25;
+      a[i*3+1]=-6+t*17+gauss()*.25;
+      a[i*3+2]=Math.sin(an)*r+gauss()*.25;}
+    F.spire=a;}
+  { // el ojo: el Spotter que te cuida — contorno, iris y pupila (por bloques ordenados)
+    const a=new Float32Array(N*3);
+    const nA=Math.floor(N*.45),nB=Math.floor(N*.35);
+    for(let i=0;i<N;i++){let x,y,z;
+      if(i<nA){const an=(i/nA)*Math.PI*2;x=Math.cos(an)*11;y=Math.sin(an)*5;z=gauss()*.4;}
+      else if(i<nA+nB){const an=((i-nA)/nB)*Math.PI*2,r=3.1+gauss()*.35;x=Math.cos(an)*r;y=Math.sin(an)*r;z=.5+gauss()*.3;}
+      else{const t=(i-nA-nB)/(N-nA-nB),an=t*Math.PI*22,r=Math.sqrt(t)*1.15;x=Math.cos(an)*r;y=Math.sin(an)*r;z=.8+gauss()*.25;}
+      a[i*3]=x+gauss()*.12;a[i*3+1]=y+gauss()*.12;a[i*3+2]=z;}
+    F.eye=a;}
+  { // la retícula: tu diario — todo medido, todo en su lugar
+    const a=new Float32Array(N*3);
+    const cols=100,rows=70;
+    for(let i=0;i<N;i++){const c=i%cols,r2=Math.floor(i/cols)%rows;
+      a[i*3]=(c/(cols-1)-.5)*30+gauss()*.05;
+      a[i*3+1]=(r2/(rows-1)-.5)*13+gauss()*.05;
+      a[i*3+2]=(r2/(rows-1)-.5)*13*.32+gauss()*.05;}
+    F.grid=a;}
+  { // la doble hélice: compites — dos trenzados que suben juntos (una hebra por mitad)
+    const a=new Float32Array(N*3);
+    const H=N/2;
+    for(let i=0;i<N;i++){const str=i<H?0:Math.PI,t=(i%H)/H,an=t*Math.PI*6+str;
+      a[i*3]=-15+t*30+gauss()*.15;
+      a[i*3+1]=Math.sin(an)*3+gauss()*.15;
+      a[i*3+2]=Math.cos(an)*3+gauss()*.15;}
+    F.helix=a;}
+  { // la lluvia: cuando cobras — cae por columnas, sin parar (columnas contiguas)
+    const a=new Float32Array(N*3);
+    const PERCOL=64;
+    for(let i=0;i<N;i++){const col=Math.floor(i/PERCOL),t=(i%PERCOL)/PERCOL;
+      a[i*3]=(col/(N/PERCOL)-.5)*32+gauss()*.12;
+      a[i*3+1]=t*16-8+gauss()*.3;
+      a[i*3+2]=(((col*2654435761)%97)/97-.5)*9;}
+    F.rain=a;}
+  /* ---- partículas vivas ---- */
+  const world=new T.Group();scene.add(world);
+  const cur=new Float32Array(F.chaos);
+  const geo=new T.BufferGeometry();
+  geo.setAttribute("position",new T.BufferAttribute(cur,3));
+  const bone=new T.Points(geo,new T.PointsMaterial({color:0xedebe6,size:.07,transparent:true,opacity:.85,depthWrite:false,sizeAttenuation:true}));
+  world.add(bone);
+  /* el acento: unas pocas en oro — los que sí llegan */
+  const NG=340,GSTRIDE=20;
+  const goldGeo=new T.BufferGeometry();
+  goldGeo.setAttribute("position",new T.BufferAttribute(new Float32Array(NG*3),3));
+  const gold=new T.Points(goldGeo,new T.PointsMaterial({color:0xc9a24b,size:.11,transparent:true,opacity:.9,depthWrite:false,sizeAttenuation:true}));
+  world.add(gold);
+  /* las sinapsis: la red que une la mente — y viaja con cada forma */
+  const E=1200,edges=new Uint16Array(E*2);
+  for(let e=0;e<E;e++){const i=Math.floor(rnd()*(N-3));edges[e*2]=i;edges[e*2+1]=i+1+Math.floor(rnd()*2);}
+  const lineGeo=new T.BufferGeometry();
+  lineGeo.setAttribute("position",new T.BufferAttribute(new Float32Array(E*6),3));
+  const lineMat=new T.LineBasicMaterial({color:0xedebe6,transparent:true,opacity:.12,depthWrite:false});
+  const net=new T.LineSegments(lineGeo,lineMat);
+  world.add(net);
+  /* las neuronas: nodos mayores que respiran */
+  const NN=150,NSTRIDE=46;
+  const nodeGeo=new T.BufferGeometry();
+  nodeGeo.setAttribute("position",new T.BufferAttribute(new Float32Array(NN*3),3));
+  const nodeMat=new T.PointsMaterial({color:0xffffff,size:.16,transparent:true,opacity:.8,depthWrite:false,sizeAttenuation:true});
+  const nodes=new T.Points(nodeGeo,nodeMat);
+  world.add(nodes);
+  /* las señales: pensamientos que disparan por la red + datos que entran de afuera */
+  const SPK=56;
+  const spkGeo=new T.BufferGeometry();
+  spkGeo.setAttribute("position",new T.BufferAttribute(new Float32Array(SPK*3),3));
+  const spkMat=new T.PointsMaterial({color:0xffe6b0,size:.22,transparent:true,opacity:.9,depthWrite:false,sizeAttenuation:true,blending:T.AdditiveBlending});
+  const sparks=new T.Points(spkGeo,spkMat);world.add(sparks);
+  const spk=[];
+  const farPt=()=>{const an=rnd()*6.283,rr=17+rnd()*15;return[Math.cos(an)*rr,(rnd()-.5)*20,Math.sin(an)*rr];};
+  for(let k=0;k<SPK;k++){const inn=rnd()<.4,fp=farPt();
+    spk.push({e:Math.floor(rnd()*E),t:rnd(),v:.007+rnd()*.02,mode:inn?"in":"ride",fx:fp[0],fy:fp[1],fz:fp[2]});}
+  /* polvo lejano */
+  const M=900,dp=new Float32Array(M*3);
+  for(let i=0;i<M;i++){const v=new T.Vector3(rnd()-.5,rnd()-.5,rnd()-.5).normalize().multiplyScalar(40+rnd()*60);
+    dp[i*3]=v.x;dp[i*3+1]=v.y;dp[i*3+2]=v.z;}
+  const dg=new T.BufferGeometry();dg.setAttribute("position",new T.BufferAttribute(dp,3));
+  const stars=new T.Points(dg,new T.PointsMaterial({color:0xedebe6,size:.14,transparent:true,opacity:.4,depthWrite:false}));
+  scene.add(stars);
+  /* ---- anclas de la narrativa: cada sección tiene su forma ---- */
+  const C1=document.querySelector('[data-ch="1"]'),C2=document.querySelector('[data-ch="2"]');
+  const FIN=document.querySelector("#cierre");
+  const FORM_SECS=[["#oferta","chaos"],["#mentor","orbit"],["#sistema","rise"],["#spotter","eye"],["#app","grid"],["#comunidad","helix"],
+    ["#extras","rain"],["#camino","rise"],["#educacion","orbit"],["#semana","grid"],["#faq","chaos"]]
+    .map(([q,f])=>[document.querySelector(q),f]).filter(x=>x[0]);
+  const FK=["chaos","fall","rise","orbit","eye","grid","helix","rain","spire"];
+  const W={chaos:1,fall:0,rise:0,orbit:0,eye:0,grid:0,helix:0,rain:0,spire:0};
+  const chPr=el=>{const r=el.getBoundingClientRect();return -r.top/((r.height-innerHeight)||1);};
+  const st={mx:0,my:0,smx:0,smy:0,p:0};
+  addEventListener("mousemove",e=>{st.mx=(e.clientX/innerWidth-.5)*2;st.my=(e.clientY/innerHeight-.5)*2;});
+  function tick(){
     frame++;
-    const doc=document.documentElement;
-    Pt=doc.scrollTop/((doc.scrollHeight-innerHeight)||1);
-    P+=(Pt-P)*0.06; // lerp suave
-    cx.clearRect(0,0,W,H);
-    const chaos=1-smooth(.12,.30,P);            // 1 = caos rojo → 0
-    const order=smooth(.14,.32,P)*(1-smooth(.44,.58,P)); // ORB visible
-    const shot=smooth(.34,.44,P)*(1-smooth(.56,.66,P));  // el disparo
-    const rise=smooth(.50,.64,P)*(1-smooth(.82,.92,P));  // equity
-    const eden=smooth(.78,.9,P);                 // ascenso final
-    const baseA=.16+.1*chaos;
-    // ---- candle tape ----
-    const gap=W/candles.length, cw=gap*.52, mid=H*.62;
-    for(let i=0;i<candles.length;i++){const d=candles[i];
-      const wob=chaos*Math.sin(frame*.02*d.sp+d.ph)*H*.05;
-      const calm=1-chaos*.5;
-      const o=mid-(d.o-.5)*H*.5*calm+wob, c=mid-(d.c-.5)*H*.5*calm+wob;
-      const hh=mid-(d.h-.5)*H*.5*calm+wob, ll=mid-(d.l-.5)*H*.5*calm+wob;
-      let up=d.c>d.o;
-      if(chaos>.55) up=(i%4===0)?up:false;               // cap1: casi todo rojo
-      if(rise>.3||eden>.2) up=(i%5!==0);                 // subida: casi todo verde
-      const col=up?"8,153,129":"242,54,69";
-      const a=baseA*(1-eden*.85);
-      const x=i*gap+gap/2;
-      cx.strokeStyle=`rgba(${col},${a})`;cx.lineWidth=1*DPR;
-      cx.beginPath();cx.moveTo(x,hh);cx.lineTo(x,ll);cx.stroke();
-      cx.fillStyle=`rgba(${col},${a+.05})`;
-      cx.fillRect(x-cw/2,Math.min(o,c),cw,Math.max(2,Math.abs(c-o)));
-    }
-    // ---- ORB lines (cap 2) ----
-    if(order>0.01){
-      const yH=H*.42,yL=H*.7;
-      cx.setLineDash([8*DPR,7*DPR]);cx.lineWidth=1.2*DPR;
-      cx.strokeStyle=`rgba(74,144,217,${.5*order})`;
-      cx.beginPath();cx.moveTo(0,yH);cx.lineTo(W,yH);cx.stroke();
-      cx.beginPath();cx.moveTo(0,yL);cx.lineTo(W,yL);cx.stroke();
-      cx.setLineDash([]);
-      cx.fillStyle=`rgba(74,144,217,${.75*order})`;
-      cx.font=`${10*DPR}px ui-monospace,monospace`;
-      cx.fillText("ORH",12*DPR,yH-8*DPR);cx.fillText("ORL",12*DPR,yL+16*DPR);
-      cx.fillStyle=`rgba(74,144,217,${.05*order})`;
-      cx.fillRect(0,yH,W,yL-yH);
-    }
-    // ---- la bala + disparo (cap 3) ----
-    if(shot>0.01){
-      const t=smooth(.36,.52,P);
-      const bx=W*(.12+t*.8), by=H*.56-Math.sin(t*Math.PI)*H*.18;
-      // estela
-      for(let k=0;k<14;k++){const tt=t-k*.015;if(tt<0)break;
-        const tx=W*(.12+tt*.8), ty=H*.56-Math.sin(tt*Math.PI)*H*.18;
-        cx.fillStyle=`rgba(127,179,230,${(1-k/14)*.4*shot})`;
-        cx.beginPath();cx.arc(tx,ty,(4-k*.2)*DPR,0,6.29);cx.fill();}
-      const g=cx.createRadialGradient(bx,by,0,bx,by,26*DPR);
-      g.addColorStop(0,`rgba(74,144,217,${.9*shot})`);g.addColorStop(1,"rgba(74,144,217,0)");
-      cx.fillStyle=g;cx.beginPath();cx.arc(bx,by,26*DPR,0,6.29);cx.fill();
-      cx.fillStyle=`rgba(190,220,250,${shot})`;cx.beginPath();cx.arc(bx,by,4.5*DPR,0,6.29);cx.fill();
-    }
-    // ---- equity curve (cap 4) ----
-    if(rise>0.01){
-      const t=smooth(.5,.78,P);
-      const pts=60,seg=Math.floor(pts*t);
-      cx.strokeStyle=`rgba(8,153,129,${.8*rise})`;cx.lineWidth=2*DPR;cx.lineJoin="round";
-      cx.beginPath();
-      for(let i=0;i<=seg;i++){const u=i/pts;
-        const y=H*.8-u*H*.5-Math.sin(u*9)*H*.03*(1-u);
-        const x=W*.08+u*W*.84;
-        i===0?cx.moveTo(x,y):cx.lineTo(x,y);}
-      cx.stroke();
-      if(seg>0){const u=seg/pts,x=W*.08+u*W*.84,y=H*.8-u*H*.5-Math.sin(u*9)*H*.03*(1-u);
-        cx.fillStyle=`rgba(8,153,129,${rise})`;cx.beginPath();cx.arc(x,y,4*DPR,0,6.29);cx.fill();}
-    }
-    // ---- ascenso al Edén (final) ----
-    if(eden>0.01){
-      for(const pt of parts){pt.y-=pt.v*(1+eden);if(pt.y<0)pt.y=1;
-        cx.fillStyle=`rgba(201,162,75,${.5*eden*pt.s/1.8})`;
-        cx.beginPath();cx.arc(pt.x*W,pt.y*H,pt.s*DPR,0,6.29);cx.fill();}
-      const g=cx.createRadialGradient(W/2,H*.15,0,W/2,H*.15,H*.55);
-      g.addColorStop(0,`rgba(201,162,75,${.12*eden})`);g.addColorStop(1,"rgba(201,162,75,0)");
-      cx.fillStyle=g;cx.fillRect(0,0,W,H);
-    }
-    requestAnimationFrame(draw);
+    const vh=innerHeight||1,doc=document.documentElement;
+    const pT=doc.scrollTop/((doc.scrollHeight-vh)||1);
+    st.p+=(pT-st.p)*.06;
+    st.smx+=(st.mx-st.smx)*.04;st.smy+=(st.my-st.smy)*.04;
+    const t1=C1?chPr(C1):-9,t2=C2?chPr(C2):-9;
+    const finT=FIN?clamp((vh-FIN.getBoundingClientRect().top)/(vh*1.05),0,1):0;
+    /* qué forma toca: la última sección que cruza el centro manda */
+    let form="chaos";
+    for(const [el,f] of FORM_SECS){const r=el.getBoundingClientRect();
+      if(r.top<vh*.55&&r.bottom>vh*.2)form=f;}
+    if(t1>-.1&&t1<1.12)form="fall";
+    if(t2>-.1&&t2<1.12)form="rise";
+    if(smooth(.12,.7,finT)>.5)form="spire";
+    for(const k of FK)W[k]+=((k===form?1:0)-W[k])*.06;
+    let wsum=0;for(const k of FK)wsum+=W[k];wsum=wsum||1;
+    /* morfea hacia la mezcla; la lluvia además CAE */
+    const pa=geo.attributes.position.array;
+    const rainOff=(frame*.05)%16;
+    const alive=W.chaos+W.eye*.55,ft=frame*.035; // la mente respira más viva en la nube y el ojo
+    for(let p3=0;p3<N;p3++){const i=p3*3;
+      let tx=0,ty=0,tz=0;
+      for(const k of FK){const w=W[k];if(w<.004)continue;const A=F[k];
+        let ay=A[i+1];
+        if(k==="rain")ay=((A[i+1]-rainOff+8)%16+16)%16-8;
+        tx+=A[i]*w;ty+=ay*w;tz+=A[i+2]*w;}
+      tx/=wsum;ty/=wsum;tz/=wsum;
+      if(alive>.01){const ph=p3*.37; // shimmer orgánico: nunca quieta, siempre pensando
+        tx+=Math.sin(ft+ph)*.2*alive;
+        ty+=Math.cos(ft*.86+ph*1.3)*.2*alive;
+        tz+=Math.sin(ft*1.12+ph*.7)*.2*alive;}
+      pa[i]+=(tx-pa[i])*.055;
+      pa[i+1]+=(ty-pa[i+1])*.055;
+      pa[i+2]+=(tz-pa[i+2])*.055;}
+    geo.attributes.position.needsUpdate=true;
+    const ga=goldGeo.attributes.position.array;
+    for(let j=0;j<NG;j++){const i=j*GSTRIDE*3;
+      ga[j*3]=pa[i];ga[j*3+1]=pa[i+1];ga[j*3+2]=pa[i+2];}
+    goldGeo.attributes.position.needsUpdate=true;
+    const la=lineGeo.attributes.position.array;
+    for(let e=0;e<E;e++){const i=edges[e*2]*3,j=edges[e*2+1]*3;
+      la[e*6]=pa[i];la[e*6+1]=pa[i+1];la[e*6+2]=pa[i+2];
+      la[e*6+3]=pa[j];la[e*6+4]=pa[j+1];la[e*6+5]=pa[j+2];}
+    lineGeo.attributes.position.needsUpdate=true;
+    const na=nodeGeo.attributes.position.array;
+    for(let n2=0;n2<NN;n2++){const i=n2*NSTRIDE*3;
+      na[n2*3]=pa[i];na[n2*3+1]=pa[i+1];na[n2*3+2]=pa[i+2];}
+    nodeGeo.attributes.position.needsUpdate=true;
+    lineMat.opacity=.08+W.chaos*.07+Math.sin(frame*.02)*.02; // la red respira, más viva en la nube
+    nodeMat.opacity=.6+Math.sin(frame*.03)*.2;
+    nodeMat.size=.16+Math.sin(frame*.05)*.03; // las neuronas laten
+    /* señales disparando: cada pensamiento recorre una sinapsis; a veces sale a agarrar datos */
+    const sa=spkGeo.attributes.position.array;
+    for(let k=0;k<SPK;k++){const S=spk[k];const ai=edges[S.e*2]*3,bi=edges[S.e*2+1]*3;
+      S.t+=S.v;
+      if(S.mode==="in"){ // un dato entra desde afuera hacia una neurona
+        if(S.t>=1){S.mode="ride";S.t=0;}
+        else{const f=S.t*S.t*(3-2*S.t);
+          sa[k*3]=S.fx+(pa[ai]-S.fx)*f;sa[k*3+1]=S.fy+(pa[ai+1]-S.fy)*f;sa[k*3+2]=S.fz+(pa[ai+2]-S.fz)*f;}
+      }else{ // viaja por la sinapsis de A a B
+        if(S.t>=1){
+          if(rnd()<.38){const fp=farPt();S.mode="in";S.t=0;S.e=Math.floor(rnd()*E);S.fx=fp[0];S.fy=fp[1];S.fz=fp[2];}
+          else{S.e=Math.floor(rnd()*E);S.t=0;}
+        }else{sa[k*3]=pa[ai]+(pa[bi]-pa[ai])*S.t;sa[k*3+1]=pa[ai+1]+(pa[bi+1]-pa[ai+1])*S.t;sa[k*3+2]=pa[ai+2]+(pa[bi+2]-pa[ai+2])*S.t;}
+      }}
+    spkGeo.attributes.position.needsUpdate=true;
+    spkMat.opacity=(.5+Math.sin(frame*.09)*.2)*(.4+W.chaos*.6+W.eye*.5);
+    /* la órbita gira mientras vives la rutina; las líneas apenas respiran */
+    spin+=.0011*W.orbit;
+    world.rotation.y=Math.sin(frame*.0004)*.1+spin;
+    world.rotation.x=Math.sin(frame*.00055)*.05*W.chaos; // la mente cabecea, viva
+    world.scale.setScalar(1+Math.sin(frame*.026)*.02*(W.chaos+W.eye)); // respira
+    bone.material.opacity=.85-st.p*.15;
+    bone.material.size=.07+Math.sin(frame*.045)*.006*W.chaos; // titila al pensar
+    cam.position.x=st.smx*1.6;
+    cam.position.y=-st.smy*1.1-W.spire*1.2;
+    cam.position.z=24-st.p*3;
+    cam.lookAt(0,W.spire*4,0); // al final, la mirada sube con la espiral
+    stars.rotation.y=frame*.0004+st.p*.5;
+    if(tape)tape.style.opacity=Math.max(0,1-W.spire*.9);
+    renderer.render(scene,cam);
+    requestAnimationFrame(tick);
   }
-  rz();draw();addEventListener("resize",rz);
+  addEventListener("resize",()=>{
+    cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();
+    renderer.setSize(innerWidth,innerHeight);});
+  tick();
+  }
+  if(window.THREE){try{boot3D();}catch(e){console.warn("3D apagado:",e);}}
+  else if(tape){ // sin WebGL: solo el ticker vive
+    addEventListener("scroll",()=>{const d=document.documentElement;
+      tape.style.opacity=Math.max(0,1-(d.scrollTop/((d.scrollHeight-innerHeight)||1))*1.2);},{passive:true});
+  }
 })();
 </script>
 </body>
