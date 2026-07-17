@@ -644,11 +644,11 @@
     <div style="font-size:1.25rem;color:var(--text);margin-bottom:6px">⬇ <b>Descargando tu app…</b></div>
     <div style="font-size:.85rem;color:var(--faint)">¿No empezó sola? Dale aquí:</div>
     <div style="margin-top:14px"><a class="btn acc lg" id="reg-dl" download>Descargar la app</a></div>
-    <div class="dl-head">Instálala en tu escritorio — 3 pasos:</div>
+    <div class="dl-head">Instálala como cualquier app — 3 pasos:</div>
     <div class="dl-steps">
-      <div class="dl-step"><span class="dl-n">1</span><p>Abre el archivo <b>SPOTTER-AI.zip</b> de tu carpeta <b>Descargas</b> — se descomprime solo.</p></div>
-      <div class="dl-step"><span class="dl-n">2</span><p>Arrastra la carpeta <b>SPOTTER-AI</b> a tu <b>Escritorio</b>.</p></div>
-      <div class="dl-step"><span class="dl-n">3</span><p>Doble clic en <b>SPOTTER-AI.html</b> — se abre tu plataforma. En Chrome, dale <b>"Instalar"</b> para dejarla fija como cualquier otra app.</p></div>
+      <div class="dl-step"><span class="dl-n">1</span><p>Abre el archivo <b>SPOTTER-AI.dmg</b> de tu carpeta <b>Descargas</b>.</p></div>
+      <div class="dl-step"><span class="dl-n">2</span><p>Arrastra el ícono de <b>SPOTTER AI</b> a la carpeta <b>Aplicaciones</b> (o a tu Escritorio) — y expulsa el instalador.</p></div>
+      <div class="dl-step"><span class="dl-n">3</span><p>Ábrela. La <b>primera vez</b>: clic derecho sobre la app → <b>Abrir</b> → <b>Abrir</b>. Ya después se abre normal, en su propia ventana.</p></div>
     </div>
   </div>
 </div></div></section>
@@ -675,7 +675,7 @@
   };
   // links absolutos calculados desde donde esté hospedada la landing (nunca se rompen por el nombre del repo)
   const _base=location.origin+location.pathname.replace(/[^/]*$/,"");
-  CFG.download=_base+"download/SPOTTER-AI.zip";
+  CFG.download=_base+"download/SPOTTER-AI.dmg";
   CFG.web=_base+"index.html";
   const _wa=$("#wa-btn"); if(_wa)_wa.href="https://wa.me/"+CFG.whatsapp+"?text="+encodeURIComponent(CFG.waText);
   $("#foot-disc").href=CFG.discord; $("#foot-app").href=CFG.app;

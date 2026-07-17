@@ -10,6 +10,14 @@
 !vendor
 !indicators
 !download
+# app nativa de escritorio: solo el código fuente, NO los binarios/bundle
+!desktop-app
+desktop-app/*
+!desktop-app/main.swift
+!desktop-app/build-app.sh
+!desktop-app/build-dmg.sh
+!desktop-app/make_dmg_bg.py
+!desktop-app/README.md
 assets/*
 vendor/*
 !vendor/three.min.js
