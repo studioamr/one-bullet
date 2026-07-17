@@ -651,11 +651,13 @@
     waText:"Hola André, quiero mi lugar en SPOTTER AI ($14,000 MXN).",
     discord:"https://discord.gg/vu3dRzAXd",
     app:"./index.html",
-    download:"https://studioamr.github.io/one-bullet/download/SPOTTER-AI.zip",
     code:"SPOTTER-2026",
-    web:"https://studioamr.github.io/one-bullet/",
-    email:"andremacouzetruiz@gmail.com"
+    form:"156ec8c9f5ddcd8b73421c94e7e63e97"
   };
+  // links absolutos calculados desde donde esté hospedada la landing (nunca se rompen por el nombre del repo)
+  const _base=location.origin+location.pathname.replace(/[^/]*$/,"");
+  CFG.download=_base+"download/SPOTTER-AI.zip";
+  CFG.web=_base+"index.html";
   const _wa=$("#wa-btn"); if(_wa)_wa.href="https://wa.me/"+CFG.whatsapp+"?text="+encodeURIComponent(CFG.waText);
   $("#foot-disc").href=CFG.discord; $("#foot-app").href=CFG.app;
   $("#yr").textContent=new Date().getFullYear();
@@ -688,7 +690,7 @@
     const name=$("#reg-name").value.trim(), email=$("#reg-email").value.trim();
     const btn=$("#reg-btn"); btn.disabled=true; btn.textContent="Enviando…";
     try{
-      await fetch("https://formsubmit.co/ajax/"+CFG.email,{method:"POST",
+      await fetch("https://formsubmit.co/ajax/"+CFG.form,{method:"POST",
         headers:{"Content-Type":"application/json",Accept:"application/json"},
         body:JSON.stringify({name,email,_subject:"👀 Lead SPOTTER AI (descarga app): "+name,_template:"table",_captcha:"false",
           _autoresponse:"¡Bienvenido a SPOTTER AI, "+name+"! 🎯\n\nSomos una escuela de trading distinta: aprendes a operar futuros con el dinero de empresas fondeadoras — no el tuyo — con un mentor en vivo cada mañana, una comunidad que no te suelta, y el Spotter, un asistente de IA que te cuida mientras operas.\n\nAquí está tu app de escritorio, gratis:\n👉 "+CFG.download+"\n\nO entra a la versión web con tu código de acceso:\n🌐 "+CFG.web+"\n🔑 Código: "+CFG.code+"\n\nCómo instalarla (2 min):\n1) Descarga y descomprime el .zip\n2) Doble clic en SPOTTER-AI.html — se abre tu plataforma\n3) Una sola vez: doble clic en setup-spotter-launcher.command (activa el Spotter)\n\nCada mañana opero la apertura de Nueva York en vivo. Únete a la comunidad: "+CFG.discord+"\n\n¿Quieres el paquete completo con mentoría? SPOTTER AI · $14,000 MXN · pago único, de por vida. Responde este correo o escríbeme por WhatsApp.\n\nNos vemos en Nueva York.\n— André · SPOTTER AI"})});
