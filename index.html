@@ -2090,7 +2090,7 @@
       <div class="p-card"><div class="c-t">Access</div>
         <div class="alloc">
           <div class="alloc-row"><span>Signed in as</span><b>${esc(u?.handle||name||"trader")}</b></div>
-          <div class="alloc-row"><span>Plan</span><b>${trialOver()?"Prueba terminada":`Prueba · ${trialLeft()} día${trialLeft()===1?"":"s"}`}</b></div>
+          <div class="alloc-row"><span>Plan</span><b>Acceso completo · gratis</b></div>
         </div>
         <div class="sl-actions" style="margin-top:14px"><button class="btn ghost" data-a="logout" data-hover>Log out</button></div></div>
       <div class="p-card"><div class="c-t">AI assistant · Spotter</div>
@@ -2136,7 +2136,7 @@
     const cp=progLoad(), lc=allLessons(), cpct=lc.length?Math.round(lc.filter(l=>cp[l.id]).length/lc.length*100):0;
     const items=NAV.map(it=>it.group?`<div class="nav-group">${it.group}</div>`
       :`<button class="navitem" data-route="${it.r}" data-hover><span>${it.label}</span>${it.r==="course"?`<span class="nav-badge">${cpct}%</span>`:""}</button>`).join("");
-    $("#sidebar").innerHTML=`<div class="sb-brand"><svg viewBox="0 0 32 32" class="brand-mark" aria-hidden="true"><g class="spin"><circle cx="16" cy="16" r="12.6" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".4"/><path d="M16 3.4v4.4M16 24.2v4.4M3.4 16h4.4M24.2 16h4.4" stroke="currentColor" stroke-width="1.4" opacity=".4" stroke-linecap="round"/></g><circle class="lock" cx="16" cy="16" r="5.4" fill="none" stroke="var(--accent)" stroke-width="1.35"/><circle cx="16" cy="16" r="2.2" fill="var(--accent)"/></svg>SPOTTER <i>AI</i></div>${userLoad()?`<div class="trial-badge">Prueba · ${trialLeft()} día${trialLeft()===1?"":"s"}</div>`:""}
+    $("#sidebar").innerHTML=`<div class="sb-brand"><svg viewBox="0 0 32 32" class="brand-mark" aria-hidden="true"><g class="spin"><circle cx="16" cy="16" r="12.6" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".4"/><path d="M16 3.4v4.4M16 24.2v4.4M3.4 16h4.4M24.2 16h4.4" stroke="currentColor" stroke-width="1.4" opacity=".4" stroke-linecap="round"/></g><circle class="lock" cx="16" cy="16" r="5.4" fill="none" stroke="var(--accent)" stroke-width="1.35"/><circle cx="16" cy="16" r="2.2" fill="var(--accent)"/></svg>SPOTTER <i>AI</i></div>${userLoad()?`<div class="trial-badge">Acceso completo</div>`:""}
       <button class="sb-profile" data-route="home" data-hover><span class="tb-av">${(name.trim()[0]||"T").toUpperCase()}</span><span class="sb-pinfo"><b>${esc(name)}</b><small>your profile</small></span></button>
       <nav class="navlist">${items}</nav>
       <div class="sb-foot"><button class="navitem" data-route="settings" data-hover><span>Settings</span></button><a class="navitem" href="${DISCORD}" target="_blank" rel="noopener" data-hover><span>Community · Discord</span></a></div>`;
@@ -2297,9 +2297,8 @@
   mostrar("home");
   if(localStorage.getItem("candado_demo")){ localStorage.removeItem("candado_historial");localStorage.removeItem("candado_demo"); }
   if(!userLoad()) userSave({handle:"trader",at:Date.now()}); // sin código: entrada libre
-  trialStart(); // arranca los 7 días de prueba
+  // amigos = acceso completo gratis: sin candado de prueba (se re-activa cuando salga a público)
   if(!localStorage.getItem("candado_onboarded")) startOnb();
-  else if(trialOver()) renderTrialEnded();
 })();
 </script>
 </body>
