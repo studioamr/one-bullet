@@ -1,13 +1,11 @@
 SPOTTER AI — App de escritorio
 ==============================
-1. Doble clic en SPOTTER-AI.html → se abre tu plataforma. (Sin códigos, ya desbloqueada.)
-2. UNA sola vez: doble clic en setup-spotter-launcher.command → instala el lanzador nativo.
-   (Si macOS lo bloquea: clic derecho → Abrir.)
-3. Haz tu setup de 2 minutos en la app y listo.
+1. Doble clic en SPOTTER-AI.html → se abre tu plataforma. (Ya desbloqueada.)
+2. Haz tu setup de 2 minutos.
 
-A partir de ahí, cada "Start Session" en la app:
-  · abre tu TradingView
-  · lanza el Spotter (Claude Code) para vigilarte en vivo
+Cada mañana, para operar:
+  · Abre TradingView
+  · Doble clic en start-watch.command → arranca el Spotter (Claude te vigila en vivo)
 
 Para el Spotter necesitas tu propia cuenta de Claude: https://claude.ai
 Tu progreso se guarda en este equipo automáticamente.

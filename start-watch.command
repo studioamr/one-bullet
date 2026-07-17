@@ -4,9 +4,6 @@ cd "$HOME/claude" 2>/dev/null || cd "$HOME"
 CLAUDE="$HOME/.local/bin/claude"
 [ -x "$CLAUDE" ] || CLAUDE="$(command -v claude)"
 
-# abre tu TradingView por si no está ya abierto
-open "https://www.tradingview.com/chart/" 2>/dev/null
-
 PROMPT="empieza sesión: vigila mi TradingView en vivo, cada ~20s revisa mi pantalla y avísame con alarma de voz si rompo mi disciplina (1 bala por sesión, stop 1% diario, cerrar tras pérdida, cazar revenge). narra el contexto del precio pero NO me des señales de compra o venta. cuando cierre el trade dame el resumen (duración, resultado). di 'terminé' para parar."
 
 clear

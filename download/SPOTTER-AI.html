@@ -812,7 +812,6 @@
   .ci .ci-tag{font-size:.56rem;text-transform:uppercase;letter-spacing:.16em;color:var(--accent);margin-bottom:10px}
   .ci h4{font-family:var(--serif);font-weight:400;font-size:1.25rem;letter-spacing:-.01em;margin-bottom:8px;line-height:1.15}
   .ci p{color:var(--ink1);font-size:.9rem;line-height:1.55}
-  .spotter-launch{margin-top:14px;display:block;text-align:center}
   .empty-note{color:var(--ink1);font-size:.95rem;line-height:1.6;max-width:52ch;
     border:1px dashed var(--line);border-radius:12px;padding:22px}
 
@@ -1718,8 +1717,6 @@
   }
   /* ---------- Start Session · SPOTTER AI · one bullet in 3 phases ---------- */
   const TV_URL="https://www.tradingview.com/chart/";
-  const SPOTTER_URI="spotter://start"; // handler nativo (instala setup-spotter-launcher.command una vez)
-  const SPOTTER_CMD="start-watch.command"; // respaldo: el lanzador directo
   function sessLoad(){try{const s=JSON.parse(localStorage.getItem("candado_session"))||{phase:"ready"};
     if(s.phase!=="ready"&&s.startedAt){const d=new Date(s.startedAt),iso=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
       if(iso!==hoy())return{phase:"ready"};} // a session from another day never survives the night
@@ -1729,8 +1726,7 @@
   function sesModeLoad(){try{return localStorage.getItem("candado_sesmode")||"live";}catch(e){return "live";}}
   function sesModeSave(m){try{localStorage.setItem("candado_sesmode",m);}catch(e){}}
   function startSession(){ sessSave({phase:"live",startedAt:Date.now(),sim:sesModeLoad()==="sim"});
-    try{window.open(TV_URL,"_blank","noopener");}catch(e){}  // 1) tu TradingView
-    try{location.href=SPOTTER_URI;}catch(e){}                 // 2) el Spotter (Claude Code) vía handler nativo
+    try{window.open(TV_URL,"_blank","noopener");}catch(e){} // abre tu TradingView
     mostrar("sesion"); }
   function practiceNow(){ sesModeSave("sim"); mostrar("sesion"); }
   const simBadge=s=>s.sim?`<span class="sim-badge">SIM · practice</span>`:"";
@@ -1751,9 +1747,7 @@
   function newSession(){ sessSave({phase:"ready"}); mostrar("sesion"); }
   function sessInfoCard(){
     return `<div class="p-card ses-info"><div class="c-t">The Spotter is with you</div>
-      <ul class="ses-ul"><li>Watches and analyzes in real time</li><li>Tracks your strategy on the chart</li><li>Reminds you of your plan</li><li>Builds your performance summary</li></ul>
-      <a class="btn fill spotter-launch" href="${SPOTTER_URI}" data-hover>▶ Launch the Spotter</a>
-      <p class="home-note">Opens Claude Code to watch your TradingView live. First time only: run <b>setup-spotter-launcher.command</b> once. No Claude yet? Open it and say: <b>empieza sesión</b>.</p></div>`;
+      <ul class="ses-ul"><li>Watches and analyzes in real time</li><li>Tracks your strategy on the chart</li><li>Reminds you of your plan</li><li>Builds your performance summary</li></ul></div>`;
   }
   function rulesLoad(){try{return Object.assign({trades:1,risk:1,sess:1.5,target:2},JSON.parse(localStorage.getItem("candado_rules")||"{}"));}catch(e){return{trades:1,risk:1,sess:1.5,target:2};}}
   function rulesSave(r){try{localStorage.setItem("candado_rules",JSON.stringify(r));}catch(e){}}
