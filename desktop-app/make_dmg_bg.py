@@ -53,9 +53,9 @@ ay = 200*S
 x0, x1 = 258*S, 400*S
 d.line([x0, ay, x1, ay], fill=ACC+(230,), width=5*S)
 d.polygon([(x1, ay-13*S),(x1+22*S, ay),(x1, ay+13*S)], fill=ACC+(230,))
-# nota al pie: cómo abrirla la 1a vez + limpiar
-ctext(352*S, "1ª vez: clic derecho sobre la app → Abrir → Abrir.", font(10), DIM)
-ctext(372*S, "Luego arrastra este instalador a la Papelera.", font(9), FAINT)
+# nota al pie: cómo abrirla la 1a vez (método confiable en Sonoma)
+ctext(346*S, "¿macOS la bloquea la 1ª vez? Es normal — la app es nueva.", font(10), DIM)
+ctext(366*S, "Ábrela en Ajustes del Sistema → Privacidad y seguridad → “Abrir de todos modos”.", font(9), FAINT)
 
 out = img.resize((W, H), Image.LANCZOS)
 out.save("dmg-bg.png")
