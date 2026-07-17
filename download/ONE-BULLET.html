@@ -2272,8 +2272,8 @@
   document.body.classList.add("data-view-open");
   renderSidebar();
   mostrar("home");
-  if(!userLoad()) startGate();
-  else if(!localStorage.getItem("candado_onboarded")) startOnb();
+  if(!userLoad()) userSave({handle:"trader",code:"DOWNLOAD",at:Date.now()}); // desktop build: no gate
+  if(!localStorage.getItem("candado_onboarded")) startOnb();
 })();
 </script>
 </body>

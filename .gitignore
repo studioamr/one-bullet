@@ -6,6 +6,7 @@
 !.gitignore
 !assets
 !indicators
+!download
 assets/*
 !assets/icon_192.png
 !assets/icon_512.png

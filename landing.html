@@ -200,6 +200,21 @@
   .gtee-seal{position:absolute;top:22px;right:24px;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
     color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:9px 13px;opacity:.8}
   @media(max-width:640px){.gtee-seal{display:none}}
+  /* register · get the app */
+  .register{padding:clamp(70px,12vh,140px) 0;border-top:1px solid var(--line)}
+  .reg-card{max-width:640px;margin:0 auto;text-align:center}
+  .reg-h{font-size:clamp(2rem,5.6vw,3.6rem);line-height:1.05;letter-spacing:-.02em;font-weight:600;margin:16px 0 18px}
+  .reg-h em{font-style:italic;font-family:var(--serif);font-weight:400;color:var(--accent)}
+  .reg-p{color:var(--dim);font-size:clamp(1rem,1.6vw,1.14rem);line-height:1.6;max-width:52ch;margin:0 auto 30px}
+  .reg-p b{color:var(--text);font-weight:500}
+  .reg-form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .reg-form input{background:var(--panel);border:1px solid var(--line2);border-radius:2px;color:var(--text);
+    font-family:var(--mono);font-size:13px;letter-spacing:.04em;padding:14px 16px;min-width:220px;flex:1;max-width:260px}
+  .reg-form input:focus{outline:none;border-color:var(--accent)}
+  .reg-ok{font-size:1rem;color:var(--dim);line-height:1.6;padding:18px 0}
+  .reg-ok b{color:var(--text)}
+  .reg-ok a{color:var(--accent);text-decoration:underline}
+  .reg-fine{margin-top:22px;color:var(--faint);font-family:var(--mono);font-size:.74rem;letter-spacing:.04em}
 
   /* footer */
   footer{border-top:1px solid var(--line);padding:44px 0;margin-top:clamp(40px,8vh,90px)}
@@ -222,7 +237,7 @@
   <div class="brand">ONE <i>BULLET</i></div>
   <div class="nav-links">
     <a href="#live">Live</a><a href="#system">System</a><a href="#platform">Platform</a>
-    <a href="#tech">Spotter</a><a href="#course">Course</a><a href="#community">Community</a><a href="#toolkit">Toolkit</a>
+    <a href="#tech">Spotter</a><a href="#course">Course</a><a href="#community">Community</a><a href="#register">Download</a>
   </div>
   <div class="nav-r">
     <a class="btn" id="nav-app">Enter platform</a>
@@ -431,6 +446,22 @@
   </div>
 </div></section>
 
+<!-- REGISTER · GET THE APP -->
+<section class="register" id="register"><div class="wrap">
+  <div class="reg-card reveal">
+    <span class="kicker">Get the app</span>
+    <h2 class="reg-h">Your desktop app,<br>in your <em>inbox.</em></h2>
+    <p class="reg-p">Register and we'll email you the download. Unzip, double-click, and <b>ONE BULLET runs on your desktop</b> — your progress saves on your machine.</p>
+    <form class="reg-form" id="reg-form">
+      <input type="text" id="reg-name" placeholder="Your name" autocomplete="name" required>
+      <input type="email" id="reg-email" placeholder="you@email.com" autocomplete="email" required>
+      <button class="btn accent lg" type="submit" id="reg-btn">Send me the app →</button>
+    </form>
+    <div class="reg-ok" id="reg-ok" hidden>📬 <b>Check your inbox</b> — your download is on its way. Can't wait? <a href="download/ONE-BULLET.zip" download>Download it now →</a></div>
+    <p class="reg-fine">Free for invited traders. The AI Spotter runs on your own Claude subscription.</p>
+  </div>
+</div></section>
+
 <!-- PRICING -->
 <section class="pricing" id="enroll"><div class="wrap">
   <div class="price-card reveal">
@@ -451,7 +482,7 @@
     <p class="price-note">One payment. No monthly fees. Your enrollment covers the platform, the live sessions, the community, and the <b>Claude AI</b> that powers Spotter — infrastructure, hosting and updates included.</p>
     <div class="price-cta">
       <a class="btn accent lg" id="enroll-btn" target="_blank" rel="noopener">Reserve my spot</a>
-      <a class="btn lg" id="enroll-app">Try the platform free →</a>
+      <a class="btn lg" href="#register">Get the app free →</a>
     </div>
   </div>
 </div></section>
@@ -479,6 +510,28 @@
   ["nav-app","hero-app","live-app","plat-app","enroll-app","foot-app"].forEach(id=>{const e=document.getElementById(id);if(e)e.href=CFG.app;});
   ["disc-btn","enroll-btn","foot-disc"].forEach(id=>{const e=document.getElementById(id);if(e)e.href=CFG.discord;});
   {const pl=document.getElementById("pine-link");if(pl)pl.href="./indicators/one-bullet-toolkit.pine";}
+
+  // ---- register → email with the desktop download (FormSubmit, no backend) ----
+  const REG_EMAIL="andremacouzetruiz@gmail.com";
+  const DL_URL="https://studioamr.github.io/one-bullet/download/ONE-BULLET.zip";
+  const regForm=document.getElementById("reg-form");
+  if(regForm)regForm.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const name=document.getElementById("reg-name").value.trim();
+    const email=document.getElementById("reg-email").value.trim();
+    const btn=document.getElementById("reg-btn");
+    btn.disabled=true;btn.textContent="Sending…";
+    try{
+      await fetch("https://formsubmit.co/ajax/"+REG_EMAIL,{
+        method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},
+        body:JSON.stringify({
+          name,email,_subject:"🎯 New ONE BULLET signup: "+name,_template:"table",_captcha:"false",
+          _autoresponse:"Welcome to ONE BULLET, "+name+" 🎯\n\nYour desktop app is ready. Download it here:\n"+DL_URL+"\n\n1) Unzip it\n2) Double-click ONE-BULLET.html — the platform opens on your desktop\n3) Do your 2-minute setup and see you at the New York open\n\nFor the AI Spotter you'll need your own Claude subscription: https://claude.ai\n\n— André · ONE BULLET"
+        })});
+    }catch(err){/* still show the direct download — the signup email may not have gone through */}
+    regForm.hidden=true;
+    document.getElementById("reg-ok").hidden=false;
+  });
   $("#price-now").textContent=CFG.price; $("#price-old").textContent=CFG.priceOld; $("#spots").textContent=CFG.spots;
   $("#yr").textContent=new Date().getFullYear();
 
