@@ -2149,7 +2149,7 @@
   function userLoad(){try{return JSON.parse(localStorage.getItem("candado_user"))||null;}catch(e){return null;}}
   function userSave(u){try{localStorage.setItem("candado_user",JSON.stringify(u));}catch(e){}}
   function codeHash(s){let h=5381;s=String(s||"").toUpperCase().replace(/\s+/g,"");for(let i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))>>>0;}return h.toString(36);}
-  const ACCESS=["rz5ko4","1r9vkdg","1r9ieay","1ra0zcf","1r9gm6n","1ra65wt","1r9x27u","1r9gxgn","1r9v4ie","1ra0zek","1r9d6uv","1ra4go1","1r9g4t0","1ra09ai","1r9tyi9","1r9q97n"];
+  const ACCESS=["rt2j71","rz5ko4","1r9vkdg","1r9ieay","1ra0zcf","1r9gm6n","1ra65wt","1r9x27u","1r9gxgn","1r9v4ie","1ra0zek","1r9d6uv","1ra4go1","1r9g4t0","1ra09ai","1r9tyi9","1r9q97n"];
   function startGate(){
     if(!document.getElementById("gate")){const d=document.createElement("div");d.id="gate";document.body.appendChild(d);}
     renderGate();
