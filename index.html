@@ -884,6 +884,7 @@
   .lead-nm{flex:1;color:var(--ink1)}.lead-nm em{color:var(--accent);font-style:normal;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;margin-left:6px}
   .lead-row.me .lead-nm{color:var(--ink)}
   .lead-el{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink)}
+  .live-tag{color:#35c46f;font-weight:600}
   .tbl td{padding:12px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;color:var(--ink1)}
   .tbl td.strong{color:var(--ink);font-family:var(--serif);font-size:.98rem}
   .tbl tr:hover td{background:rgba(244,241,234,.02)}
@@ -1070,6 +1071,21 @@
   const $=s=>document.querySelector(s);
   const body=document.body;
   const KEY="candado_state_v1", VKEY="candado_voz", HKEY="candado_historial", PKEY="candado_progress";
+  /* ================= BACKEND EN VIVO · Supabase (perfiles / leaderboard / carrera reales) ================= */
+  const SUPA_URL="https://eskpyntqmioiwvaczpcl.supabase.co";
+  const SUPA_KEY="sb_publishable_Yafq724ShItiCiiyVhB2Vw_ka05P7pd";
+  let SUPA_PROFILES=[];
+  function deviceId(){ let d; try{d=localStorage.getItem("candado_did");}catch(e){} if(!d){ d="d_"+Math.random().toString(36).slice(2,10)+Date.now().toString(36); try{localStorage.setItem("candado_did",d);}catch(e){} } return d; }
+  function supaHead(x){ return Object.assign({apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY,"Content-Type":"application/json"},x||{}); }
+  function supaUpsert(){ try{
+    const p=profileLoad()||{}, a=acctLoad()||{}, r=eloLoad(), yr=youRacer(), done=(NPtrades()||[]).filter(t=>t.result), wins=done.filter(t=>t.result==="win").length;
+    const row={ id:deviceId(), handle:(p.handle||"trader").toString().slice(0,24), firm:a.firm||null, phase:yr.phase||"eval",
+      elo:(r.elo||1200)|0, net_pnl:Math.round(totalProfit()||0), win_rate:done.length?Math.round(wins/done.length*100):0,
+      trades:done.length, eval_pct:Math.round(yr.evalPct||0), updated_at:new Date().toISOString() };
+    fetch(SUPA_URL+"/rest/v1/profiles",{method:"POST",headers:supaHead({Prefer:"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify(row)}).catch(()=>{});
+  }catch(e){} }
+  function supaRefresh(){ fetch(SUPA_URL+"/rest/v1/profiles?select=id,handle,phase,elo,net_pnl,win_rate,eval_pct&order=elo.desc&limit=60",{headers:supaHead()})
+    .then(r=>r.ok?r.json():null).then(d=>{ if(Array.isArray(d)){ SUPA_PROFILES=d; if(["training","comunidad","progreso"].indexOf(vistaActual)>=0) mostrar(vistaActual); } }).catch(()=>{}); }
   const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
   const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   const SETUPS_L={orb:"ORB",killzone:"Killzone",smc:"SMC",emas:"EMAs",breakout:"Breakout",rev:"Reversal",otro:"Other"};
@@ -1788,15 +1804,18 @@
   function buildRace(){
     const yr=youRacer(); const you={...yr,pos:racePos(yr)};
     const joined=raceJoined();
-    let racers=[you];
-    if(joined) racers=racers.concat(raceCrew().map(m=>({...m,pos:racePos(m)})));
+    let racers=[you]; const me=deviceId(), live=joined&&SUPA_PROFILES.length>1;
+    if(joined){
+      if(live) racers=racers.concat(SUPA_PROFILES.filter(p=>p.id!==me).slice(0,8).map(p=>{const m={u:p.handle||"trader",phase:p.phase||"eval",evalPct:p.eval_pct||0,bufferPct:0,payouts:0};m.pos=racePos(m);return m;}));
+      else racers=racers.concat(raceCrew().map(m=>({...m,pos:racePos(m)})));
+    }
     racers.sort((a,b)=>b.pos-a.pos);
     return `<div class="race">
       <div class="race-zones"><span>Eval</span><span>Funded</span><span>Eden →</span></div>
       ${racers.map(raceLane).join("")}
       ${joined
-        ? `<div class="race-empty">You're racing the <b>pace-setters</b> — pass them to reach Eden. Your lane moves with your real profit. The live crew replaces the pacers when the backend connects.</div>`
-        : `<div class="race-join"><p>You're not in a race yet — <b>join one</b> to line up against the pace-setters and see where you stand.</p><button class="btn fill" data-a="joinrace" data-hover>Join a race →</button></div>`}
+        ? `<div class="race-empty">${live?'<b>● En vivo</b> — traders reales de la comunidad SPOTTER AI, moviéndose con su profit real.':"You're racing the <b>pace-setters</b> — pass them to reach Eden. The live crew replaces the pacers as the community grows."}</div>`
+        : `<div class="race-join"><p>You're not in a race yet — <b>join one</b> to line up and see where you stand.</p><button class="btn fill" data-a="joinrace" data-hover>Join a race →</button></div>`}
     </div>`;
   }
   function viewHome(){
@@ -1865,10 +1884,10 @@
   }
   function wonSession(){ const s=sessLoad(); s.phase="done"; s.result="won"; s.endedAt=Date.now();
     s.tradeMin=s.firedAt?Math.max(1,Math.round((s.endedAt-s.firedAt)/60000)):null; sessSave(s);
-    sessRecord({outcome:"GANADA",durMin:s.tradeMin,sim:!!s.sim}); mostrar("sesion"); }
+    sessRecord({outcome:"GANADA",durMin:s.tradeMin,sim:!!s.sim}); supaUpsert(); mostrar("sesion"); }
   function lostSession(){ const s=sessLoad(); s.phase="done"; s.result="lost"; s.endedAt=Date.now();
     s.tradeMin=s.firedAt?Math.max(1,Math.round((s.endedAt-s.firedAt)/60000)):null; sessSave(s);
-    sessRecord({outcome:"BLOQUEADO",durMin:s.tradeMin,sim:!!s.sim}); mostrar("sesion"); }
+    sessRecord({outcome:"BLOQUEADO",durMin:s.tradeMin,sim:!!s.sim}); supaUpsert(); mostrar("sesion"); }
   function endSession(){ const s=sessLoad(); s.phase="done"; s.result=s.result||"flat"; s.endedAt=Date.now(); sessSave(s); mostrar("sesion"); }
   function newSession(){ sessSave({phase:"ready"}); mostrar("sesion"); }
   function sessInfoCard(){
@@ -2063,14 +2082,20 @@
   function trainEnd(){ const t=tLoad(); if(t.phase!=="live")return; t.phase="done"; t.endedAt=Date.now(); t.durMin=Math.max(1,Math.round((t.endedAt-t.startedAt)/60000)); tSave(t); mostrar("training"); }
   function trainSeal(outcome){ const r=eloLoad(); const d=outcome==="won"?20:-16; r.elo=Math.max(800,r.elo+d); if(outcome==="won")r.w++; else r.l++; eloSave(r);
     const t=tLoad(); try{const log=JSON.parse(localStorage.getItem("candado_trainlog")||"[]"); log.unshift({fecha:hoy(),durMin:t.durMin||null,outcome,elo:r.elo}); localStorage.setItem("candado_trainlog",JSON.stringify(log.slice(0,50)));}catch(e){}
-    tSave({phase:"ready"}); mostrar("training"); }
+    tSave({phase:"ready"}); supaUpsert(); mostrar("training"); }
   function trainBoard(r){
-    const you={name:(profileLoad()||{}).handle||"you", elo:r.elo, you:true};
-    const crew=[["NY_killer",42],["liq_hunter",-31],["one_shot",63],["asia_range",-58],["fvg_god",95]]
-      .map(([n,dd])=>({name:n,elo:Math.max(800,r.elo+dd),you:false})).concat([you]).sort((a,b)=>b.elo-a.elo);
-    return `<div class="p-card"><div class="c-t">Leaderboard <span class="room-agg">Elo · you vs the crew</span></div>
+    const me=deviceId(), live=SUPA_PROFILES.length>1; let crew;
+    if(live){
+      crew=SUPA_PROFILES.map(p=>({name:p.handle||"trader",elo:p.elo||1200,you:p.id===me})).sort((a,b)=>b.elo-a.elo).slice(0,10);
+      if(!crew.some(m=>m.you)) crew.push({name:(profileLoad()||{}).handle||"you",elo:r.elo,you:true});
+    }else{
+      const you={name:(profileLoad()||{}).handle||"you",elo:r.elo,you:true};
+      crew=[["NY_killer",42],["liq_hunter",-31],["one_shot",63],["asia_range",-58],["fvg_god",95]]
+        .map(([n,dd])=>({name:n,elo:Math.max(800,r.elo+dd),you:false})).concat([you]).sort((a,b)=>b.elo-a.elo);
+    }
+    return `<div class="p-card"><div class="c-t">Leaderboard <span class="room-agg">Elo · ${live?'<span class="live-tag">● live</span> community':'you vs the crew'}</span></div>
       <div class="lead">${crew.map((m,i)=>`<div class="lead-row ${m.you?'me':''}"><span class="lead-rk">#${i+1}</span><span class="lead-nm">${esc(m.name)}${m.you?' <em>you</em>':''}</span><span class="lead-el">${m.elo}</span></div>`).join("")}</div>
-      <p class="home-note">Sample crew — real 1v1s and live ranks turn on with the community backend.</p></div>`;
+      <p class="home-note">${live?"Live — real traders from the SPOTTER AI community.":"Sample crew — real ranks appear as the community grows."}</p></div>`;
   }
   function viewTraining(){
     const t=tLoad(), r=eloLoad();
@@ -2399,7 +2424,7 @@
     rulesSave({trades:d.trades||1,risk:d.risk||1,sess:d.sess||1.5,target:d.ptarget||2});
     try{localStorage.setItem("candado_onboarded","1");}catch(e){}
     ONB=null; const o=document.getElementById("onb"); if(o)o.remove();
-    renderSidebar(); mostrar("home");
+    supaUpsert(); renderSidebar(); mostrar("home");
   }
   function onbPill(list,cur,attr){ return list.map(x=>`<button class="onb-pill ${x[0]===cur?"on":""}" data-${attr}="${x[0]}" data-hover>${x[1]}</button>`).join(""); }
   function renderOnb(){
@@ -2483,6 +2508,9 @@
   if(!userLoad()) userSave({handle:"trader",at:Date.now()}); // sin código: entrada libre
   // amigos = acceso completo gratis: sin candado de prueba (se re-activa cuando salga a público)
   if(!localStorage.getItem("candado_onboarded")) startOnb();
+
+  /* backend en vivo: publica tu perfil y trae la comunidad real */
+  supaUpsert(); supaRefresh(); setInterval(supaRefresh, 45000);
 
   /* ---------- EN VIVO: banner cuando André transmite (Kick/YouTube) ---------- */
   function applyLive(d){
