@@ -952,6 +952,12 @@
   .grd-bar{height:7px;border-radius:99px;background:rgba(244,241,234,.08);overflow:hidden}
   .grd-bar span{display:block;height:100%;border-radius:99px;transition:width .4s var(--ease)}
   .guard-edit span{font-size:.78rem}.guard-edit input{width:100%}
+  .grd-sec{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink1);margin:14px 0 8px}.grd-sec:first-of-type{margin-top:4px}
+  .grd-hint{text-transform:none;letter-spacing:0;color:var(--ink2);margin-left:6px}
+  .grd-adv{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  .grd-adv summary{cursor:pointer;font-size:.82rem;color:var(--ink1);list-style:none}.grd-adv summary::-webkit-details-marker{display:none}
+  .grd-adv summary:before{content:"▸ ";color:var(--accent)}.grd-adv[open] summary:before{content:"▾ "}
+  .grd-adv .guard-edit{margin-top:12px}
   .pm-card{background:linear-gradient(180deg,rgba(61,134,207,.06),transparent);border-color:rgba(61,134,207,.22)}
   .pm-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
   .pm-k{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink1)}
@@ -1291,7 +1297,7 @@
   /* ---------- events ---------- */
   document.addEventListener("click",e=>{
     const b=e.target.closest("button[data-a]");if(!b)return;
-    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,shareshot:sealPoster,tradenew:tradeNew,tradesave:tradeSave,tradedel:tradeDelete,csvimport:csvImportClick,exportdata:exportData,importdata:importDataClick,pmspeak:()=>spkr(premarketText()),dismissnudge:()=>{TRADING_NUDGE="";statusPush(sessLoad().phase||"ready");mostrar(vistaActual);},replayonb:startOnb,practicenow:practiceNow,joinrace:()=>{raceJoin();mostrar("progreso");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,spkr:spkToggle,invite:()=>{try{window.open("https://wa.me/?text="+encodeURIComponent("Prueba SPOTTER AI conmigo — la plataforma de trading con disciplina: https://studioamr.github.io/spotter-ai/landing.html"),"_blank");}catch(e){}},logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
+    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,shareshot:sealPoster,tradenew:tradeNew,tradesave:tradeSave,tradedel:tradeDelete,csvimport:csvImportClick,exportdata:exportData,importdata:importDataClick,guardreset:()=>{const a=acctLoad()||{};delete a.dailyLoss;delete a.maxDD;delete a.consistency;delete a.minDays;acctSave(a);mostrar("settings");},pmspeak:()=>spkr(premarketText()),dismissnudge:()=>{TRADING_NUDGE="";statusPush(sessLoad().phase||"ready");mostrar(vistaActual);},replayonb:startOnb,practicenow:practiceNow,joinrace:()=>{raceJoin();mostrar("progreso");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,spkr:spkToggle,invite:()=>{try{window.open("https://wa.me/?text="+encodeURIComponent("Prueba SPOTTER AI conmigo — la plataforma de trading con disciplina: https://studioamr.github.io/spotter-ai/landing.html"),"_blank");}catch(e){}},logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
   });
   document.addEventListener("input",e=>{ if(!e.target)return;
     if(ONB&&e.target.id&&e.target.id.startsWith("onb-")){ const d=ONB.data, id=e.target.id, v=e.target.value;
@@ -1761,21 +1767,31 @@
   function acctSave(a){try{localStorage.setItem("candado_account",JSON.stringify(a));}catch(e){}}
   /* ---------- Motor de reglas de fondeadora + guardián de blow-up ---------- */
   /* valores TÍPICOS como % del tamaño de cuenta — editables; el usuario confirma con su firma */
-  const FIRM_PRESETS={
-    "Tradeify":     {dailyLoss:0.03, maxDD:0.06,  consistency:0.20, minDays:0},
-    "Lucid Trading":{dailyLoss:0.03, maxDD:0.045, consistency:0.30, minDays:0},
-    "Lucid":        {dailyLoss:0.03, maxDD:0.045, consistency:0.30, minDays:0},
-    "Apex":         {dailyLoss:0,    maxDD:0.06,  consistency:0.30, minDays:0},
-    "Topstep":      {dailyLoss:0.02, maxDD:0.04,  consistency:0.50, minDays:2},
-    "_default":     {dailyLoss:0.03, maxDD:0.06,  consistency:0.30, minDays:0}
+  /* Reglas TÍPICAS por firma y FASE (% del tamaño de cuenta) — las evals y las fondeadas
+     tienen reglas distintas; se aplican solas según tu fase. Editables, confirma con tu plan. */
+  const FIRM_RULES={
+    "Tradeify":     { eval:{dailyLoss:0,    maxDD:0.06,  consistency:0,    minDays:0, target:0.06},
+                      funded:{dailyLoss:0,    maxDD:0.06,  consistency:0.20, minDays:0} },
+    "Lucid":        { eval:{dailyLoss:0.03, maxDD:0.045, consistency:0,    minDays:0, target:0.09},
+                      funded:{dailyLoss:0.03, maxDD:0.045, consistency:0.30, minDays:0} },
+    "Lucid Trading":{ eval:{dailyLoss:0.03, maxDD:0.045, consistency:0,    minDays:0, target:0.09},
+                      funded:{dailyLoss:0.03, maxDD:0.045, consistency:0.30, minDays:0} },
+    "Apex":         { eval:{dailyLoss:0,    maxDD:0.05,  consistency:0,    minDays:1, target:0.06},
+                      funded:{dailyLoss:0,    maxDD:0.05,  consistency:0.30, minDays:0} },
+    "Topstep":      { eval:{dailyLoss:0.02, maxDD:0.04,  consistency:0,    minDays:0, target:0.06},
+                      funded:{dailyLoss:0.02, maxDD:0.04,  consistency:0.50, minDays:5} },
+    "_default":     { eval:{dailyLoss:0.03, maxDD:0.06,  consistency:0,    minDays:0, target:0.08},
+                      funded:{dailyLoss:0.03, maxDD:0.06,  consistency:0.30, minDays:0} }
   };
-  function firmPreset(f){ return FIRM_PRESETS[f]||FIRM_PRESETS._default; }
-  function guardLoad(){ const a=acctLoad()||{}, p=firmPreset(a.firm);
-    return { firm:a.firm||"tu firma", size:a.size||50000,
-      dailyLoss:(a.dailyLoss!=null?a.dailyLoss:p.dailyLoss),
-      maxDD:(a.maxDD!=null?a.maxDD:p.maxDD),
-      consistency:(a.consistency!=null?a.consistency:p.consistency),
-      minDays:(a.minDays!=null?a.minDays:p.minDays) }; }
+  function firmRules(firm,phase){ const f=FIRM_RULES[firm]||FIRM_RULES._default; return f[phase]||f.eval; }
+  // fase para las reglas: manual si la fijaste, si no la deduce de tu progreso (eval → funded al pasar)
+  function guardPhase(){ const a=acctLoad()||{}; if(a.guardPhase==="eval"||a.guardPhase==="funded")return a.guardPhase; return youRacer().phase==="eval"?"eval":"funded"; }
+  function guardLoad(){ const a=acctLoad()||{}, ph=guardPhase(), r=firmRules(a.firm,ph);
+    return { firm:a.firm||"tu firma", size:a.size||50000, phase:ph, phaseLabel:ph==="eval"?"Evaluación":"Cuenta fondeada", target:r.target||0,
+      dailyLoss:(a.dailyLoss!=null?a.dailyLoss:r.dailyLoss),
+      maxDD:(a.maxDD!=null?a.maxDD:r.maxDD),
+      consistency:(a.consistency!=null?a.consistency:r.consistency),
+      minDays:(a.minDays!=null?a.minDays:r.minDays) }; }
   function guardStats(){ const g=guardLoad(), size=g.size;
     const h=histLoad().filter(x=>!x.sim&&x.pnl!=null).slice().sort((a,b)=>(a.fecha||"").localeCompare(b.fecha||""));
     let eq=size, peak=size; const dayPnl={};
@@ -1796,6 +1812,8 @@
     const col=st==="bad"?"var(--rojo)":st==="warn"?"#C9A24B":"#35c46f";
     return `<div class="grd-row"><div class="grd-top"><span>${label}</span><b>${detail}</b></div><div class="grd-bar"><span style="width:${Math.round(frac*100)}%;background:${col}"></span></div></div>`; }
   function guardCard(){ const s=guardStats(), g=s.g, rows=[];
+    if(g.phase==="eval"&&g.target>0){ const tgt$=Math.round(s.size*g.target), room=Math.max(0,tgt$-Math.max(0,s.totalProfit));
+      rows.push(guardMeter("Objetivo del eval",Math.max(0,s.totalProfit)/tgt$,room>0?`te falta $${room.toLocaleString("en-US")} · objetivo $${tgt$.toLocaleString("en-US")}`:`objetivo cumplido ✓`,true)); }
     if(s.dailyLoss$>0){ const used=Math.max(0,-s.todayPnl), room=s.dailyLoss$-used;
       rows.push(guardMeter("Límite de pérdida diaria",used/s.dailyLoss$,`$${Math.max(0,Math.round(room)).toLocaleString("en-US")} de margen hoy · máx $${s.dailyLoss$.toLocaleString("en-US")}`)); }
     if(s.maxDD$>0){ const room=s.maxDD$-s.dd;
@@ -1804,9 +1822,9 @@
       rows.push(guardMeter("Regla de consistencia",share/g.consistency,`tu mejor día = ${Math.round(share*100)}% del total · máx ${Math.round(g.consistency*100)}%`)); }
     if(g.minDays>0){ rows.push(guardMeter("Días mínimos de trading",s.days/g.minDays,`${s.days} de ${g.minDays} días`,true)); }
     if(!rows.length)return "";
-    return `<div class="p-card guard-card"><div class="c-t">Reglas de ${esc(g.firm)} <span class="room-agg">guardián de blow-up</span></div>
+    return `<div class="p-card guard-card"><div class="c-t">Reglas de ${esc(g.firm)} <span class="room-agg" style="color:${g.phase==="eval"?"#C9A24B":"var(--accent)"}">${g.phaseLabel}</span></div>
       ${rows.join("")}
-      <p class="home-note">Distancias calculadas de tu journal. Los límites son <b>editables en Settings</b> — confírmalos con tu fondeadora, cada plan cambia.</p></div>`; }
+      <p class="home-note">Reglas de tu <b>${g.phaseLabel.toLowerCase()}</b> aplicadas solas · distancias desde tu journal. Ajústalas en Settings — confirma con tu plan, cada firma cambia.</p></div>`; }
   /* ---------- Brief de premarket (calendario + tu fuga + plan) ---------- */
   function todayEcon(){ const idx=new Date().getDay()-1; if(idx<0||idx>4)return []; return (HOME_DATA.econ[idx]||{}).events||[]; }
   function premarketText(){ const name=spotName(), ev=todayEcon(), leak=topLeak(), highs=ev.filter(e=>e[2]==="high");
@@ -2443,10 +2461,18 @@
         <div class="acct-edit"><span>Handle <input id="pf-handle" value="${esc(name)}" placeholder="your handle"></span></div></div>
       <div class="p-card"><div class="c-t">Trading account</div>
         <div class="acct-edit"><span>Firm <input id="acct-firm" value="${esc(a.firm||"")}"></span><span>Size $<input id="acct-size" type="number" value="${a.size||50000}"></span><span>Eval target $<input id="acct-target" type="number" value="${a.evalTarget||1000}"></span></div></div>
-      ${(()=>{ const g=guardLoad(); return `<div class="p-card"><div class="c-t">Reglas de tu fondeadora <span class="room-agg">el guardián las usa en vivo</span></div>
-        <div class="onb-row" style="margin-bottom:12px">${["Tradeify","Lucid","Apex","Topstep"].map(f=>`<button class="onb-pill" data-firmpreset="${f}" data-hover>${f}</button>`).join("")}</div>
-        <div class="acct-edit guard-edit"><span>Pérdida diaria máx % <input id="guard-daily" type="number" step="0.1" value="${(g.dailyLoss*100).toFixed(1)}"></span><span>Drawdown máx % <input id="guard-maxdd" type="number" step="0.1" value="${(g.maxDD*100).toFixed(1)}"></span><span>Consistencia máx % <input id="guard-cons" type="number" step="1" value="${Math.round(g.consistency*100)}"></span><span>Días mínimos <input id="guard-mindays" type="number" step="1" value="${g.minDays}"></span></div>
-        <p class="home-note">% del tamaño de cuenta. Pon 0 para desactivar una regla. <b>Confírmalos con tu firma</b> — cada plan cambia.</p></div>`; })()}
+      ${(()=>{ const g=guardLoad(), ph=(a.guardPhase==="eval"||a.guardPhase==="funded")?a.guardPhase:"auto", custom=(a.dailyLoss!=null||a.maxDD!=null||a.consistency!=null||a.minDays!=null);
+        const firmPill=f=>`<button class="onb-pill ${a.firm===f?"on":""}" data-firmpreset="${f}" data-hover>${f}</button>`;
+        const phPill=(k,l)=>`<button class="onb-pill ${ph===k?"on":""}" data-guardphase="${k}" data-hover>${l}</button>`;
+        return `<div class="p-card"><div class="c-t">Reglas de tu fondeadora <span class="room-agg">se aplican solas por firma y fase</span></div>
+        <div class="grd-sec">Tu firma</div>
+        <div class="onb-row">${["Tradeify","Lucid","Apex","Topstep"].map(firmPill).join("")}</div>
+        <div class="grd-sec">Tu fase <span class="grd-hint">las evals y las fondeadas tienen reglas distintas</span></div>
+        <div class="onb-row">${phPill("auto","Auto ("+(guardPhase()==="eval"?"Evaluación":"Cuenta fondeada")+")")}${phPill("eval","Evaluación")}${phPill("funded","Cuenta fondeada")}</div>
+        <p class="home-note" style="margin-top:12px">El guardián usa las reglas típicas de <b>${esc(g.firm)} · ${g.phaseLabel.toLowerCase()}</b>. ${custom?"Estás usando valores manuales.":"Se ajustan solas."} <b>Confirma con tu plan</b> — cada firma cambia.</p>
+        <details class="grd-adv"${custom?" open":""}><summary>Ajuste fino (opcional)</summary>
+          <div class="acct-edit guard-edit"><span>Pérdida diaria máx % <input id="guard-daily" type="number" step="0.1" value="${(g.dailyLoss*100).toFixed(1)}"></span><span>Drawdown máx % <input id="guard-maxdd" type="number" step="0.1" value="${(g.maxDD*100).toFixed(1)}"></span><span>Consistencia máx % <input id="guard-cons" type="number" step="1" value="${Math.round(g.consistency*100)}"></span><span>Días mínimos <input id="guard-mindays" type="number" step="1" value="${g.minDays}"></span></div>
+          ${custom?`<button class="btn ghost" data-a="guardreset" data-hover>Volver a las reglas automáticas</button>`:""}</details></div>`; })()}
       <div class="p-card"><div class="c-t">Tu journal · respaldo <span class="room-agg">vive en este dispositivo</span></div>
         <p class="home-p">Tu bitácora, cuentas y progreso se guardan solo en este equipo. Exporta un respaldo para no perderlos si limpias el navegador o cambias de compu.</p>
         <div class="sl-actions"><button class="btn fill" data-a="exportdata" data-hover>⭳ Exportar respaldo (JSON)</button><button class="btn" data-a="importdata" data-hover>⭱ Importar respaldo</button></div></div>
@@ -2541,7 +2567,8 @@
     if(e.target.closest("[data-spotclose]")||e.target.id==="spot-modal"){const m=document.getElementById("spot-modal");if(m){m.hidden=true;m.innerHTML="";}return;}
     const te=e.target.closest("[data-tedit]"); if(te){tradeEdit(te.dataset.tedit);return;}
     if(e.target.closest("[data-tradeclose]")||e.target.id==="trade-modal"){closeTradeModal();return;}
-    const fp=e.target.closest("[data-firmpreset]"); if(fp){const f=fp.dataset.firmpreset,p=firmPreset(f),a=acctLoad()||{size:50000,evalTarget:1000};a.firm=f;a.dailyLoss=p.dailyLoss;a.maxDD=p.maxDD;a.consistency=p.consistency;a.minDays=p.minDays;acctSave(a);mostrar("settings");return;}
+    const fp=e.target.closest("[data-firmpreset]"); if(fp){const a=acctLoad()||{size:50000,evalTarget:1000};a.firm=fp.dataset.firmpreset;delete a.dailyLoss;delete a.maxDD;delete a.consistency;delete a.minDays;acctSave(a);mostrar("settings");return;} // firma → reglas automáticas por fase
+    const gph=e.target.closest("[data-guardphase]"); if(gph){const a=acctLoad()||{size:50000,evalTarget:1000},k=gph.dataset.guardphase;if(k==="auto")delete a.guardPhase;else a.guardPhase=k;acctSave(a);mostrar("settings");return;}
     const a=e.target.closest("[data-route]"); if(a){mostrar(a.dataset.route);return;}
     const les=e.target.closest("[data-lesson]"); if(les){courseLesson=les.dataset.lesson;mostrar("course");return;}
     if(e.target.closest("[data-back]")){courseLesson=null;mostrar("course");return;}
