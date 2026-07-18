@@ -881,6 +881,20 @@
   const farPt=()=>{const an=rnd()*6.283,rr=17+rnd()*15;return[Math.cos(an)*rr,(rnd()-.5)*20,Math.sin(an)*rr];};
   for(let k=0;k<SPK;k++){const inn=rnd()<.4,fp=farPt();
     spk.push({e:Math.floor(rnd()*E),t:rnd(),v:.007+rnd()*.02,mode:inn?"in":"ride",fx:fp[0],fy:fp[1],fz:fp[2]});}
+  /* ---- RAYOS: la deidad cargándose. Descargas que caen del contorno del ojo hacia el iris ---- */
+  const BOLTS=16, BSEG=12;
+  const boltGeo=new T.BufferGeometry();
+  const boltPos=new Float32Array(BOLTS*BSEG*2*3);
+  boltGeo.setAttribute("position",new T.BufferAttribute(boltPos,3));
+  const boltMat=new T.LineBasicMaterial({color:0xdff0ff,transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending});
+  const bolts=new T.LineSegments(boltGeo,boltMat); world.add(bolts);
+  const BS=[];
+  function seedBolt(b){ b.a=rnd()*6.283; b.r=10+rnd()*2.5; b.life=6+rnd()*16; b.seed=rnd()*900; b.amp=.7+rnd()*1.5; }
+  for(let b=0;b<BOLTS;b++){ const o={}; seedBolt(o); BS.push(o); }
+  /* núcleo: el iris incandescente mientras carga */
+  const coreMat=new T.PointsMaterial({color:0xeaf6ff,size:1.6,transparent:true,opacity:0,depthWrite:false,sizeAttenuation:true,blending:T.AdditiveBlending});
+  const coreGeo=new T.BufferGeometry(); coreGeo.setAttribute("position",new T.BufferAttribute(new Float32Array([0,0,.9]),3));
+  world.add(new T.Points(coreGeo,coreMat));
   /* polvo lejano */
   const M=900,dp=new Float32Array(M*3);
   for(let i=0;i<M;i++){const v=new T.Vector3(rnd()-.5,rnd()-.5,rnd()-.5).normalize().multiplyScalar(40+rnd()*60);
@@ -908,7 +922,7 @@
     const t1=C1?chPr(C1):-9,t2=C2?chPr(C2):-9;
     const finT=FIN?clamp((vh-FIN.getBoundingClientRect().top)/(vh*1.05),0,1):0;
     /* qué forma toca: la última sección que cruza el centro manda */
-    let form="chaos";
+    let form="eye";   // el HERO abre con el ojo: la deidad que te vigila, cargándose
     for(const [el,f] of FORM_SECS){const r=el.getBoundingClientRect();
       if(r.top<vh*.55&&r.bottom>vh*.2)form=f;}
     if(t1>-.1&&t1<1.12)form="fall";
@@ -979,6 +993,33 @@
     cam.position.z=24-st.p*3;
     cam.lookAt(0,W.spire*4,0); // al final, la mirada sube con la espiral
     stars.rotation.y=frame*.0004+st.p*.5;
+    /* ---- la deidad se carga: los rayos caen del contorno al iris y estallan en oleadas ---- */
+    if(W.eye>.02){
+      const surge=Math.pow((Math.sin(frame*.021)+1)/2,3);          // ciclo lento de carga → descarga
+      const flick=.45+Math.random()*.55;                            // parpadeo eléctrico crudo
+      for(let b=0;b<BOLTS;b++){ const B=BS[b];
+        if(--B.life<=0) seedBolt(B);
+        const ca=Math.cos(B.a), sa2=Math.sin(B.a);
+        const ex=ca*B.r, ey=sa2*B.r*.45;                            // nace en la elipse del ojo (11:5)
+        const ix=ca*3.1,  iy=sa2*3.1;                               // muere en el borde del iris
+        for(let s=0;s<BSEG;s++){
+          const t0=s/BSEG, t1=(s+1)/BSEG;
+          const jit=t=>{ const w=Math.sin(t*Math.PI);               // quiebre máximo a media descarga
+            return (Math.sin(B.seed+t*17+frame*.5)+Math.sin(B.seed*2.3+t*41))*w*B.amp*(.5+surge*.9); };
+          const o=(b*BSEG+s)*6;
+          boltPos[o  ]=ex+(ix-ex)*t0 + jit(t0)*.55;
+          boltPos[o+1]=ey+(iy-ey)*t0 + jit(t0+.3)*.55;
+          boltPos[o+2]=.6+jit(t0+.7)*.3;
+          boltPos[o+3]=ex+(ix-ex)*t1 + jit(t1)*.55;
+          boltPos[o+4]=ey+(iy-ey)*t1 + jit(t1+.3)*.55;
+          boltPos[o+5]=.6+jit(t1+.7)*.3;
+        }
+      }
+      boltGeo.attributes.position.needsUpdate=true;
+      boltMat.opacity=W.eye*(.42+surge*.58)*flick;                  // se enciende al descargar
+      coreMat.opacity=W.eye*(.55+surge*.45);                        // el iris incandescente
+      coreMat.size=1.4+surge*3.4;
+    } else { boltMat.opacity=0; coreMat.opacity=0; }
     if(tape)tape.style.opacity=Math.max(0,1-W.spire*.9);
     renderer.render(scene,cam);
     requestAnimationFrame(tick);
