@@ -891,8 +891,29 @@
   .pf-id{flex:1}.pf-name{font-family:var(--serif);font-weight:400;font-size:1.9rem;line-height:1}
   .pf-meta{color:var(--ink2);font-size:.82rem;margin-top:5px}
   .pf-elo{text-align:center}.pf-elo span{font-family:var(--serif);font-size:1.9rem;color:var(--accent);display:block;line-height:1}.pf-elo small{font-size:.6rem;text-transform:uppercase;letter-spacing:.16em;color:var(--ink2)}
-  .pf-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-  @media(max-width:640px){.pf-stats{grid-template-columns:repeat(2,1fr)}}
+  .pf-stats{display:grid;grid-template-columns:repeat(6,1fr);gap:9px}
+  @media(max-width:640px){.pf-stats{grid-template-columns:repeat(3,1fr)}}
+  .wall-composer{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .wall-input{flex:1;background:#000;border:1px solid var(--line);border-radius:9px;color:var(--ink);font-family:var(--sans);font-size:.9rem;padding:10px 13px}
+  .wall-input:focus{outline:none;border-color:var(--accent)}
+  .wall{display:flex;flex-direction:column;gap:2px}
+  .wall-post{display:flex;gap:11px;padding:12px 4px;border-bottom:1px solid var(--line)}
+  .wp-av{width:34px;height:34px;flex:none;border-radius:50%;background:rgba(61,134,207,.16);color:var(--accent);font-weight:600;font-size:.82rem;display:flex;align-items:center;justify-content:center}
+  .wp-b{flex:1}.wp-h{display:flex;gap:8px;align-items:baseline}.wp-h b{font-size:.88rem}.wp-h span{font-size:.7rem;color:var(--ink2)}
+  .wp-b p{font-size:.9rem;color:var(--ink1);line-height:1.45;margin-top:2px}
+  .chal-card .chal-top{display:flex;justify-content:space-between;align-items:flex-start}
+  .chal-k{font-size:.6rem;text-transform:uppercase;letter-spacing:.2em;color:var(--accent)}
+  .chal-h{font-family:var(--serif);font-weight:400;font-size:1.3rem;margin-top:3px}
+  .chal-n{font-family:var(--serif);font-size:2rem;color:var(--accent);line-height:1}.chal-n small{font-size:1rem;color:var(--ink2)}
+  .chal-card .prog-bar{margin:12px 0 4px}
+  .inv-card{display:flex;justify-content:space-between;align-items:center;gap:14px}
+  .spk-toggle{float:right;background:none;border:1px solid var(--line2);border-radius:999px;color:var(--ink2);font-family:var(--sans);font-size:.68rem;padding:4px 11px;cursor:pointer;transition:all .2s}
+  .spk-toggle.on{border-color:rgba(53,196,111,.4);color:#35c46f}
+  .wb-card{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;background:rgba(61,134,207,.06);border-color:rgba(61,134,207,.22)}
+  .wb-l{font-family:var(--serif);font-size:1.15rem}.wb-l b{color:var(--accent)}
+  .wb-r{display:flex;gap:8px;flex-wrap:wrap}
+  .wb-chip{font-size:.78rem;font-variant-numeric:tabular-nums;color:var(--ink1);background:#000;border:1px solid var(--line);border-radius:999px;padding:5px 11px}
+  .wb-chip.up{color:#35c46f}.wb-chip.down{color:var(--rojo)}
   .pf-stat{background:var(--bg1);border:1px solid var(--line);border-radius:12px;padding:14px 10px;text-align:center}
   .pf-sv{font-family:var(--serif);font-size:1.5rem;line-height:1}.pf-sv.up{color:#35c46f}.pf-sv.down{color:var(--rojo)}
   .pf-sl{font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--ink2);margin-top:6px}
@@ -1208,6 +1229,14 @@
   function disparar(){sirena();hablar("Sir. You've lost your only bullet. I recommend closing the platform immediately. Come back tomorrow, cold. Today is not your day.");}
   function pararAlarma(){silenciado=true;clearInterval(alarmaTimer);try{speechSynthesis.cancel();}catch(e){}}
 
+  /* ---------- SPOTTER LIGERO · voz en la app (español, sin Claude Code) ---------- */
+  function spkOn(){ try{return localStorage.getItem("candado_spkr")!=="0";}catch(e){return true;} }
+  function spkToggle(){ try{localStorage.setItem("candado_spkr",spkOn()?"0":"1");}catch(e){} if(spkOn())spkr("Spotter de voz activado."); mostrar(vistaActual); }
+  function spkVoice(){ try{const vs=speechSynthesis.getVoices();return vs.find(v=>/es[-_]MX/i.test(v.lang))||vs.find(v=>/es[-_]419/i.test(v.lang))||vs.find(v=>/^es/i.test(v.lang))||null;}catch(e){return null;} }
+  function spkr(txt){ if(!spkOn()||!("speechSynthesis" in window))return; try{speechSynthesis.cancel();}catch(e){}
+    (txt.match(/[^.,;:!?]+[.,;:!?]*/g)||[txt]).forEach(fr=>{const t=fr.trim();if(!t)return;const u=new SpeechSynthesisUtterance(t);const v=spkVoice();if(v){u.voice=v;u.lang=v.lang;}else{u.lang="es-MX";}u.rate=0.98;u.pitch=1;u.volume=1;try{speechSynthesis.speak(u);}catch(e){}}); }
+  function spotName(){ return (profileLoad()||{}).handle||"trader"; }
+
   /* ---------- transitions ---------- */
   let parteHablada=false;
   function armar(){
@@ -1361,7 +1390,7 @@
   /* ---------- events ---------- */
   document.addEventListener("click",e=>{
     const b=e.target.closest("button[data-a]");if(!b)return;
-    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,addinvest:addInvest,replayonb:startOnb,createlobby:battleLobby,practicenow:practiceNow,joinrace:()=>{raceJoin();mostrar("comunidad");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
+    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,addinvest:addInvest,replayonb:startOnb,createlobby:battleLobby,practicenow:practiceNow,joinrace:()=>{raceJoin();mostrar("comunidad");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,spkr:spkToggle,wallpost:()=>{const i=$("#wall-input"),v=i&&i.value.trim();if(v){supaPost(v);if(i)i.value="";}},invite:()=>{try{window.open("https://wa.me/?text="+encodeURIComponent("Prueba SPOTTER AI conmigo — la plataforma de trading con disciplina: https://studioamr.github.io/spotter-ai/landing.html"),"_blank");}catch(e){}},logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
   });
   document.addEventListener("input",e=>{ if(!e.target)return;
     if(ONB&&e.target.id&&e.target.id.startsWith("onb-")){ const d=ONB.data, id=e.target.id, v=e.target.value;
@@ -1825,7 +1854,7 @@
     localStorage.setItem("candado_racecrew",JSON.stringify(crew));
     localStorage.setItem("candado_race","1");
   }
-  function raceLane(m){ const ph=PH_RACE[m.phase]||PH_RACE.eval; return `<div class="race-lane ${m.you?"me":""}">
+  function raceLane(m){ const ph=PH_RACE[m.phase]||PH_RACE.eval; return `<div class="race-lane ${m.you?"me":""}" ${m.you||m.bot?"":`data-uprofile="${esc(m.u||"")}"`}>
       <div class="race-info"><span class="rl-name">${esc(m.u)}${m.you?' <em>you</em>':m.bot?' <span class="rl-bot">pacer</span>':""}</span>
         <span class="rl-meta"><span class="rl-badge" style="color:${ph.c};border-color:${ph.c}">${ph.l}</span><span class="rl-bal">$${(m.balance||0).toLocaleString("en-US")}</span></span></div>
       <div class="race-track"><span class="rt-tick" style="left:33%"></span><span class="rt-tick" style="left:66%"></span><span class="rt-finish"></span>
@@ -1867,6 +1896,7 @@
     const econ=`<div class="econ-grid">${HOME_DATA.econ.map((d,i)=>{const isT=i===todayIdx;return `<div class="econ-col ${isT?"today":""}"><div class="econ-dh">${d.day}${isT?' <em>today</em>':""}</div><div class="econ-evs">${d.events.length?d.events.map(e=>`<div class="econ-ev"><span class="imp imp-${e[2]}"></span><div class="econ-ei"><div class="econ-en">${e[0]}</div><div class="econ-tm">${e[1]} ET</div></div></div>`).join(""):'<div class="econ-empty">—</div>'}</div></div>`;}).join("")}</div>`;
     return `<div class="home2">
       <div class="home-hero"><h1 class="home-h1">Hi, <input id="pf-handle" class="hero-name" value="${esc(name)}" placeholder="trader">.</h1><p class="home-tag">Your trading platform — learn the system, take the one bullet, and measure your path to payout.</p></div>
+      ${welcomeBack()}
       ${sec("For you",forYou)}
       ${sec("Economic calendar",econ)}
       ${sec("Recommended prop firms",firms)}
@@ -1902,10 +1932,11 @@
     try{window.open(TV_URL,"_blank","noopener");}catch(e){} // abre tu TradingView
     // en la app nativa: manda tu perfil + lanza el Spotter (Claude Code vigilando tu pantalla)
     try{ if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.spotter){ window.webkit.messageHandlers.spotter.postMessage(JSON.stringify(spotterSnapshot())); } }catch(e){}
+    spkr("Listo, "+spotName()+". Una sola bala hoy. Tu setup A más, stop al uno por ciento. Respira y espera tu entrada.");
     mostrar("sesion"); }
   function practiceNow(){ sesModeSave("sim"); mostrar("sesion"); }
   const simBadge=s=>s.sim?`<span class="sim-badge">SIM · practice</span>`:"";
-  function fireBullet(){ const s=sessLoad(); if(s.phase!=="live")return; s.phase="fired"; s.firedAt=Date.now(); sessSave(s); mostrar("sesion"); }
+  function fireBullet(){ const s=sessLoad(); if(s.phase!=="live")return; s.phase="fired"; s.firedAt=Date.now(); sessSave(s); spkr("Bala disparada. Ahora administra el trade. No muevas tu stop. Cierra cuando toque."); mostrar("sesion"); }
   function sessRecord(patch){ // upsert today's trade into the journal — SIM and LIVE keep separate records
     const sim=!!sessLoad().sim;
     const h=histLoad(); let rec=h.find(x=>x.fecha===hoy()&&!!x.sim===sim);
@@ -1914,15 +1945,16 @@
   }
   function wonSession(){ const s=sessLoad(); s.phase="done"; s.result="won"; s.endedAt=Date.now();
     s.tradeMin=s.firedAt?Math.max(1,Math.round((s.endedAt-s.firedAt)/60000)):null; sessSave(s);
-    sessRecord({outcome:"GANADA",durMin:s.tradeMin,sim:!!s.sim}); supaUpsert(); mostrar("sesion"); }
+    sessRecord({outcome:"GANADA",durMin:s.tradeMin,sim:!!s.sim}); supaUpsert(); spkr("Buen tiro. Sellaste tu sesión con disciplina. Cierra la plataforma por hoy."); mostrar("sesion"); }
   function lostSession(){ const s=sessLoad(); s.phase="done"; s.result="lost"; s.endedAt=Date.now();
     s.tradeMin=s.firedAt?Math.max(1,Math.round((s.endedAt-s.firedAt)/60000)):null; sessSave(s);
-    sessRecord({outcome:"BLOQUEADO",durMin:s.tradeMin,sim:!!s.sim}); supaUpsert(); mostrar("sesion"); }
+    sessRecord({outcome:"BLOQUEADO",durMin:s.tradeMin,sim:!!s.sim}); supaUpsert(); spkr("Se acabó el día. Cierra la plataforma y vuelve mañana en frío. No caces revenge."); mostrar("sesion"); }
   function endSession(){ const s=sessLoad(); s.phase="done"; s.result=s.result||"flat"; s.endedAt=Date.now(); sessSave(s); mostrar("sesion"); }
   function newSession(){ sessSave({phase:"ready"}); mostrar("sesion"); }
   function sessInfoCard(){
-    return `<div class="p-card ses-info"><div class="c-t">The Spotter is with you</div>
-      <ul class="ses-ul"><li>Watches and analyzes in real time</li><li>Tracks your strategy on the chart</li><li>Reminds you of your plan</li><li>Builds your performance summary</li></ul></div>`;
+    const on=spkOn();
+    return `<div class="p-card ses-info"><div class="c-t">The Spotter is with you <button class="spk-toggle ${on?"on":""}" data-a="spkr" data-hover>${on?"🔊 Voz activa":"🔈 Voz apagada"}</button></div>
+      <ul class="ses-ul"><li>Te habla por voz en cada momento — reglas, disciplina, cierre</li><li>Te recuerda tu plan y tu única bala</li><li>Arma tu resumen de sesión</li><li><b>Pro:</b> con Claude Code también <b>ve tu pantalla</b> en vivo</li></ul></div>`;
   }
   function rulesLoad(){try{return Object.assign({trades:1,risk:1,sess:1.5,target:2},JSON.parse(localStorage.getItem("candado_rules")||"{}"));}catch(e){return{trades:1,risk:1,sess:1.5,target:2};}}
   function rulesSave(r){try{localStorage.setItem("candado_rules",JSON.stringify(r));}catch(e){}}
@@ -2049,13 +2081,47 @@
     {t:"Course drop", s:"New masterclass added to the Academy this week"},
     {t:"Office hours", s:"Q&A with André after Friday's session"},
   ];
+  /* --- muro de comunidad en vivo (tabla posts de Supabase) --- */
+  let SUPA_POSTS=[];
+  function supaPost(body){ try{ const p=profileLoad()||{}; fetch(SUPA_URL+"/rest/v1/posts",{method:"POST",headers:supaHead({Prefer:"return=minimal"}),body:JSON.stringify({author:(p.handle||"trader").toString().slice(0,24),kind:"note",body:String(body).slice(0,280)})}).then(()=>supaPostsRefresh()).catch(()=>{}); }catch(e){} }
+  function supaPostsRefresh(){ fetch(SUPA_URL+"/rest/v1/posts?select=author,kind,body,created_at&order=created_at.desc&limit=25",{headers:supaHead()}).then(r=>r.ok?r.json():null).then(d=>{ if(Array.isArray(d)){ SUPA_POSTS=d; if(vistaActual==="comunidad") mostrar("comunidad"); } }).catch(()=>{}); }
+  function wallTime(t){ try{ const ms=Date.now()-new Date(t).getTime(), m=Math.floor(ms/60000); if(m<1)return"ahora"; if(m<60)return m+"m"; const h=Math.floor(m/60); if(h<24)return h+"h"; return Math.floor(h/24)+"d"; }catch(e){return"";} }
+  /* --- racha de disciplina (sesiones seguidas sin revenge) --- */
+  function discStreak(){ const h=histLoad().filter(x=>x.outcome).sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||"")); let s=0; for(const x of h){ if(x.revenges){break;} s++; } return s; }
+  function welcomeBack(){ const h=histLoad().filter(x=>x.outcome); if(!h.length)return ""; const net=totalProfit(),streak=discStreak(),name=(profileLoad()||{}).handle||"trader";
+    return `<div class="p-card wb-card"><div class="wb-l">De vuelta, <b>${esc(name)}</b>.</div><div class="wb-r"><span class="wb-chip">🔥 ${streak} racha</span><span class="wb-chip ${net>=0?'up':'down'}">${money(net)} net</span><span class="wb-chip">${h.length} sesiones</span></div></div>`; }
+  /* --- reto semanal --- */
+  function weeklyChallenge(){
+    const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    const weekAgo=iso(new Date(Date.now()-6*864e5)), wk=histLoad().filter(x=>x.outcome&&(x.fecha||"")>=weekAgo);
+    const clean=wk.filter(x=>!x.revenges).length, target=5, pct=Math.min(100,Math.round(clean/target*100));
+    return `<div class="p-card chal-card"><div class="chal-top"><div><div class="chal-k">Esta semana</div><h3 class="chal-h">5 sesiones · 0 revenge</h3></div><div class="chal-n">${clean}<small>/${target}</small></div></div>
+      <div class="prog-bar"><span style="width:${pct}%"></span></div>
+      <p class="home-note">${clean>=target?"¡Reto completado! 🏆 Disciplina de acero esta semana.":"Respeta tu bala cada sesión — sin cazar revenge. Vas "+clean+" de "+target+"."}</p></div>`;
+  }
+  /* --- perfil público de otro trader (clic en el leaderboard/carrera) --- */
+  function openUserProfile(handle){ const u=SUPA_PROFILES.find(p=>(p.handle||"")===handle); if(!u)return;
+    let m=document.getElementById("spot-modal"); if(!m){m=document.createElement("div");m.id="spot-modal";m.className="spot-modal";document.body.appendChild(m);}
+    m.innerHTML=`<div class="spot-card"><button class="spot-x" data-spotclose>×</button>
+      <div class="pf-hero" style="margin-bottom:14px"><div class="pf-av">${((u.handle||"T").trim()[0]||"T").toUpperCase()}</div>
+        <div class="pf-id"><h2 class="pf-name">${esc(u.handle||"trader")}</h2><div class="pf-meta">${({eval:"In eval",funded:"Funded",payout:"Cashing"})[u.phase]||"In eval"}</div></div>
+        <div class="pf-elo"><span>${u.elo||1200}</span><small>Elo</small></div></div>
+      <div class="pf-stats"><div class="pf-stat"><div class="pf-sv">${u.win_rate||0}%</div><div class="pf-sl">Win rate</div></div><div class="pf-stat"><div class="pf-sv ${(u.net_pnl||0)>=0?'up':'down'}">${money(u.net_pnl||0)}</div><div class="pf-sl">Net P&L</div></div><div class="pf-stat"><div class="pf-sv">${u.eval_pct||0}%</div><div class="pf-sl">Eval</div></div></div></div>`;
+    m.hidden=false; }
   function viewComunidad(){
+    const p=profileLoad()||{}, av=((p.handle||"T").trim()[0]||"T").toUpperCase();
     const card=a=>`<a class="ann-card" href="${DISCORD}" target="_blank" rel="noopener" data-hover><div class="fy-t">${a.live?'<span class="live-dot"></span> ':""}${esc(a.t)}</div><div class="fy-s">${esc(a.s)}</div></a>`;
     const strip=ANNOUNCEMENTS.map(card).join("");
     const ann=`<div class="marquee"><div class="marquee-track">${strip}${strip}</div></div>`;
+    const composer=`<div class="p-card wall-composer"><span class="wp-av">${av}</span><input id="wall-input" class="wall-input" placeholder="Comparte tu PNL, tu win, tu racha…" maxlength="280"><button class="btn fill" data-a="wallpost" data-hover>Postear</button></div>`;
+    const feed=SUPA_POSTS.length?`<div class="wall">${SUPA_POSTS.map(x=>`<div class="wall-post"><span class="wp-av">${((x.author||"T").trim()[0]||"T").toUpperCase()}</span><div class="wp-b"><div class="wp-h"><b>${esc(x.author||"trader")}</b><span>${wallTime(x.created_at)}</span></div><p>${esc(x.body||"")}</p></div></div>`).join("")}</div>`:`<div class="hempty" style="padding:14px 2px">Sé el primero en postear — la comunidad aparece en vivo.</div>`;
+    const invite=`<div class="p-card inv-card"><div><b>Invita a un trader</b><p class="home-note" style="margin:2px 0 0">Comparte SPOTTER AI y suban juntos en el leaderboard.</p></div><button class="btn" data-a="invite" data-hover>Compartir link →</button></div>`;
     return `<div class="home2">
+      ${homeSec("The wall · live",composer+feed)}
+      ${homeSec("Weekly challenge",weeklyChallenge())}
       ${homeSec("Announcements",ann)}
-      ${homeSec("Race to payout",buildRace(),"Your path to payout · the community race connects soon.")}
+      ${homeSec("Race to payout",buildRace())}
+      ${invite}
     </div>`;
   }
   /* ---------- Training · playable 1v1 vs the bot ---------- */
@@ -2124,7 +2190,7 @@
         .map(([n,dd])=>({name:n,elo:Math.max(800,r.elo+dd),you:false})).concat([you]).sort((a,b)=>b.elo-a.elo);
     }
     return `<div class="p-card"><div class="c-t">Leaderboard <span class="room-agg">Elo · ${live?'<span class="live-tag">● live</span> community':'you vs the crew'}</span></div>
-      <div class="lead">${crew.map((m,i)=>`<div class="lead-row ${m.you?'me':''}"><span class="lead-rk">#${i+1}</span><span class="lead-nm">${esc(m.name)}${m.you?' <em>you</em>':''}</span><span class="lead-el">${m.elo}</span></div>`).join("")}</div>
+      <div class="lead">${crew.map((m,i)=>`<div class="lead-row ${m.you?'me':''}" ${(!m.you&&live)?`data-uprofile="${esc(m.name)}"`:""}><span class="lead-rk">#${i+1}</span><span class="lead-nm">${esc(m.name)}${m.you?' <em>you</em>':''}</span><span class="lead-el">${m.elo}</span></div>`).join("")}</div>
       <p class="home-note">${live?"Live — real traders from the SPOTTER AI community.":"Sample crew — real ranks appear as the community grows."}</p></div>`;
   }
   function viewTraining(){
@@ -2397,7 +2463,7 @@
       <div class="p-card pf-hero"><div class="pf-av">${(name.trim()[0]||"T").toUpperCase()}</div>
         <div class="pf-id"><h2 class="pf-name">${esc(name)}</h2><div class="pf-meta">${esc(a.firm||"no account yet")} · ${({eval:"In eval",funded:"Funded",payout:"Cashing"})[yr.phase]||"In eval"}</div></div>
         <div class="pf-elo"><span>${r.elo}</span><small>Elo</small></div></div>
-      <div class="pf-stats">${stat("Sessions",h.length)}${stat("Win rate",wr+"%")}${stat("Net P&L",money(net),net>=0?'up':'down')}${stat("Discipline",disc+"%")}${stat("Payouts",poutLoad().length)}</div>
+      <div class="pf-stats">${stat("🔥 Racha",discStreak())}${stat("Sessions",h.length)}${stat("Win rate",wr+"%")}${stat("Net P&L",money(net),net>=0?'up':'down')}${stat("Discipline",disc+"%")}${stat("Payouts",poutLoad().length)}</div>
       <div class="p-card"><div class="c-t">Achievements <span class="room-agg">${got.length} / ${ACHIEVEMENTS.length} unlocked</span></div>
         <div class="ach-grid">${ACHIEVEMENTS.map(card).join("")}</div></div>
     </div>`;
@@ -2423,8 +2489,8 @@
   const NAV=[
     {r:"home",label:"Home"},{r:"course",label:"Course"},{r:"comunidad",label:"Community"},
     {group:"TRADE"},{r:"sesion",label:"Start Session"},{r:"training",label:"Training"},
-    {group:"JOURNAL"},{r:"dashboard",label:"Dashboard"},{r:"trades",label:"Trades"},{r:"coach",label:"AI Coach"},{r:"progreso",label:"Progress"},{r:"calendario",label:"Calendar"},{r:"cuentas",label:"Accounts"},
-    {group:"MONEY"},{r:"plan",label:"Plan"},{r:"payouts",label:"Payouts"},{r:"investments",label:"Investments"},
+    {group:"JOURNAL"},{r:"dashboard",label:"Dashboard"},{r:"trades",label:"Trades"},{r:"coach",label:"AI Coach"},{r:"progreso",label:"Progress"},{r:"cuentas",label:"Accounts"},
+    {group:"MONEY"},{r:"plan",label:"Plan"},{r:"payouts",label:"Payouts"},
   ];
   function renderSidebar(){
     const name=profileLoad().handle||"trader";
@@ -2450,6 +2516,7 @@
   }
   document.addEventListener("click",e=>{
     const sp=e.target.closest("[data-spot]"); if(sp){openSpotModal(sp.dataset.spot);return;}
+    const up=e.target.closest("[data-uprofile]"); if(up&&up.dataset.uprofile){openUserProfile(up.dataset.uprofile);return;}
     if(e.target.closest("[data-spotclose]")||e.target.id==="spot-modal"){const m=document.getElementById("spot-modal");if(m){m.hidden=true;m.innerHTML="";}return;}
     const a=e.target.closest("[data-route]"); if(a){mostrar(a.dataset.route);return;}
     const les=e.target.closest("[data-lesson]"); if(les){courseLesson=les.dataset.lesson;mostrar("course");return;}
@@ -2599,7 +2666,7 @@
   if(!localStorage.getItem("candado_onboarded")) startOnb();
 
   /* backend en vivo: publica tu perfil y trae la comunidad real */
-  supaUpsert(); supaRefresh(); setInterval(supaRefresh, 45000);
+  supaUpsert(); supaRefresh(); supaPostsRefresh(); setInterval(supaRefresh, 45000); setInterval(supaPostsRefresh, 45000);
 
   /* ---------- EN VIVO: banner cuando André transmite (Kick/YouTube) ---------- */
   function applyLive(d){
