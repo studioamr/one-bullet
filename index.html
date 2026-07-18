@@ -411,12 +411,9 @@
   .gate-inp.code.err{border-bottom-color:var(--rojo)}
   .gate-err{color:var(--rojo);font-size:.8rem}
 
-  #field{position:fixed;inset:0;z-index:0;opacity:.9;transition:opacity .8s;pointer-events:none}
-  .eye-bg{position:fixed;left:50%;top:46%;transform:translate(-50%,-50%);width:min(80vw,940px);height:auto;z-index:0;pointer-events:none;color:var(--ink);opacity:.075}
+  .eye-bg{position:fixed;left:50%;top:46%;transform:translate(-50%,-50%);width:min(80vw,940px);height:auto;z-index:0;pointer-events:none;color:var(--ink);opacity:.10}
   #eyeBall{transition:none}
   @media(prefers-reduced-motion:reduce){.eye-bg{opacity:.05}}
-  .amr-art{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.7}
-  body[data-estado="BLOQUEADO"] .amr-art{display:none}
   .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
@@ -581,7 +578,6 @@
   .sep{width:1px;align-self:center;height:22px;background:var(--line)}
 
   body[data-estado="BLOQUEADO"]{background:var(--rojo);color:#0A0A0B}
-  body[data-estado="BLOQUEADO"] #field{opacity:.22}
   body[data-estado="BLOQUEADO"] .grain{opacity:.09;mix-blend-mode:multiply}
   body[data-estado="BLOQUEADO"] .state{color:#0A0A0B}
   body[data-estado="BLOQUEADO"] .state em{color:#0A0A0B}
@@ -1204,44 +1200,12 @@
 <body data-estado="ARMADO">
 <button id="pwa-install" class="pwa-install" data-hover>⬇ Instalar la app</button>
 
-  <canvas id="field"></canvas>
   <!-- el Spotter: un ojo de fondo que te vigila (misma proporción que el ojo de la landing) -->
   <svg class="eye-bg" aria-hidden="true" viewBox="0 0 440 200" preserveAspectRatio="xMidYMid meet">
     <ellipse cx="220" cy="100" rx="200" ry="91" fill="none" stroke="currentColor" stroke-width="1.7" opacity=".55"/>
     <g id="eyeBall">
       <circle cx="220" cy="100" r="56" fill="none" stroke="var(--accent)" stroke-width="1.7" opacity=".7"/>
       <circle cx="220" cy="100" r="21" fill="var(--accent)" opacity=".55"/>
-    </g>
-  </svg>
-  <svg class="amr-art" id="amrArt" aria-hidden="true" viewBox="0 0 1200 1600" preserveAspectRatio="xMidYMid slice">
-    <defs>
-      <filter id="amrInk" x="-25%" y="-25%" width="150%" height="150%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.011 0.016" numOctaves="3" seed="7" result="n"/>
-        <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G"/>
-      </filter>
-      <radialGradient id="amrSun" cx="50%" cy="50%" r="50%">
-        <stop offset="0" stop-color="#3d86cf" stop-opacity=".5"/>
-        <stop offset="1" stop-color="#3d86cf" stop-opacity="0"/>
-      </radialGradient>
-    </defs>
-    <g filter="url(#amrInk)">
-      <circle cx="600" cy="700" r="130" fill="url(#amrSun)"/>
-      <g fill="none" stroke="#3d86cf" stroke-linecap="round">
-        <path d="M470 700 A130 130 0 0 1 730 700" stroke-width="2.4" opacity=".42"/>
-        <path d="M415 700 A185 185 0 0 1 785 700" stroke-width="1.9" opacity=".3"/>
-        <path d="M360 700 A240 240 0 0 1 840 700" stroke-width="1.5" opacity=".2"/>
-        <path d="M305 700 A295 295 0 0 1 895 700" stroke-width="1.2" opacity=".13"/>
-        <path d="M250 700 A350 350 0 0 1 950 700" stroke-width="1" opacity=".08"/>
-      </g>
-    </g>
-    <g filter="url(#amrInk)" fill="none" stroke-width="2">
-      <rect x="512" y="1330" width="176" height="230" rx="6" stroke="#F4F1EA" opacity=".12"/>
-      <rect x="536" y="1300" width="128" height="30" rx="4" stroke="#F4F1EA" opacity=".12"/>
-      <circle cx="600" cy="1250" r="20" stroke="#3d86cf" opacity=".5"/>
-    </g>
-    <g filter="url(#amrInk)" fill="none" stroke="#F4F1EA" opacity=".09" stroke-width="1">
-      <circle cx="1050" cy="240" r="120"/><circle cx="1050" cy="240" r="96"/><circle cx="1050" cy="240" r="72"/><circle cx="1050" cy="240" r="48"/>
-      <circle cx="1050" cy="240" r="13" fill="#3d86cf" stroke="none" opacity=".6"/>
     </g>
   </svg>
   <div class="grain"></div>
@@ -1434,16 +1398,6 @@
   setInterval(tick,1000);tick();
 
 
-  const cv=$("#field"),cx=cv.getContext("2d");let W,H,dots;
-  function rz(){W=cv.width=innerWidth;H=cv.height=innerHeight;
-    const n=Math.min(90,Math.floor(W*H/17000));
-    dots=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.14,vy:(Math.random()-.5)*.14,r:Math.random()*1.3+.3}));}
-  function draw(){cx.clearRect(0,0,W,H);const bl=body.dataset.estado==="BLOQUEADO";
-    const col=bl?"10,10,11":"244,241,234";
-    for(const d of dots){d.x+=d.vx;d.y+=d.vy;if(d.x<0||d.x>W)d.vx*=-1;if(d.y<0||d.y>H)d.vy*=-1;
-      cx.beginPath();cx.arc(d.x,d.y,d.r,0,6.29);cx.fillStyle="rgba("+col+","+(bl?.16:.12)+")";cx.fill();}
-    requestAnimationFrame(draw);}
-  rz();draw();window.addEventListener("resize",rz);
 
   /* ===================== SPOTTER JOURNAL (screenshots + summaries the Spotter sends) ===================== */
   function spotLoad(){try{return JSON.parse(localStorage.getItem("candado_spotter")||"{}");}catch(e){return {};}}
@@ -2734,7 +2688,7 @@
     const cp=progLoad(), lc=allLessons(), cpct=lc.length?Math.round(lc.filter(l=>cp[l.id]).length/lc.length*100):0;
     const items=NAV.map(it=>it.group?`<div class="nav-group">${it.group}</div>`
       :`<button class="navitem" data-route="${it.r}" data-hover><span>${it.label}</span>${it.r==="course"?`<span class="nav-badge">${cpct}%</span>`:""}</button>`).join("");
-    $("#sidebar").innerHTML=`<div class="sb-brand"><svg viewBox="0 0 32 32" class="brand-mark" aria-hidden="true"><ellipse cx="16" cy="16" rx="13.2" ry="6" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".45"/><circle class="lock" cx="16" cy="16" r="3.7" fill="none" stroke="var(--accent)" stroke-width="1.35"/><circle cx="16" cy="16" r="1.5" fill="var(--accent)"/></svg>SPOTTER <i>AI</i></div>${userLoad()?`<div class="trial-badge">Full access</div>`:""}
+    $("#sidebar").innerHTML=`<div class="sb-brand"><svg viewBox="0 0 32 32" class="brand-mark" aria-hidden="true"><ellipse cx="16" cy="16" rx="13.2" ry="6" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".45"/><circle class="lock" cx="16" cy="16" r="3.7" fill="none" stroke="var(--accent)" stroke-width="1.35"/><circle cx="16" cy="16" r="1.5" fill="var(--accent)"/></svg></div>${userLoad()?`<div class="trial-badge">Full access</div>`:""}
       <button class="sb-profile" data-route="profile" data-hover><span class="tb-av">${(name.trim()[0]||"T").toUpperCase()}</span><span class="sb-pinfo"><b>${esc(name)}</b><small>your profile</small></span></button>
       <nav class="navlist">${items}</nav>
       <div class="sb-foot"><button class="navitem" data-route="settings" data-hover><span>Settings</span></button><a class="navitem" href="${DISCORD}" target="_blank" rel="noopener" data-hover><span>Discord →</span></a></div>`;
@@ -2921,14 +2875,24 @@
       bar.innerHTML=`<span class="lb-dot"></span><b>LIVE</b> · ${esc(d.title||"André is streaming")} · ${plat} <span class="lb-cta">Watch now →</span>`;
     }else if(bar){ bar.remove(); }
   }
-  /* --- the Spotter's eye: the pupil tracks your cursor; when you stop, it drifts on its own --- */
-  (function(){ const g=document.getElementById("eyeBall"); if(!g)return;
-    let tx=0,ty=0,cx=0,cy=0,idle=999;
-    addEventListener("mousemove",e=>{ tx=((e.clientX/innerWidth)-.5)*2; ty=((e.clientY/innerHeight)-.5)*2; idle=0; },{passive:true});
-    (function loop(){ idle++;
-      if(idle>200){ const t=Date.now()*0.00035; tx=Math.cos(t)*.55; ty=Math.sin(t*0.8)*.4; } // a wandering gaze
-      cx+=((tx*104)-cx)*.055; cy+=((ty*30)-cy)*.055;   // the iris moves INSIDE the eye
-      g.setAttribute("transform","translate("+cx.toFixed(1)+","+cy.toFixed(1)+")");
+  /* --- the Spotter's eye: a watchman. It sweeps, locks on, holds. It never follows you. --- */
+  (function(){ const ball=document.getElementById("eyeBall"); if(!ball)return;
+    const pupil=ball.querySelector("circle:last-child");
+    let cx=0,cy=0,tx=0,ty=0,hold=0,t=0;
+    function newTarget(){ const r=Math.random();
+      if(r<.55){ tx=(Math.random()*2-1)*95; ty=(Math.random()*2-1)*24; hold=140+Math.random()*160; }   // sweeps, searching
+      else if(r<.85){ tx=Math.max(-100,Math.min(100,tx+(Math.random()*2-1)*28));                       // locks on, holds
+                      ty=Math.max(-27,Math.min(27,ty+(Math.random()*2-1)*10)); hold=200+Math.random()*220; }
+      else { tx=0; ty=0; hold=120+Math.random()*120; }                                                  // back to centre, on guard
+    }
+    newTarget();
+    (function loop(){ t++;
+      if(--hold<=0) newTarget();
+      cx+=(tx-cx)*.018; cy+=(ty-cy)*.018;                                    // heavy, deliberate gaze
+      const jx=Math.sin(t*.13)*.7, jy=Math.cos(t*.11)*.5;                    // micro-tremor: alive, tense
+      ball.setAttribute("transform","translate("+(cx+jx).toFixed(1)+","+(cy+jy).toFixed(1)+")");
+      if(pupil){ const d=Math.hypot(tx-cx,ty-cy);                            // pupil narrows as it focuses
+        pupil.setAttribute("r",(21-Math.min(5,d*.04)+Math.sin(t*.02)*1.2).toFixed(1)); }
       requestAnimationFrame(loop); })();
   })();
   window.__liveStatus=applyLive;                 // the native app injects the status here
