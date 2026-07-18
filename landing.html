@@ -810,40 +810,68 @@
       a[i*3+1]=-6+t*17+gauss()*.25;
       a[i*3+2]=Math.sin(an)*r+gauss()*.25;}
     F.spire=a;}
-  { /* EL OJO — la deidad. Almendra con comisuras, iris de fibras radiales, anillo límbico,
-       pupila abismal, corona de rayos y polvo de datos alrededor. */
+  let EYE_END=0;   // hasta aquí llega la estructura del ojo; de ahí en adelante es polvo
+  { /* EL OJO — la deidad de máquina. Nada anatómico: lente decagonal de aristas duras,
+       facetas concéntricas, anillo de medición, obturador octagonal, núcleo hexagonal.
+       Flota en su campo de datos y la corona emana cuantizada, medida. */
     const a=new Float32Array(N*3);
-    const P=[.32,.15,.13,.09,.06];                  // almendra, límbico, fibras, pupila, corona (resto = polvo)
-    const n1=Math.floor(N*P[0]), n2=Math.floor(N*P[1]), n3=Math.floor(N*P[2]),
-          n4=Math.floor(N*P[3]), n5=Math.floor(N*P[4]);
-    const c1=n1, c2=c1+n2, c3=c2+n3, c4=c3+n4, c5=c4+n5;
-    const RIN=1.35, ROUT=3.5;                        // pupila → borde del iris
-    const bowl=r=>.95-r*r*.055;                      // el iris es cóncavo: un lente, no un disco
+    const RX=11.2, RY=5.2;
+    const V=[[-1,0],[-.724,-.6],[-.357,-.95],[0,-1.025],[.357,-.95],[.724,-.6],
+             [1,0],[.724,.6],[.357,.95],[0,1.025],[-.357,.95],[-.724,.6]];
+    const NV=V.length;
+    const poly=(t,sc)=>{                            // punto sobre el lente decagonal
+      const f=(t%1+1)%1*NV, k=Math.floor(f), u=f-k;
+      const A=V[k], B=V[(k+1)%NV];
+      return [(A[0]+(B[0]-A[0])*u)*RX*sc, (A[1]+(B[1]-A[1])*u)*RY*sc]; };
+    const P=[.17,.13,.09,.14,.08,.10];              // marco, facetas, medición, obturador, núcleo, corona
+    const c=[]; let acc=0;
+    for(const p of P){ acc+=Math.floor(N*p); c.push(acc); }
     for(let i=0;i<N;i++){ let x,y,z;
-      if(i<c1){                                      // 1. CONTORNO: almendra, punta en las comisuras
-        const u=(i/c1)*2-1, up=(i%2===0)?1:-1;
-        const h=Math.pow(Math.max(0,1-u*u),.72);     // exponente <1 → almendra, no elipse
-        x=u*11.2; y=up*(up>0?5.4:4.1)*h; z=gauss()*.35;
-      } else if(i<c2){                               // 2. ANILLO LÍMBICO: el borde nítido del iris
-        const an=((i-c1)/n2)*6.283, r=ROUT+gauss()*.035;
-        x=Math.cos(an)*r; y=Math.sin(an)*r; z=bowl(r)+gauss()*.08;
-      } else if(i<c3){                               // 3. FIBRAS DEL IRIS: 78 estrías radiales
-        const SP=78, an=(Math.floor(rnd()*SP)/SP)*6.283+gauss()*.014;
-        const t=Math.pow(rnd(),.55), r=RIN+t*(ROUT-RIN);
-        const wob=Math.sin(an*9)*.055*(1-t);         // las fibras no son rectas
-        x=Math.cos(an)*r+wob; y=Math.sin(an)*r+wob; z=bowl(r)+gauss()*.05;
-      } else if(i<c4){                               // 4. PUPILA: borde nítido, centro abismal
-        const an=((i-c3)/n4)*6.283, r=RIN+gauss()*.03;
-        x=Math.cos(an)*r; y=Math.sin(an)*r; z=bowl(r)+.12;
-      } else if(i<c5){                               // 5. CORONA: rayos divinos saliendo del contorno
-        const SP2=54, an=(Math.floor(rnd()*SP2)/SP2)*6.283;
-        const t=Math.pow(rnd(),1.7), sc=1.04+t*.52;  // densos junto al borde, se desvanecen
-        x=Math.cos(an)*11.2*sc; y=Math.sin(an)*4.9*sc; z=gauss()*.55;
-      } else {                                       // 6. POLVO: el ojo flota en un campo de datos
+      if(i<c[0]){                                   // 1. MARCO: el lente, aristas rectas
+        const q=poly(i/c[0],1); x=q[0]; y=q[1]; z=gauss()*.12;
+      } else if(i<c[1]){                            // 2. FACETAS: capas del lente, escalonadas en z
+        const n=c[1]-c[0], k=i-c[0], lay=k%3, sc=[.82,.64,.48][lay];
+        const q=poly(Math.floor(k/3)/(n/3),sc); x=q[0]; y=q[1]; z=.25+lay*.26+gauss()*.05;
+      } else if(i<c[2]){                            // 3. ANILLO DE MEDICIÓN: 96 marcas radiales
+        const n=c[2]-c[1], k=i-c[1], TK=96, ti=k%TK;
+        const an=(ti/TK)*6.283, len=(ti%8===0)?.62:.26, t=Math.floor(k/TK)/Math.max(1,n/TK);
+        const r=3.30+t*len;
+        x=Math.cos(an)*r; y=Math.sin(an)*r; z=.92+gauss()*.04;
+      } else if(i<c[3]){                            // 4. OBTURADOR: dos octágonos + cuerdas que cierran
+        const n=c[3]-c[2], k=i-c[2], t=k/n;
+        if(t<.62){                                  // los octágonos
+          const R=(k%2)?2.90:2.45, rot=(k%2)?0:.3927;
+          const f=((k/2)/(n*.31))*8, e=Math.floor(f), u=f-e;
+          const a0=e/8*6.283+rot, a1=(e+1)/8*6.283+rot;
+          x=Math.cos(a0)*R+(Math.cos(a1)*R-Math.cos(a0)*R)*u;
+          y=Math.sin(a0)*R+(Math.sin(a1)*R-Math.sin(a0)*R)*u;
+          z=1.12+gauss()*.04;
+        } else {                                    // las 8 cuerdas: las aspas cerrando
+          const kk=k-Math.floor(n*.62), per=Math.max(1,Math.floor(n*.38/8));
+          const e=Math.floor(kk/per)%8, u=(kk%per)/per, R=2.90;
+          const a0=e/8*6.283, a1=((e+3)%8)/8*6.283;
+          x=Math.cos(a0)*R+(Math.cos(a1)*R-Math.cos(a0)*R)*u;
+          y=Math.sin(a0)*R+(Math.sin(a1)*R-Math.sin(a0)*R)*u;
+          z=1.06+gauss()*.04;
+        }
+      } else if(i<c[4]){                            // 5. NÚCLEO: hexágono + pupila
+        const n=c[4]-c[3], k=i-c[3], t=k/n;
+        if(t<.55){ const f=(k/(n*.55))*6, e=Math.floor(f), u=f-e, R=1.25;
+          const a0=e/6*6.283-1.5708, a1=(e+1)/6*6.283-1.5708;
+          x=Math.cos(a0)*R+(Math.cos(a1)*R-Math.cos(a0)*R)*u;
+          y=Math.sin(a0)*R+(Math.sin(a1)*R-Math.sin(a0)*R)*u; z=1.32+gauss()*.03;
+        } else { const an=rnd()*6.283, r=.62+gauss()*.03;
+          x=Math.cos(an)*r; y=Math.sin(an)*r; z=1.44+gauss()*.03; }
+      } else if(i<c[5]){                            // 6. CORONA: emanación cuantizada, en dos tramos
+        const SP=56, an=(Math.floor(rnd()*SP)/SP)*6.283;
+        const seg=rnd()<.62?1:2, sc=seg===1?(1.030+rnd()*.038):(1.088+rnd()*.032);
+        x=Math.cos(an)*RX*sc; y=Math.sin(an)*RY*sc; z=gauss()*.45;
+      } else {                                      // 7. POLVO: el campo de datos donde flota
         const an=rnd()*6.283, rr=14+Math.pow(rnd(),.8)*16;
         x=Math.cos(an)*rr; y=Math.sin(an)*rr*.55+gauss()*1.4; z=gauss()*3.0;
       }
-      a[i*3]=x+gauss()*.04; a[i*3+1]=y+gauss()*.04; a[i*3+2]=z; }
+      a[i*3]=x+gauss()*.035; a[i*3+1]=y+gauss()*.035; a[i*3+2]=z; }
+    EYE_END=c[5];
     F.eye=a;}
   { // la retícula: tu diario — todo medido, todo en su lugar
     const a=new Float32Array(N*3);
@@ -946,12 +974,24 @@
   /* ---- anclas de la narrativa: cada sección tiene su forma ---- */
   const C1=document.querySelector('[data-ch="1"]'),C2=document.querySelector('[data-ch="2"]');
   const FIN=document.querySelector("#cierre");
+  const HERO=document.querySelector("header.hero");
   const FORM_SECS=[["#oferta","chaos"],["#mentor","orbit"],["#sistema","rise"],["#spotter","eye"],["#app","grid"],["#comunidad","helix"],
     ["#extras","rain"],["#camino","rise"],["#educacion","orbit"],["#semana","grid"],["#faq","chaos"]]
     .map(([q,f])=>[document.querySelector(q),f]).filter(x=>x[0]);
   const FK=["chaos","fall","rise","orbit","eye","grid","helix","rain","spire"];
   const W={chaos:0,fall:0,rise:0,orbit:0,eye:1,grid:0,helix:0,rain:0,spire:0}; // el hero abre con EL OJO (el Spotter que te vigila)
   const chPr=el=>{const r=el.getBoundingClientRect();return -r.top/((r.height-innerHeight)||1);};
+  /* LA MIRADA: la deidad no te sigue — barre. Salta de golpe a un punto, se clava,
+     sostiene, y de vez en cuando vuelve al centro. Cada salto dispara una descarga. */
+  const gaze={x:0,y:0,tx:0,ty:0,hold:0,flash:0};
+  function newGaze(){
+    const r=rnd();
+    if(r<.26){ gaze.tx=0; gaze.ty=0; gaze.hold=100+rnd()*130; }        // vuelve al centro y te clava la mirada
+    else if(r<.45){ gaze.tx=(rnd()-.5)*.22; gaze.ty=(rnd()-.5)*.12; gaze.hold=40+rnd()*60; }  // micro-ajuste
+    else { gaze.tx=(rnd()-.5)*.72; gaze.ty=(rnd()-.5)*.32; gaze.hold=60+rnd()*140; }          // barrido amplio
+    gaze.flash=1;
+  }
+  newGaze();
   const st={mx:0,my:0,smx:0,smy:0,p:0};
   addEventListener("mousemove",e=>{st.mx=(e.clientX/innerWidth-.5)*2;st.my=(e.clientY/innerHeight-.5)*2;});
   function tick(){
@@ -963,7 +1003,10 @@
     const t1=C1?chPr(C1):-9,t2=C2?chPr(C2):-9;
     const finT=FIN?clamp((vh-FIN.getBoundingClientRect().top)/(vh*1.05),0,1):0;
     /* qué forma toca: la última sección que cruza el centro manda */
-    let form="eye";   // el HERO abre con el ojo: la deidad que te vigila, cargándose
+    /* el ojo SOLO vive donde le toca: el hero y #spotter. Entre sección y sección
+       la mente vuelve a ser nube — no reaparece la deidad a media transición. */
+    let form="chaos";
+    if(HERO){const hr=HERO.getBoundingClientRect(); if(hr.bottom>vh*.42)form="eye";}
     for(const [el,f] of FORM_SECS){const r=el.getBoundingClientRect();
       if(r.top<vh*.55&&r.bottom>vh*.2)form=f;}
     if(t1>-.1&&t1<1.12)form="fall";
@@ -971,6 +1014,14 @@
     if(smooth(.12,.7,finT)>.5)form="spire";
     for(const k of FK)W[k]+=((k===form?1:0)-W[k])*.06;
     let wsum=0;for(const k of FK)wsum+=W[k];wsum=wsum||1;
+    /* el parpadeo: el obturador se cierra de golpe, dos veces, cada ~9s.
+       Se aplica SOLO a las partículas del ojo — ni el polvo ni el resto de la página. */
+    const bp=(frame%540)/540;
+    let shut=1, inBlink=false;
+    if(bp>.84&&bp<.938){ const u=(bp-.84)/.098;
+      shut=Math.pow(Math.abs(Math.cos(u*6.283)),.35); inBlink=true; }   // abierto → zas → abierto → zas
+    else if(bp>=.938&&bp<.978) inBlink=true;                            // margen para que reabra de golpe
+    const eyeShut=1-(1-shut)*W.eye;                                     // solo cuando el ojo está formado
     /* morfea hacia la mezcla; la lluvia además CAE */
     const pa=geo.attributes.position.array;
     const rainOff=(frame*.05)%16;
@@ -986,8 +1037,10 @@
         tx+=Math.sin(ft+ph)*.2*alive;
         ty+=Math.cos(ft*.86+ph*1.3)*.2*alive;
         tz+=Math.sin(ft*1.12+ph*.7)*.2*alive;}
+      const isEye=p3<EYE_END;
+      if(isEye&&eyeShut<.999)ty*=eyeShut;              // el obturador aplasta solo al ojo
       pa[i]+=(tx-pa[i])*.055;
-      pa[i+1]+=(ty-pa[i+1])*.055;
+      pa[i+1]+=(ty-pa[i+1])*((inBlink&&isEye)?.4:.055);// el parpadeo es seco, no un desvanecido
       pa[i+2]+=(tz-pa[i+2])*.055;}
     geo.attributes.position.needsUpdate=true;
     const ga=goldGeo.attributes.position.array;
@@ -1024,8 +1077,13 @@
     spkMat.opacity=(.5+Math.sin(frame*.09)*.2)*(.4+W.chaos*.6+W.eye*.5);
     /* la órbita gira mientras vives la rutina; las líneas apenas respiran */
     spin+=.0011*W.orbit;
-    world.rotation.y=Math.sin(frame*.0004)*.1+spin;
-    world.rotation.x=Math.sin(frame*.00055)*.05*W.chaos; // la mente cabecea, viva
+    /* la mirada barre: sacada rápida al objetivo, luego se sostiene clavada */
+    if(--gaze.hold<=0) newGaze();
+    gaze.x+=(gaze.tx-gaze.x)*.085;
+    gaze.y+=(gaze.ty-gaze.y)*.085;
+    gaze.flash*=.93;
+    world.rotation.y=Math.sin(frame*.0004)*.1+spin+gaze.x*W.eye;
+    world.rotation.x=Math.sin(frame*.00055)*.05*W.chaos+gaze.y*W.eye; // la mente cabecea, viva
     world.scale.setScalar(1+Math.sin(frame*.026)*.02*(W.chaos+W.eye)); // respira
     bone.material.opacity=.85-st.p*.15;
     bone.material.size=.07+Math.sin(frame*.045)*.006*W.chaos; // titila al pensar
@@ -1072,7 +1130,8 @@
         haloPos[i*3+2]=pz*Math.cos(h.tilt); }
       haloGeo.attributes.position.needsUpdate=true;
       haloMat.opacity=W.eye*(.35+surge*.45);
-      boltMat.opacity=W.eye*(.42+surge*.58)*flick;                  // se enciende al descargar
+      // se enciende al descargar, estalla al clavar la mirada, se corta al parpadear
+      boltMat.opacity=Math.min(1,W.eye*(.42+surge*.58)*flick*(1+gaze.flash*.9))*shut;
     } else { boltMat.opacity=0; feedMat.opacity=0; haloMat.opacity=0; }
     if(tape)tape.style.opacity=Math.max(0,1-W.spire*.9);
     renderer.render(scene,cam);
