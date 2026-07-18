@@ -1,5 +1,5 @@
 #!/bin/bash
-# SPOTTER AI — arranca una sesión de Claude que vigila tu TradingView en vivo.
+# SPOTTER AI — arranca al Spotter: una sesión de Claude que vigila tu TradingView en vivo.
 cd "$HOME/claude" 2>/dev/null || cd "$HOME"
 CLAUDE="$HOME/.local/bin/claude"
 [ -x "$CLAUDE" ] || CLAUDE="$(command -v claude)"
@@ -8,14 +8,23 @@ PROMPT="empieza sesión: vigila mi TradingView en vivo, cada ~20s revisa mi pant
 
 clear
 echo ""
-echo "   SPOTTER AI — Spotter en línea…"
-echo "   (te va a pedir permiso para ver tu pantalla — apruébalo)"
+echo "   ◉  SPOTTER AI — el Spotter se está conectando…"
 echo ""
 
-if [ -x "$CLAUDE" ]; then
+if [ -n "$CLAUDE" ] && [ -x "$CLAUDE" ]; then
+  echo "   Te va a pedir permiso para ver tu pantalla — apruébalo."
+  echo "   (verás el indicador naranja arriba: el Spotter está mirando)"
+  echo ""
   exec "$CLAUDE" "$PROMPT"
 else
-  echo "   No encontré el comando 'claude'. Abre un chat de Claude y escribe: empieza sesión"
+  echo "   El Spotter en vivo corre sobre Claude Code (la IA que te vigila la pantalla)."
+  echo "   Para activarlo necesitas instalarlo una vez:"
+  echo ""
+  echo "     1) Ten una cuenta de Claude (claude.ai)"
+  echo "     2) Instala Claude Code:  https://claude.ai/code"
+  echo "     3) Vuelve a darle a Start Session en la app"
+  echo ""
+  echo "   Mientras tanto, la plataforma funciona completa sin el Spotter en vivo."
   echo ""
   read -n 1 -s -r -p "   Enter para cerrar…"
 fi

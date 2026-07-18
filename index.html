@@ -1812,6 +1812,8 @@
   function sesModeSave(m){try{localStorage.setItem("candado_sesmode",m);}catch(e){}}
   function startSession(){ sessSave({phase:"live",startedAt:Date.now(),sim:sesModeLoad()==="sim"});
     try{window.open(TV_URL,"_blank","noopener");}catch(e){} // abre tu TradingView
+    // en la app nativa: lanza el Spotter (Claude Code vigilando tu pantalla)
+    try{ if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.spotter){ window.webkit.messageHandlers.spotter.postMessage("start"); } }catch(e){}
     mostrar("sesion"); }
   function practiceNow(){ sesModeSave("sim"); mostrar("sesion"); }
   const simBadge=s=>s.sim?`<span class="sim-badge">SIM · practice</span>`:"";

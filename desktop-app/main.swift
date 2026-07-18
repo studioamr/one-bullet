@@ -2,7 +2,7 @@
 import Cocoa
 import WebKit
 
-class Delegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDelegate {
+class Delegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
     var window: NSWindow!
     var webView: WKWebView!
 
@@ -18,6 +18,9 @@ class Delegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDeleg
         window.minSize = NSSize(width: 900, height: 600)
 
         let cfg = WKWebViewConfiguration()
+        let ucc = WKUserContentController()
+        ucc.add(self, name: "spotter")     // puente: el botón Start Session lanza el Spotter
+        cfg.userContentController = ucc
         webView = WKWebView(frame: rect, configuration: cfg)
         webView.navigationDelegate = self
         webView.uiDelegate = self
@@ -34,6 +37,20 @@ class Delegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDeleg
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ s: NSApplication) -> Bool { true }
+
+    // Start Session pide lanzar el Spotter (Claude Code vigilando la pantalla)
+    func userContentController(_ u: WKUserContentController, didReceive message: WKScriptMessage) {
+        if message.name == "spotter" { launchSpotter() }
+    }
+    func launchSpotter() {
+        guard let res = Bundle.main.resourceURL else { return }
+        let script = res.appendingPathComponent("start-watch.command")
+        try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: script.path)
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+        p.arguments = [script.path]   // .command → se abre en Terminal y arranca a Claude
+        try? p.run()
+    }
 
     // enlaces externos (http/https: Discord, WhatsApp, TradingView) → navegador del sistema
     func webView(_ w: WKWebView, decidePolicyFor a: WKNavigationAction,

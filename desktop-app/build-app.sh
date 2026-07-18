@@ -19,6 +19,9 @@ cp "$ROOT/assets/icon_192.png" "$APP/Contents/Resources/assets/icon_192.png"
 cp "$ROOT/assets/icon_512.png" "$APP/Contents/Resources/assets/icon_512.png" 2>/dev/null || true
 # ícono azul del bundle
 cp "$ROOT/assets/spotter.icns" "$APP/Contents/Resources/spotter.icns"
+# script del Spotter (Claude vigilando) que dispara Start Session
+cp "$ROOT/start-watch.command" "$APP/Contents/Resources/start-watch.command"
+chmod +x "$APP/Contents/Resources/start-watch.command"
 
 # 3) Info.plist
 cat > "$APP/Contents/Info.plist" <<'PLIST'
