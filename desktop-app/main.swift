@@ -1,8 +1,9 @@
 // SPOTTER AI — app nativa de Mac (WKWebView). Su propia ventana, sin navegador.
 import Cocoa
 import WebKit
+import UserNotifications
 
-class Delegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
+class Delegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler, UNUserNotificationCenterDelegate {
     var window: NSWindow!
     var webView: WKWebView!
 
@@ -34,7 +35,36 @@ class Delegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDeleg
         }
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
-        startLive()   // consulta periódica del estado EN VIVO
+        startLive()          // consulta periódica del estado EN VIVO
+        scheduleReminders()  // recordatorios (apertura de Nueva York)
+    }
+
+    // Recordatorios nativos: te avisa aunque la app esté cerrada.
+    func scheduleReminders() {
+        let center = UNUserNotificationCenter.current()
+        center.delegate = self
+        center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
+            guard granted else { return }
+            center.removeAllPendingNotificationRequests()
+            // 1) 15 min antes de la apertura de Nueva York (9:15 AM hora de NY, cada día hábil)
+            let ny = TimeZone(identifier: "America/New_York")
+            let reminders: [(String, Int, Int, String)] = [
+                ("ny-open", 9, 15, "En 15 min abre Nueva York. ¿Listo con tu setup? Una bala."),
+                ("ny-recap", 16, 30, "Cerró la sesión. Registra tu trade y deja que el Spotter te califique.")
+            ]
+            for (id, h, m, body) in reminders {
+                let c = UNMutableNotificationContent()
+                c.title = "SPOTTER AI"; c.body = body; c.sound = .default
+                var comps = DateComponents(); comps.hour = h; comps.minute = m; comps.timeZone = ny
+                let trig = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
+                center.add(UNNotificationRequest(identifier: id, content: c, trigger: trig), withCompletionHandler: nil)
+            }
+        }
+    }
+    // Mostrar la notificación aunque la app esté al frente.
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.banner, .sound])
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ s: NSApplication) -> Bool { true }
