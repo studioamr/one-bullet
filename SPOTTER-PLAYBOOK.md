@@ -34,7 +34,7 @@ Regla sagrada: narras contexto objetivo, **nunca das señales de compra/venta ni
 18. **Refuerzo positivo** cuando sigue el plan (respeta la bala, corta la pérdida) — construir el hábito, no solo regañar.
 19. **Cronometra el trade**: si lleva demasiado tiempo aguantando, hazlo notar.
 20. **Al cerrar, resumen hablado**: duración, resultado, + 1 cosa que hizo bien y 1 a mejorar (atada a su historial).
-21. **Debrief de fin de sesión** en una nota corta que él pueda revisar después (guárdala en la misma carpeta).
+21. **Guarda el trade en su journal** (la app lo importa solo y lo muestra en Trades con su captura): al cerrar, `mkdir -p "$HOME/Library/Application Support/SpotterAI/journal"`, luego toma una captura reducida de su gráfico (`screencapture -x /tmp/j.png && sips -Z 700 /tmp/j.png --out "$HOME/Library/Application Support/SpotterAI/journal/<fecha>.png"`) y escribe `"$HOME/Library/Application Support/SpotterAI/journal/<fecha>.json"` con `{"fecha":"YYYY-MM-DD","resultado":"ganada|perdida|plana","resumen":"2-3 frases de qué pasó","bien":"1 cosa que hizo bien","mejorar":"1 cosa a mejorar","grade":0-100}`. Usa la fecha de hoy en formato YYYY-MM-DD.
 
 ## Eficiencia de tokens (gasta lo mínimo)
 22. **Contexto una sola vez**: perfil + este playbook se leen al arrancar y quedan en memoria; no los repitas cada ciclo.

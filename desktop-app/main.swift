@@ -38,6 +38,39 @@ class Delegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDeleg
 
     func applicationShouldTerminateAfterLastWindowClosed(_ s: NSApplication) -> Bool { true }
 
+    // Al volver a la app (tras una sesión), importa lo que el Spotter dejó en el journal.
+    func applicationDidBecomeActive(_ n: Notification) { importJournal() }
+    // Al terminar de cargar la plataforma, importa también.
+    func webView(_ w: WKWebView, didFinish navigation: WKNavigation!) { importJournal() }
+
+    // Lee ~/Library/Application Support/SpotterAI/journal/<fecha>.json (+ .png) que guardó el
+    // Spotter y los inyecta al journal de la app (captura como data-URI + resumen de sesión).
+    func importJournal() {
+        guard let wv = webView else { return }
+        let fm = FileManager.default
+        let dir = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Library/Application Support/SpotterAI/journal")
+        guard let files = try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil) else { return }
+        for f in files where f.pathExtension == "json" {
+            guard let data = try? Data(contentsOf: f),
+                  var obj = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+                  let fecha = obj["fecha"] as? String else { continue }
+            let png = dir.appendingPathComponent(fecha + ".png")
+            if let img = try? Data(contentsOf: png) {
+                obj["shot"] = "data:image/png;base64," + img.base64EncodedString()
+            }
+            guard let payload = try? JSONSerialization.data(withJSONObject: obj),
+                  var payloadStr = String(data: payload, encoding: .utf8) else { continue }
+            payloadStr = payloadStr.replacingOccurrences(of: "\u{2028}", with: "\\u2028")
+                                   .replacingOccurrences(of: "\u{2029}", with: "\\u2029")
+            let done = f.appendingPathExtension("done")
+            DispatchQueue.main.async {
+                wv.evaluateJavaScript("window.__spotterImport(\(payloadStr))") { result, error in
+                    if error == nil, (result as? String) == "ok" { try? fm.moveItem(at: f, to: done) }
+                }
+            }
+        }
+    }
+
     // Start Session pide lanzar el Spotter (Claude Code vigilando la pantalla)
     func userContentController(_ u: WKUserContentController, didReceive message: WKScriptMessage) {
         if message.name == "spotter" { launchSpotter(profile: message.body as? String ?? "") }

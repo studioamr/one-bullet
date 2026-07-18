@@ -858,6 +858,19 @@
   .tbl{width:100%;border-collapse:collapse;font-size:.84rem}
   .tbl th{text-align:left;font-size:.56rem;text-transform:uppercase;letter-spacing:.14em;color:var(--ink2);
     font-weight:400;padding:10px 12px;border-bottom:1px solid var(--line)}
+  .spot-none{color:var(--ink2)}
+  .spot-chip{background:rgba(61,134,207,.12);border:1px solid rgba(61,134,207,.3);border-radius:7px;color:var(--accent);font-family:var(--sans);font-size:.76rem;font-weight:600;padding:4px 9px;cursor:pointer;transition:all .15s}
+  .spot-chip:hover{background:rgba(61,134,207,.22)}
+  .spot-modal{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)}
+  .spot-card{position:relative;width:min(680px,100%);max-height:88vh;overflow-y:auto;background:var(--bg1);border:1px solid var(--line);border-radius:16px;padding:26px}
+  .spot-x{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--ink2);font-size:1.5rem;line-height:1;cursor:pointer}
+  .spot-x:hover{color:var(--ink)}
+  .spot-date{font-size:.62rem;text-transform:uppercase;letter-spacing:.2em;color:var(--accent)}
+  .spot-grade{font-family:var(--serif);font-size:1.2rem;margin:6px 0 14px}.spot-grade b{color:var(--accent)}
+  .spot-img{width:100%;border-radius:10px;border:1px solid var(--line);margin-bottom:14px;display:block}
+  .spot-sum{color:var(--ink1);font-size:.95rem;line-height:1.6;margin-bottom:12px}
+  .spot-line{font-size:.86rem;padding:7px 0;border-top:1px solid var(--line)}
+  .spot-line.up{color:#35c46f}.spot-line.down{color:var(--rojo)}
   .tbl td{padding:12px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;color:var(--ink1)}
   .tbl td.strong{color:var(--ink);font-family:var(--serif);font-size:.98rem}
   .tbl tr:hover td{background:rgba(244,241,234,.02)}
@@ -1341,6 +1354,34 @@
     requestAnimationFrame(draw);}
   rz();draw();window.addEventListener("resize",rz);
 
+  /* ===================== SPOTTER JOURNAL (screenshots + resúmenes que manda el Spotter) ===================== */
+  function spotLoad(){try{return JSON.parse(localStorage.getItem("candado_spotter")||"{}");}catch(e){return {};}}
+  function spotSave(o){try{localStorage.setItem("candado_spotter",JSON.stringify(o));}catch(e){}}
+  // La app NATIVA llama esto con los artefactos que el Spotter guardó (captura + resumen de sesión).
+  window.__spotterImport=function(payload){
+    try{
+      const d=typeof payload==="string"?JSON.parse(payload):payload;
+      if(!d||!d.fecha)return "no-fecha";
+      const s=spotLoad();
+      s[d.fecha]={summary:(d.resumen||d.summary||"").toString(), bien:(d.bien||"").toString(), mejorar:(d.mejorar||"").toString(), grade:(d.grade!=null?d.grade:null), shot:(d.shot||null), at:(d.at||d.fecha)};
+      const keys=Object.keys(s).sort(); while(keys.length>30){ delete s[keys.shift()]; } // poda: últimas 30 sesiones
+      spotSave(s);
+      try{ if(document.querySelector('.nav-item.active')?.dataset.route==="trades") mostrar("trades"); }catch(_){}
+      return "ok";
+    }catch(e){ return "err:"+e.message; }
+  };
+  function spotCell(fecha){ const s=spotLoad()[fecha]; if(!s)return '<span class="spot-none">·</span>';
+    return `<button class="spot-chip" data-spot="${fecha}" data-hover>📷${s.grade!=null?' '+s.grade:''}</button>`; }
+  function openSpotModal(fecha){ const s=spotLoad()[fecha], m=document.getElementById("spot-modal"); if(!s||!m)return;
+    m.innerHTML=`<div class="spot-card"><button class="spot-x" data-spotclose>×</button>
+      <div class="spot-date">Sesión · ${fecha}</div>
+      ${s.grade!=null?`<div class="spot-grade">Spotter grade <b>${s.grade}</b>/100</div>`:""}
+      ${s.shot?`<img class="spot-img" src="${s.shot}" alt="captura de la sesión">`:""}
+      ${s.summary?`<p class="spot-sum">${esc(s.summary)}</p>`:""}
+      ${s.bien?`<div class="spot-line up">✓ ${esc(s.bien)}</div>`:""}
+      ${s.mejorar?`<div class="spot-line down">△ ${esc(s.mejorar)}</div>`:""}</div>`;
+    m.hidden=false; }
+
   /* ===================== JOURNAL ENGINE (NorthPoint tech) ===================== */
   function NPtrades(){ return histLoad().slice().reverse().map(x=>({
     fecha:x.fecha, pnl:(x.pnl==null?null:x.pnl),
@@ -1453,9 +1494,9 @@
       <div class="kpi"><div class="k-l">Profit factor</div><div class="k-v">${st.hasP?pf_txt(st.profitFactor):"—"}</div></div></div>
     <div class="p-card">${calendarFull(calMonth)}</div>`; }
 
-  function viewTrades(){ const all=NPtrades().slice().reverse(); if(!all.length)return emptyState("No trades yet. Every sealed session is logged here with its duration, result, P&L, setup and emotion.");
-    return `<table class="tbl"><thead><tr><th>Date</th><th>Result</th><th>Dur.</th><th>P&L</th><th>Setup</th><th>Emotion</th><th>Rev.</th></tr></thead><tbody>`+
-      all.map(t=>`<tr><td class="strong">${t.fecha.slice(5).replace("-","/")}${t.sim?' <span class="sim-badge">SIM</span>':""}</td><td><span class="pill ${t.result}">${t.result==="win"?"Won":"Lost"}</span></td><td>${t.durMin?t.durMin+"m":"—"}</td><td class="${t.pnl>0?'up':t.pnl<0?'down':''}">${t.pnl!=null?money(t.pnl):"—"}</td><td>${t.setup?(SETUPS_L[t.setup]||t.setup):"—"}</td><td>${t.emotion?(EMO_L[t.emotion]||t.emotion):"—"}</td><td>${t.revenges?'<span class="down">'+t.revenges+'</span>':"·"}</td></tr>`).join("")+`</tbody></table>`; }
+  function viewTrades(){ const all=NPtrades().slice().reverse(); if(!all.length)return emptyState("No trades yet. Every sealed session is logged here with its duration, result, P&L, setup and emotion — and the Spotter attaches a screenshot and session summary.");
+    return `<table class="tbl"><thead><tr><th>Date</th><th>Result</th><th>Dur.</th><th>P&L</th><th>Setup</th><th>Emotion</th><th>Rev.</th><th>Spotter</th></tr></thead><tbody>`+
+      all.map(t=>`<tr><td class="strong">${t.fecha.slice(5).replace("-","/")}${t.sim?' <span class="sim-badge">SIM</span>':""}</td><td><span class="pill ${t.result}">${t.result==="win"?"Won":"Lost"}</span></td><td>${t.durMin?t.durMin+"m":"—"}</td><td class="${t.pnl>0?'up':t.pnl<0?'down':''}">${t.pnl!=null?money(t.pnl):"—"}</td><td>${t.setup?(SETUPS_L[t.setup]||t.setup):"—"}</td><td>${t.emotion?(EMO_L[t.emotion]||t.emotion):"—"}</td><td>${t.revenges?'<span class="down">'+t.revenges+'</span>':"·"}</td><td>${spotCell(t.fecha)}</td></tr>`).join("")+`</tbody></table><div id="spot-modal" class="spot-modal" hidden></div>`; }
 
   /* AI Coach · NorthPoint logic: memory hero + KPIs + insights w/ rules + breakdowns */
   function coachGroup(arr,keyFn,labelFn){ const m={};
@@ -2289,6 +2330,8 @@
     if(v==="comunidad"||v==="progreso")requestAnimationFrame(()=>requestAnimationFrame(()=>{document.querySelectorAll(".rc-run").forEach(r=>{r.style.left=r.dataset.pos+"%";});}));
   }
   document.addEventListener("click",e=>{
+    const sp=e.target.closest("[data-spot]"); if(sp){openSpotModal(sp.dataset.spot);return;}
+    if(e.target.closest("[data-spotclose]")||e.target.id==="spot-modal"){const m=document.getElementById("spot-modal");if(m){m.hidden=true;m.innerHTML="";}return;}
     const a=e.target.closest("[data-route]"); if(a){mostrar(a.dataset.route);return;}
     const les=e.target.closest("[data-lesson]"); if(les){courseLesson=les.dataset.lesson;mostrar("course");return;}
     if(e.target.closest("[data-back]")){courseLesson=null;mostrar("course");return;}
