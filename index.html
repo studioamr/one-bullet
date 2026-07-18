@@ -885,6 +885,26 @@
   .lead-row.me .lead-nm{color:var(--ink)}
   .lead-el{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink)}
   .live-tag{color:#35c46f;font-weight:600}
+  .profile2{display:flex;flex-direction:column;gap:16px}
+  .pf-hero{display:flex;align-items:center;gap:18px}
+  .pf-av{width:64px;height:64px;flex:none;border-radius:50%;background:linear-gradient(135deg,var(--accent),#5B9BD5);color:#fff;font-family:var(--serif);font-size:1.8rem;display:flex;align-items:center;justify-content:center}
+  .pf-id{flex:1}.pf-name{font-family:var(--serif);font-weight:400;font-size:1.9rem;line-height:1}
+  .pf-meta{color:var(--ink2);font-size:.82rem;margin-top:5px}
+  .pf-elo{text-align:center}.pf-elo span{font-family:var(--serif);font-size:1.9rem;color:var(--accent);display:block;line-height:1}.pf-elo small{font-size:.6rem;text-transform:uppercase;letter-spacing:.16em;color:var(--ink2)}
+  .pf-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  @media(max-width:640px){.pf-stats{grid-template-columns:repeat(2,1fr)}}
+  .pf-stat{background:var(--bg1);border:1px solid var(--line);border-radius:12px;padding:14px 10px;text-align:center}
+  .pf-sv{font-family:var(--serif);font-size:1.5rem;line-height:1}.pf-sv.up{color:#35c46f}.pf-sv.down{color:var(--rojo)}
+  .pf-sl{font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--ink2);margin-top:6px}
+  .ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+  @media(max-width:640px){.ach-grid{grid-template-columns:1fr}}
+  .ach{display:flex;gap:12px;align-items:flex-start;background:var(--bg1);border:1px solid var(--line);border-radius:12px;padding:13px 14px;position:relative}
+  .ach.got{border-color:rgba(61,134,207,.34);background:rgba(61,134,207,.07)}
+  .ach.locked{opacity:.6}
+  .ach-ic{font-size:1.4rem;flex:none;line-height:1}
+  .ach-b{flex:1}.ach-b b{font-size:.92rem}.ach-b p{font-size:.74rem;color:var(--ink2);margin-top:2px;line-height:1.4}
+  .ach-bar{height:4px;background:var(--line);border-radius:999px;margin-top:8px;overflow:hidden}.ach-bar span{display:block;height:100%;background:var(--accent)}
+  .ach-chk{position:absolute;top:12px;right:13px;color:#35c46f;font-weight:700}
   .tbl td{padding:12px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;color:var(--ink1)}
   .tbl td.strong{color:var(--ink);font-family:var(--serif);font-size:.98rem}
   .tbl tr:hover td{background:rgba(244,241,234,.02)}
@@ -2315,7 +2335,42 @@
   }
 
   /* ---------- shell / router ---------- */
+  /* ---------- Perfil + Logros (genérico, por los datos reales del usuario) ---------- */
+  function trainLog(){try{return JSON.parse(localStorage.getItem("candado_trainlog")||"[]");}catch(e){return[];}}
+  const ACHIEVEMENTS=[
+    {id:"first_trade",ic:"🎯",t:"First bullet",d:"Log your first session",ok:()=>histLoad().some(x=>x.outcome)},
+    {id:"ten_sessions",ic:"🔥",t:"On the grind",d:"Log 10 sessions",ok:()=>histLoad().filter(x=>x.outcome).length>=10,pr:()=>histLoad().filter(x=>x.outcome).length/10},
+    {id:"disciplined",ic:"🛡️",t:"Ice cold",d:"5 sessions in a row, zero revenge",ok:()=>{const h=histLoad().filter(x=>x.outcome).slice(0,5);return h.length>=5&&h.every(x=>!x.revenges);}},
+    {id:"profitable",ic:"💰",t:"In the green",d:"Net P&L over $1,000",ok:()=>totalProfit()>=1000,pr:()=>Math.max(0,totalProfit())/1000},
+    {id:"eval_cleared",ic:"🏆",t:"Eval cleared",d:"Hit your evaluation target",ok:()=>totalProfit()>=((acctLoad()||{}).evalTarget||1000),pr:()=>Math.max(0,totalProfit())/(((acctLoad()||{}).evalTarget)||1000)},
+    {id:"first_payout",ic:"💵",t:"First payout",d:"Cash and log your first payout",ok:()=>poutLoad().length>0},
+    {id:"ranked",ic:"⚔️",t:"Contender",d:"Reach 1,300 Elo in Training",ok:()=>eloLoad().elo>=1300,pr:()=>Math.max(0,(eloLoad().elo-1200)/100)},
+    {id:"reps",ic:"🔁",t:"Rep machine",d:"10 training sessions",ok:()=>trainLog().length>=10,pr:()=>trainLog().length/10},
+    {id:"scholar",ic:"📚",t:"Student of the game",d:"Finish the course",ok:()=>{const cp=progLoad(),lc=allLessons();return lc.length&&lc.every(l=>cp[l.id]);},pr:()=>{const cp=progLoad(),lc=allLessons();return lc.length?lc.filter(l=>cp[l.id]).length/lc.length:0;}},
+    {id:"in_room",ic:"🤝",t:"In the room",d:"Join the community",ok:()=>{const c=(profileLoad()||{}).communities||{};return Object.keys(c).some(k=>c[k]);}},
+    {id:"racer",ic:"🏁",t:"On the grid",d:"Join a race",ok:()=>localStorage.getItem("candado_race")==="1"},
+    {id:"funded",ic:"🥇",t:"Funded",d:"Reach the funded phase",ok:()=>{const ph=youRacer().phase;return ph&&ph!=="eval";}},
+  ];
+  function achEarned(A){try{return !!A.ok();}catch(e){return false;}}
+  function viewProfile(){
+    const p=profileLoad()||{}, a=acctLoad()||{}, r=eloLoad(), h=histLoad().filter(x=>x.outcome), yr=youRacer();
+    const wins=h.filter(x=>x.outcome==="GANADA").length, wr=h.length?Math.round(wins/h.length*100):0, net=totalProfit();
+    const disc=h.length?Math.round(h.filter(x=>!x.revenges).length/h.length*100):100;
+    const name=(p.handle||"trader"), got=ACHIEVEMENTS.filter(achEarned);
+    const stat=(l,v,cls)=>`<div class="pf-stat"><div class="pf-sv ${cls||''}">${v}</div><div class="pf-sl">${l}</div></div>`;
+    const card=A=>{ const e=achEarned(A); let pr=null; if(!e&&A.pr){try{pr=Math.min(1,Math.max(0,A.pr()||0));}catch(x){pr=null;}}
+      return `<div class="ach ${e?'got':'locked'}"><div class="ach-ic">${e?A.ic:'🔒'}</div><div class="ach-b"><b>${A.t}</b><p>${A.d}</p>${pr!=null&&pr<1?`<div class="ach-bar"><span style="width:${Math.round(pr*100)}%"></span></div>`:''}</div>${e?'<span class="ach-chk">✓</span>':''}</div>`; };
+    return `<div class="profile2">
+      <div class="p-card pf-hero"><div class="pf-av">${(name.trim()[0]||"T").toUpperCase()}</div>
+        <div class="pf-id"><h2 class="pf-name">${esc(name)}</h2><div class="pf-meta">${esc(a.firm||"no account yet")} · ${({eval:"In eval",funded:"Funded",payout:"Cashing"})[yr.phase]||"In eval"}</div></div>
+        <div class="pf-elo"><span>${r.elo}</span><small>Elo</small></div></div>
+      <div class="pf-stats">${stat("Sessions",h.length)}${stat("Win rate",wr+"%")}${stat("Net P&L",money(net),net>=0?'up':'down')}${stat("Discipline",disc+"%")}${stat("Payouts",poutLoad().length)}</div>
+      <div class="p-card"><div class="c-t">Achievements <span class="room-agg">${got.length} / ${ACHIEVEMENTS.length} unlocked</span></div>
+        <div class="ach-grid">${ACHIEVEMENTS.map(card).join("")}</div></div>
+    </div>`;
+  }
   const VISTAS={
+    profile:{t:"Profile",s:"you · stats · achievements",f:viewProfile},
     home:{t:"Home",s:"your trading room",f:viewHome},
     course:{t:"Course",s:"the TJR Boot Camp · 30 days",f:viewCourseRouter},
     comunidad:{t:"Community",s:"the room, racing to payout",f:viewComunidad},
@@ -2344,7 +2399,7 @@
     const items=NAV.map(it=>it.group?`<div class="nav-group">${it.group}</div>`
       :`<button class="navitem" data-route="${it.r}" data-hover><span>${it.label}</span>${it.r==="course"?`<span class="nav-badge">${cpct}%</span>`:""}</button>`).join("");
     $("#sidebar").innerHTML=`<div class="sb-brand"><svg viewBox="0 0 32 32" class="brand-mark" aria-hidden="true"><g class="spin"><circle cx="16" cy="16" r="12.6" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".4"/><path d="M16 3.4v4.4M16 24.2v4.4M3.4 16h4.4M24.2 16h4.4" stroke="currentColor" stroke-width="1.4" opacity=".4" stroke-linecap="round"/></g><circle class="lock" cx="16" cy="16" r="5.4" fill="none" stroke="var(--accent)" stroke-width="1.35"/><circle cx="16" cy="16" r="2.2" fill="var(--accent)"/></svg>SPOTTER <i>AI</i></div>${userLoad()?`<div class="trial-badge">Acceso completo</div>`:""}
-      <button class="sb-profile" data-route="home" data-hover><span class="tb-av">${(name.trim()[0]||"T").toUpperCase()}</span><span class="sb-pinfo"><b>${esc(name)}</b><small>your profile</small></span></button>
+      <button class="sb-profile" data-route="profile" data-hover><span class="tb-av">${(name.trim()[0]||"T").toUpperCase()}</span><span class="sb-pinfo"><b>${esc(name)}</b><small>your profile</small></span></button>
       <nav class="navlist">${items}</nav>
       <div class="sb-foot"><button class="navitem" data-route="settings" data-hover><span>Settings</span></button><a class="navitem" href="${DISCORD}" target="_blank" rel="noopener" data-hover><span>Community · Discord</span></a></div>`;
   }
