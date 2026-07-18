@@ -905,6 +905,15 @@
   .ach-b{flex:1}.ach-b b{font-size:.92rem}.ach-b p{font-size:.74rem;color:var(--ink2);margin-top:2px;line-height:1.4}
   .ach-bar{height:4px;background:var(--line);border-radius:999px;margin-top:8px;overflow:hidden}.ach-bar span{display:block;height:100%;background:var(--accent)}
   .ach-chk{position:absolute;top:12px;right:13px;color:#35c46f;font-weight:700}
+  .plan-toggle{justify-content:flex-start;margin:0 0 6px}
+  .plan-note{color:var(--ink2);font-size:.86rem;line-height:1.5;padding:2px 2px 4px}.plan-note b{color:var(--ink1)}
+  .plan-actions{margin:2px 0}
+  .mp-inp{background:#000;border:1px solid var(--line);border-radius:8px;color:var(--ink);font-family:var(--sans);font-size:.86rem;padding:8px 11px;width:100%}
+  .mp-inp:focus{outline:none;border-color:var(--accent)}
+  .mp-firm{font-size:1rem;font-weight:600;margin-bottom:10px}
+  .mp-setup{margin-top:4px}
+  .plan-phase .fr input.mp-inp{width:120px;text-align:right;padding:5px 8px}
+  .plan-phase .fr{align-items:center}
   .tbl td{padding:12px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;color:var(--ink1)}
   .tbl td.strong{color:var(--ink);font-family:var(--serif);font-size:.98rem}
   .tbl tr:hover td{background:rgba(244,241,234,.02)}
@@ -1352,7 +1361,7 @@
   /* ---------- events ---------- */
   document.addEventListener("click",e=>{
     const b=e.target.closest("button[data-a]");if(!b)return;
-    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,addinvest:addInvest,replayonb:startOnb,createlobby:battleLobby,practicenow:practiceNow,joinrace:()=>{raceJoin();mostrar("comunidad");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
+    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,addinvest:addInvest,replayonb:startOnb,createlobby:battleLobby,practicenow:practiceNow,joinrace:()=>{raceJoin();mostrar("comunidad");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
   });
   document.addEventListener("input",e=>{ if(!e.target)return;
     if(ONB&&e.target.id&&e.target.id.startsWith("onb-")){ const d=ONB.data, id=e.target.id, v=e.target.value;
@@ -1368,6 +1377,7 @@
     else if(e.target.id==="rul-trades"||e.target.id==="rul-risk"||e.target.id==="rul-sess"||e.target.id==="rul-target"){
       const r=rulesLoad(), v=parseFloat(e.target.value);
       if(!isNaN(v)&&v>0){ if(e.target.id==="rul-trades")r.trades=Math.round(v); else if(e.target.id==="rul-risk")r.risk=v; else if(e.target.id==="rul-sess")r.sess=v; else r.target=v; rulesSave(r); }}
+    else if(e.target.dataset&&e.target.dataset.mp){ const k=e.target.dataset.mp, mp=myPlanLoad(); if(k==="setup")mp.setup=e.target.value; else{const a=k.split("."),i=+a[0];mp.phases[i]=mp.phases[i]||{};mp.phases[i][a[1]]=e.target.value;} myPlanSave(mp); }
     else if(e.target.id==="ses-pnl"){const v=parseFloat(e.target.value);sessRecord({pnl:isNaN(v)?null:v});}
     else if(e.target.id==="ses-notes"){sessRecord({notes:e.target.value});}
     else if(e.target.id==="acct-why"||e.target.id==="acct-firm"||e.target.id==="acct-size"||e.target.id==="acct-target"){
@@ -2213,7 +2223,11 @@
     {n:3,firm:"Apex",units:"×20 50Ks",cost:37500,process:"1–3 days eval + 2–5 days buffer",target:"$2,000 × 20",pay:700000},
     {n:4,firm:"Tradeify · Lucid · Apex",units:"×30 50Ks",cost:55000,process:"1–3 days eval + 2–5 days buffer",target:"$2,000 × 50",pay:945000},
   ];
-  function viewPlan(){
+  function planMode(){try{return localStorage.getItem("candado_planmode")||"amr";}catch(e){return "amr";}}
+  function myPlanLoad(){try{return JSON.parse(localStorage.getItem("candado_myplan"))||{setup:"",phases:[{},{},{},{}]};}catch(e){return{setup:"",phases:[{},{},{},{}]};}}
+  function myPlanSave(p){try{localStorage.setItem("candado_myplan",JSON.stringify(p));}catch(e){}}
+  function myPlanCopyAMR(){ const mp=myPlanLoad(); mp.phases=PLAN_PHASES.map(p=>({firm:p.firm,units:p.units,cost:String(p.cost),target:p.target,pay:String(p.pay)})); if(!mp.setup)mp.setup="Opening Range Breakout → liquidity"; myPlanSave(mp); mostrar("plan"); }
+  function amrPlanBody(){
     const accts=acctsLoad()||[], nA=accts.length, cashed=poutLoad().length;
     const cur=cashed===0?1:(nA>=30?4:nA>=20?3:nA>=5?2:1);
     const fmt=n=>"$"+n.toLocaleString("en-US");
@@ -2223,19 +2237,38 @@
       <div class="pp-rows">
         <div class="fr"><span>Accounts</span><b>${p.units}</b></div>
         <div class="fr"><span>Cost</span><b>${fmt(p.cost)}</b></div>
-        <div class="fr"><span>Process</span><b>10 business days</b></div>
         <div class="fr"><span>Timeline</span><b>${p.process}</b></div>
         <div class="fr"><span>Payout target</span><b>${p.target}</b></div>
         <div class="fr"><span>First pay</span><b class="up">${fmt(p.pay)}</b></div>
       </div></div>`;}).join("");
-    return `<div class="plan2">
+    return `<div class="plan-note">Esta es <b>la ruta con la que André (AMR) escaló</b> — el plan del mentor. Síguela tal cual, o arma la tuya en <b>"Mi plan"</b>.</div>
       <div class="plan-grid">${cards}</div>
       <div class="p-card model-card"><div class="c-t">Execution model · proven ✓</div>
         <div class="model-in">
-          <div><div class="model-h">A+ setup</div><p class="home-p"><b>Opening Range Breakout</b> into Asia / London liquidity. One bullet, every phase — the size changes, the setup and the rules never do.</p></div>
+          <div><div class="model-h">A+ setup de AMR</div><p class="home-p"><b>Opening Range Breakout</b> hacia liquidez de Asia / Londres. Una bala, cada fase — el tamaño cambia, el setup y las reglas no.</p></div>
           <div class="model-flow"><span>ORB</span><em>→</em><span>Asia liq.</span><em>→</em><span>London liq.</span></div>
-        </div></div>
-    </div>`;
+        </div></div>`;
+  }
+  function myPlanBody(){
+    const mp=myPlanLoad();
+    const ph=(i)=>{const p=mp.phases[i]||{}; return `<div class="p-card plan-phase"><div class="pp-head"><div class="pp-tag">Fase ${i+1}</div></div>
+      <input class="mp-inp mp-firm" data-mp="${i}.firm" value="${esc(p.firm||"")}" placeholder="Tu fondeadora">
+      <div class="pp-rows">
+        <div class="fr"><span>Cuentas</span><input class="mp-inp" data-mp="${i}.units" value="${esc(p.units||"")}" placeholder="×1"></div>
+        <div class="fr"><span>Costo</span><input class="mp-inp" data-mp="${i}.cost" value="${esc(p.cost||"")}" placeholder="$1,750"></div>
+        <div class="fr"><span>Meta payout</span><input class="mp-inp" data-mp="${i}.target" value="${esc(p.target||"")}" placeholder="$1,000"></div>
+        <div class="fr"><span>1er pago</span><input class="mp-inp" data-mp="${i}.pay" value="${esc(p.pay||"")}" placeholder="$17,500"></div>
+      </div></div>`;};
+    return `<div class="p-card"><div class="c-t">Mi setup A+</div>
+        <input class="mp-inp mp-setup" data-mp="setup" value="${esc(mp.setup||"")}" placeholder="Tu setup: ORB, swing en soportes/resistencias, scalping de rango, breakout…">
+        <p class="home-note">Escribe tu estrategia y arma tus fases. Todo es tuyo y editable.</p></div>
+      <div class="plan-actions"><button class="btn" data-a="copyamr" data-hover>Copiar el plan AMR como base →</button></div>
+      <div class="plan-grid">${[0,1,2,3].map(ph).join("")}</div>`;
+  }
+  function viewPlan(){
+    const mode=planMode();
+    const toggle=`<div class="onb-row plan-toggle"><button class="onb-pill ${mode==="amr"?"on":""}" data-planmode="amr" data-hover>El plan AMR</button><button class="onb-pill ${mode==="mine"?"on":""}" data-planmode="mine" data-hover>Mi plan</button></div>`;
+    return `<div class="plan2">${toggle}${mode==="mine"?myPlanBody():amrPlanBody()}</div>`;
   }
   /* ---------- Payouts · enter what you cashed → $ per destination ---------- */
   const SPLIT_DEF=[["Reinvest in prop firms","#2f6fb0"],["Investments","#3d86cf"],["Expenses / life","#5f9fda"],["Reserve","#88bbe8"],["Fun","#b6d6f2"]];
@@ -2429,6 +2462,7 @@
       else if(a==="finish"){finishOnb();return;}
       renderOnb();return;}
     const oc=e.target.closest("[data-onbcomm]"); if(oc&&ONB){const k=oc.dataset.onbcomm;ONB.data.comms[k]=!ONB.data.comms[k];renderOnb();return;}
+    const pm=e.target.closest("[data-planmode]"); if(pm){try{localStorage.setItem("candado_planmode",pm.dataset.planmode);}catch(x){} mostrar("plan");return;}
     const of=e.target.closest("[data-onbfirm]"); if(of&&ONB){ONB.data.firm=of.dataset.onbfirm;renderOnb();return;}
     const oe=e.target.closest("[data-onbexp]"); if(oe&&ONB){ONB.data.exp=oe.dataset.onbexp;renderOnb();return;}
     const go=e.target.closest("[data-go]"); if(go){mostrar(go.dataset.go);return;}
