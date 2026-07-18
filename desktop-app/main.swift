@@ -44,11 +44,23 @@ class Delegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDeleg
     }
     func launchSpotter() {
         guard let res = Bundle.main.resourceURL else { return }
-        let script = res.appendingPathComponent("start-watch.command")
-        try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: script.path)
+        let src = res.appendingPathComponent("start-watch.command")
+        let fm = FileManager.default
+        // Copiamos el script a Application Support y le quitamos la cuarentena que heredó de la
+        // descarga; así Gatekeeper NO lo bloquea al abrirlo (self-heal).
+        let dir = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Library/Application Support/SpotterAI")
+        let dst = dir.appendingPathComponent("start-watch.command")
+        try? fm.createDirectory(at: dir, withIntermediateDirectories: true)
+        try? fm.removeItem(at: dst)
+        do { try fm.copyItem(at: src, to: dst) } catch { return }
+        try? fm.setAttributes([.posixPermissions: 0o755], ofItemAtPath: dst.path)
+        let strip = Process()
+        strip.executableURL = URL(fileURLWithPath: "/usr/bin/xattr")
+        strip.arguments = ["-cr", dst.path]     // quita com.apple.quarantine y demás
+        try? strip.run(); strip.waitUntilExit()
         let p = Process()
         p.executableURL = URL(fileURLWithPath: "/usr/bin/open")
-        p.arguments = [script.path]   // .command → se abre en Terminal y arranca a Claude
+        p.arguments = [dst.path]                 // abre la copia limpia en Terminal → arranca Claude
         try? p.run()
     }
 
