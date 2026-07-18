@@ -1723,16 +1723,6 @@
   function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
   function initials(n){return (String(n||"").split(/[ _.@-]+/).filter(Boolean).map(w=>w[0]).slice(0,2).join("")||"?").toUpperCase();}
   const HOME_DATA={
-    instruments:[
-      {sym:"MNQ",name:"Micro Nasdaq",price:29656.25,pct:0.06},
-      {sym:"NQ",name:"Nasdaq 100",price:29656.25,pct:0.06},
-      {sym:"ES",name:"S&P 500",price:7433.50,pct:0.01},
-      {sym:"YM",name:"Dow",price:52007,pct:-0.02},
-      {sym:"RTY",name:"Russell 2000",price:2996.10,pct:-0.03},
-      {sym:"GC",name:"Gold",price:4077.90,pct:0.12},
-      {sym:"CL",name:"Oil",price:75.19,pct:-0.20},
-      {sym:"BTC",name:"Bitcoin",price:98240,pct:1.42},
-    ],
     firms:[
       {name:"Tradeify",rating:4.7,maxFunding:"$750K",split:"90%",cost:"$120",tags:["Instant funding","Automated payouts"]},
       {name:"Lucid Trading",rating:4.8,maxFunding:"$600K",split:"90%",cost:"$100",tags:["EOD drawdowns","No hard breach"]},
@@ -1745,23 +1735,7 @@
       {day:"Thu",events:[["Jobless Claims","08:30","high"],["Core PCE","08:30","high"]]},
       {day:"Fri",events:[["Non-Farm Payrolls","08:30","high"],["Michigan sentiment","10:00","med"]]},
     ],
-    news:[
-      {t:"Futures steady into the New York open as desks wait on this week's data", src:"CNBC · Futures", time:"6:12 AM", tag:"Indices", url:"https://www.cnbc.com/futures-and-commodities/", kind:"range"},
-      {t:"Nasdaq holds its range after megacap earnings — MNQ coils near the highs", src:"CNBC · NQ", time:"5:48 AM", tag:"MNQ", url:"https://www.cnbc.com/quotes/NQ.1", kind:"up"},
-      {t:"Dollar firms and yields tick up ahead of the jobs print", src:"Reuters · FX", time:"5:30 AM", tag:"Macro", url:"https://www.reuters.com/markets/currencies/", kind:"line"},
-      {t:"Oil slips as crude inventories build; energy names under pressure", src:"Reuters · Energy", time:"5:05 AM", tag:"Oil", url:"https://www.reuters.com/markets/commodities/", kind:"down"},
-    ],
   };
-  function newsThumb(kind){
-    const C={up:"#089981",down:"#F23645",line:"#C9A24B",range:"#3d86cf"}[kind]||"#3d86cf";
-    const bars={
-      up:`<rect x="8" y="30" width="6" height="16" rx="1"/><rect x="20" y="24" width="6" height="22" rx="1"/><rect x="32" y="16" width="6" height="30" rx="1"/><rect x="44" y="8" width="6" height="38" rx="1"/>`,
-      down:`<rect x="8" y="8" width="6" height="38" rx="1"/><rect x="20" y="16" width="6" height="30" rx="1"/><rect x="32" y="24" width="6" height="22" rx="1"/><rect x="44" y="32" width="6" height="14" rx="1"/>`,
-      range:`<rect x="8" y="18" width="6" height="22" rx="1"/><rect x="20" y="14" width="6" height="28" rx="1"/><rect x="32" y="18" width="6" height="24" rx="1"/><rect x="44" y="14" width="6" height="26" rx="1"/>`,
-      line:`<path d="M6 40 L20 32 L32 36 L52 14" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke="${C}"/>`
-    }[kind]||"";
-    return `<svg viewBox="0 0 58 54" aria-hidden="true"><rect width="58" height="54" rx="9" fill="${C}" opacity=".13"/><g fill="${C}">${bars}</g></svg>`;
-  }
   const homeSec=(l,body,note)=>`<section class="home-sec"><div class="sec-label">${l}</div>${body}${note?`<div class="home-note">${note}</div>`:""}</section>`;
   const PH_RACE={eval:{c:"#C9A24B",l:"In eval"},funded:{c:"var(--accent)",l:"Funded"},payout:{c:"#35c46f",l:"Eden"}};
   const racePos=m=> m.phase==="eval" ? 2+(Math.min(100,m.evalPct||0)/100)*31
@@ -1823,21 +1797,15 @@
       {t:"Your dashboard", s:"Equity curve, win rate and your real stats", btn:"Dashboard", go:"dashboard"},
     ];
     const forYou=`<div class="fy-grid">${fy.map(c=>`<div class="fy-card"><div class="fy-main"><div class="fy-t">${c.t}</div><div class="fy-s">${c.s}</div></div><button class="btn" data-go="${c.go}" data-hover>${c.btn} →</button></div>`).join("")}</div>`;
-    // PRICES
-    const prices=`<div class="hscroll inst-row">${HOME_DATA.instruments.map(x=>{const u=x.pct>0,d=x.pct<0;return `<div class="inst"><div class="inst-top"><span class="inst-sym">${x.sym}</span><span class="inst-name">${x.name}</span></div><div class="inst-price">${x.price.toLocaleString("en-US",{minimumFractionDigits:2})}</div><div class="inst-chg ${u?"up":d?"down":"flat"}">${u?"▲":d?"▼":"·"} ${x.pct>0?"+":""}${x.pct.toFixed(2)}%</div></div>`;}).join("")}</div>`;
-    // PROP FIRMS
-    const firms=`<div class="hscroll firm-row">${HOME_DATA.firms.map(f=>`<div class="firm"><div class="firm-top"><span class="firm-logo">${initials(f.name)}</span><div><div class="firm-name">${f.name}</div><div class="firm-rate">★ ${f.rating}/5</div></div></div><div class="firm-stats"><div><span>Max funding</span><b class="up">${f.maxFunding}</b></div><div><span>Split</span><b>${f.split}</b></div><div><span>From</span><b>${f.cost}</b></div></div><div class="firm-tags">${f.tags.map(t=>`<span class="ftag">${t}</span>`).join("")}</div></div>`).join("")}</div>`;
+    // PROP FIRMS (empresas reales · datos que tú confirmas)
+    const firms=`<div class="hscroll firm-row">${HOME_DATA.firms.map(f=>`<div class="firm"><div class="firm-top"><span class="firm-logo">${initials(f.name)}</span><div><div class="firm-name">${f.name}</div></div></div><div class="firm-stats"><div><span>Max funding</span><b class="up">${f.maxFunding}</b></div><div><span>Split</span><b>${f.split}</b></div><div><span>From</span><b>${f.cost}</b></div></div><div class="firm-tags">${f.tags.map(t=>`<span class="ftag">${t}</span>`).join("")}</div></div>`).join("")}</div>`;
     // ECON
     const todayIdx=new Date().getDay()-1; // Mon..Fri → 0..4; weekend marks none
     const econ=`<div class="econ-grid">${HOME_DATA.econ.map((d,i)=>{const isT=i===todayIdx;return `<div class="econ-col ${isT?"today":""}"><div class="econ-dh">${d.day}${isT?' <em>today</em>':""}</div><div class="econ-evs">${d.events.length?d.events.map(e=>`<div class="econ-ev"><span class="imp imp-${e[2]}"></span><div class="econ-ei"><div class="econ-en">${e[0]}</div><div class="econ-tm">${e[1]} ET</div></div></div>`).join(""):'<div class="econ-empty">—</div>'}</div></div>`;}).join("")}</div>`;
-    // NEWS (clickable → article, with thumbnail)
-    const newsHtml=`<div class="news2">${HOME_DATA.news.map(n=>`<a class="nw" href="${n.url}" target="_blank" rel="noopener" data-hover><div class="nw-thumb">${newsThumb(n.kind)}</div><div class="nw-main"><div class="nw-t">${esc(n.t)}</div><div class="nw-meta">${esc(n.src)} · ${esc(n.time)} · <span class="nw-tagx">${esc(n.tag)}</span></div></div><span class="nw-go">↗</span></a>`).join("")}</div>`;
     return `<div class="home2">
       <div class="home-hero"><h1 class="home-h1">Hi, <input id="pf-handle" class="hero-name" value="${esc(name)}" placeholder="trader">.</h1><p class="home-tag">Your trading platform — learn the system, take the one bullet, and measure your path to payout.</p></div>
       ${sec("For you",forYou)}
-      ${sec("Instrument prices",prices,"Illustrative — a live feed connects with a data key.")}
       ${sec("Economic calendar",econ)}
-      ${sec("Today's news",newsHtml)}
       ${sec("Recommended prop firms",firms)}
     </div>`;
   }
