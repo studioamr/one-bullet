@@ -767,6 +767,39 @@
   .race{display:flex;flex-direction:column;gap:15px}
   .race-empty{margin-top:4px;padding:16px 18px;border:1px dashed var(--line);border-radius:12px;color:var(--ink1);font-size:.82rem;line-height:1.55}
   .race-empty b{color:var(--ink)}
+  .race-join{margin-top:6px;padding:18px;border:1px solid rgba(61,134,207,.3);background:rgba(61,134,207,.06);border-radius:12px;text-align:center}
+  .race-join p{color:var(--ink1);font-size:.86rem;line-height:1.5;margin-bottom:14px}
+  .race-join b{color:var(--ink)}
+  .rl-bot{font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:1px 5px;margin-left:5px;vertical-align:middle}
+  /* Training · playable bot battle */
+  .tb-live,.tb-result{padding:18px}
+  .tb-top{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+  .tb-score{display:flex;flex-direction:column;min-width:74px}
+  .tb-score.right{align-items:flex-end;margin-left:auto}
+  .tb-score span{font-size:.6rem;text-transform:uppercase;letter-spacing:.16em;color:var(--ink2)}
+  .tb-score b{font-family:var(--serif);font-size:1.5rem;font-variant-numeric:tabular-nums}
+  .tb-score b.up{color:#35c46f}.tb-score b.down{color:var(--rojo)}
+  .tb-prog{flex:1;position:relative;height:5px;background:rgba(244,241,234,.08);border-radius:999px}
+  .tb-prog-bar{position:absolute;left:0;top:0;height:100%;background:var(--accent);border-radius:999px;transition:width .2s}
+  .tb-prog span{position:absolute;right:0;top:8px;font-size:.6rem;color:var(--ink2);font-variant-numeric:tabular-nums}
+  .tb-chart{width:100%;height:240px;display:block;background:#08090c;border:1px solid var(--line);border-radius:10px}
+  .tb-controls{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .tb-controls .btn{flex:1;min-width:120px;justify-content:center}
+  .tb-controls .nextc{flex:1.4}
+  .up-btn{border-color:rgba(53,196,111,.5)!important;color:#35c46f!important}
+  .up-btn:hover{background:rgba(53,196,111,.12)!important}
+  .dn-btn{border-color:rgba(214,73,63,.5)!important;color:var(--rojo)!important}
+  .dn-btn:hover{background:rgba(214,73,63,.12)!important}
+  .tb-result{text-align:center}
+  .tb-result.win{border-color:rgba(53,196,111,.4)}
+  .tb-result.loss{border-color:rgba(214,73,63,.4)}
+  .tb-res-h{font-family:var(--serif);font-size:2rem;margin-bottom:16px}
+  .tb-res-grid{display:flex;align-items:center;justify-content:center;gap:22px;margin-bottom:14px}
+  .tb-res-grid span{display:block;font-size:.6rem;text-transform:uppercase;letter-spacing:.16em;color:var(--ink2)}
+  .tb-res-grid b{font-family:var(--serif);font-size:1.7rem;font-variant-numeric:tabular-nums}
+  .tb-res-grid b.up{color:#35c46f}.tb-res-grid b.down{color:var(--rojo)}
+  .tb-vs{color:var(--ink2);font-size:.8rem}
+  .tb-elo{color:var(--ink1);font-size:.9rem;margin-bottom:18px}.tb-elo b{color:var(--accent)}
   .race-zones{display:flex;justify-content:space-between;font-size:.55rem;text-transform:uppercase;letter-spacing:.14em;color:var(--ink2);padding:0 2px;margin-bottom:2px}
   .race-lane.me .rl-name{color:var(--ink)}
   .race-info{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;gap:10px;flex-wrap:wrap}
@@ -1257,7 +1290,7 @@
   /* ---------- events ---------- */
   document.addEventListener("click",e=>{
     const b=e.target.closest("button[data-a]");if(!b)return;
-    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,addinvest:addInvest,replayonb:startOnb,findmatch:battleFind,createlobby:battleLobby,practicenow:practiceNow,logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
+    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,addinvest:addInvest,replayonb:startOnb,createlobby:battleLobby,practicenow:practiceNow,joinrace:()=>{raceJoin();mostrar("comunidad");},tbnew:tbNew,tblong:()=>tbAct("long"),tbshort:()=>tbAct("short"),tbclose:()=>tbAct("close"),tbnext:tbNext,tbback:tbBack,logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
   });
   document.addEventListener("input",e=>{ if(!e.target)return;
     if(ONB&&e.target.id&&e.target.id.startsWith("onb-")){ const d=ONB.data, id=e.target.id, v=e.target.value;
@@ -1700,17 +1733,41 @@
     if(prof>=tgt) return {u:name,you:true,phase:"funded",balance:size+prof,bufferPct:Math.min(100,Math.round((prof-tgt)/(tgt*0.6)*100))};
     return {u:name,you:true,phase:"eval",balance:size+prof,evalPct:Math.max(0,Math.min(100,Math.round(prof/tgt*100)))};
   }
+  function raceJoined(){ return localStorage.getItem("candado_race")==="1"; }
+  function raceCrew(){ try{const c=JSON.parse(localStorage.getItem("candado_racecrew"));if(Array.isArray(c)&&c.length)return c;}catch(e){} return []; }
+  function raceJoin(){
+    const pool=["Nash","Vera","Koa","Sol","Rhea","Dex","Mika","Bo","Ari","Zane","Cleo","Remy"];
+    const pick=pool.slice().sort(()=>Math.random()-0.5).slice(0,6);
+    const size=(acctLoad()||{}).size||50000;
+    const crew=pick.map(u=>{
+      const r=Math.random(); let m;
+      if(r<0.5) m={u,bot:true,phase:"eval",evalPct:15+Math.floor(Math.random()*80)};
+      else if(r<0.82) m={u,bot:true,phase:"funded",bufferPct:5+Math.floor(Math.random()*85)};
+      else m={u,bot:true,phase:"payout",payouts:1+Math.floor(Math.random()*3)};
+      m.balance=size+Math.floor(Math.random()*9000-1000);
+      return m;
+    });
+    localStorage.setItem("candado_racecrew",JSON.stringify(crew));
+    localStorage.setItem("candado_race","1");
+  }
+  function raceLane(m){ const ph=PH_RACE[m.phase]||PH_RACE.eval; return `<div class="race-lane ${m.you?"me":""}">
+      <div class="race-info"><span class="rl-name">${esc(m.u)}${m.you?' <em>you</em>':m.bot?' <span class="rl-bot">pacer</span>':""}</span>
+        <span class="rl-meta"><span class="rl-badge" style="color:${ph.c};border-color:${ph.c}">${ph.l}</span><span class="rl-bal">$${(m.balance||0).toLocaleString("en-US")}</span></span></div>
+      <div class="race-track"><span class="rt-tick" style="left:33%"></span><span class="rt-tick" style="left:66%"></span><span class="rt-finish"></span>
+        <div class="rc-run ${m.you?"me":""}" data-pos="${(m.pos||2).toFixed(1)}" style="left:2%;background:${ph.c}">${initials(m.u)}</div></div>
+    </div>`; }
   function buildRace(){
-    const you=youRacer(); const rows=[{...you,pos:racePos(you)}];
+    const yr=youRacer(); const you={...yr,pos:racePos(yr)};
+    const joined=raceJoined();
+    let racers=[you];
+    if(joined) racers=racers.concat(raceCrew().map(m=>({...m,pos:racePos(m)})));
+    racers.sort((a,b)=>b.pos-a.pos);
     return `<div class="race">
       <div class="race-zones"><span>Eval</span><span>Funded</span><span>Eden →</span></div>
-      ${rows.map(m=>{const ph=PH_RACE[m.phase]||PH_RACE.eval;return `<div class="race-lane ${m.you?"me":""}">
-        <div class="race-info"><span class="rl-name">${esc(m.u)}${m.you?' <em>you</em>':""}</span>
-          <span class="rl-meta"><span class="rl-badge" style="color:${ph.c};border-color:${ph.c}">${ph.l}</span><span class="rl-bal">$${m.balance.toLocaleString("en-US")}</span></span></div>
-        <div class="race-track"><span class="rt-tick" style="left:33%"></span><span class="rt-tick" style="left:66%"></span><span class="rt-finish"></span>
-          <div class="rc-run ${m.you?"me":""}" data-pos="${m.pos.toFixed(1)}" style="left:2%;background:${ph.c}">${initials(m.u)}</div></div>
-      </div>`;}).join("")}
-      <div class="race-empty">You're starting fresh — <b>your lane begins at zero.</b> The race fills in with the crew once you join a community and the live backend is connected.</div>
+      ${racers.map(raceLane).join("")}
+      ${joined
+        ? `<div class="race-empty">You're racing the <b>pace-setters</b> — pass them to reach Eden. Your lane moves with your real profit. The live crew replaces the pacers when the backend connects.</div>`
+        : `<div class="race-join"><p>You're not in a race yet — <b>join one</b> to line up against the pace-setters and see where you stand.</p><button class="btn fill" data-a="joinrace" data-hover>Join a race →</button></div>`}
     </div>`;
   }
   function viewHome(){
@@ -1911,42 +1968,101 @@
       ${homeSec("Race to payout",buildRace(),"Your path to payout · the community race connects soon.")}
     </div>`;
   }
-  /* ---------- Training · 1v1 battles (Chart Champs logic) ---------- */
+  /* ---------- Training · playable 1v1 vs the bot ---------- */
   function eloLoad(){try{return JSON.parse(localStorage.getItem("candado_elo"))||{elo:1200,w:0,l:0};}catch(e){return{elo:1200,w:0,l:0};}}
-  let BATTLE={searching:false,lobby:null};
-  function battleFind(){BATTLE.searching=!BATTLE.searching;mostrar("training");}
+  function eloSave(e){try{localStorage.setItem("candado_elo",JSON.stringify(e));}catch(x){}}
+  let BATTLE={lobby:null};
   function battleLobby(){BATTLE.lobby="1B-"+Math.random().toString(36).slice(2,6).toUpperCase();mostrar("training");}
+  let TB=null; // partida activa contra el bot
+  function tbGen(seed,n){
+    let s=seed>>>0; const rnd=()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};
+    let p=100, trend=(rnd()-0.5)*0.7; const out=[];
+    for(let k=0;k<n;k++){
+      if(rnd()<0.13) trend=(rnd()-0.5)*1.3;
+      const o=p, c=Math.max(2,o+trend+(rnd()-0.5)*1.9);
+      out.push({o,h:Math.max(o,c)+rnd()*1.1,l:Math.min(o,c)-rnd()*1.1,c}); p=c;
+    }
+    return out;
+  }
+  function tbNew(){ TB={cs:tbGen((Math.random()*1e9)|0,64),i:22,you:{pos:0,entry:0,pnl:0},bot:{pos:0,entry:0,pnl:0},done:false,res:null}; mostrar("training"); }
+  function tbAct(a){ if(!TB||TB.done)return; const y=TB.you, cur=TB.cs[TB.i-1].c;
+    if((a==="long"||a==="short")&&y.pos===0){y.pos=a==="long"?1:-1;y.entry=cur;}
+    else if(a==="close"&&y.pos!==0){y.pnl+=(cur-y.entry)*y.pos;y.pos=0;}
+    mostrar("training"); }
+  function tbBot(){ const b=TB.bot,i=TB.i,cs=TB.cs,cur=cs[i-1].c;
+    if(i<5)return; const m=cs[i-1].c-cs[i-4].c;
+    if(b.pos===0){ if(Math.random()<0.55){ if(m>1.2){b.pos=1;b.entry=cur;} else if(m<-1.2){b.pos=-1;b.entry=cur;} } }
+    else { const up=(cur-b.entry)*b.pos;
+      if(up>3.2||up<-2.4||(b.pos===1&&m<-0.8)||(b.pos===-1&&m>0.8)||Math.random()<0.18){b.pnl+=up;b.pos=0;} } }
+  function tbNext(){ if(!TB||TB.done)return;
+    if(TB.i>=TB.cs.length){tbEnd();mostrar("training");return;}
+    TB.i++; tbBot(); if(TB.i>=TB.cs.length)tbEnd(); mostrar("training"); }
+  function tbEnd(){ const cur=TB.cs[TB.cs.length-1].c,y=TB.you,b=TB.bot;
+    if(y.pos!==0){y.pnl+=(cur-y.entry)*y.pos;y.pos=0;}
+    if(b.pos!==0){b.pnl+=(cur-b.entry)*b.pos;b.pos=0;}
+    const yF=+y.pnl.toFixed(1),bF=+b.pnl.toFixed(1),e=eloLoad(); let o;
+    if(yF>bF){o="win";e.elo+=18;e.w++;} else if(yF<bF){o="loss";e.elo=Math.max(800,e.elo-15);e.l++;} else o="tie";
+    eloSave(e); TB.done=true; TB.res={you:yF,bot:bF,outcome:o,elo:e.elo}; }
+  function tbBack(){ TB=null; mostrar("training"); }
+  function tbChart(){
+    const cs=TB.cs,i=TB.i,N=34,st=Math.max(0,i-N),vis=cs.slice(st,i);
+    let hi=Math.max(...vis.map(c=>c.h)),lo=Math.min(...vis.map(c=>c.l)); const pad=(hi-lo)*0.08||1; hi+=pad;lo-=pad;
+    const W=680,H=240,cw=W/N,bw=cw*0.58, y=v=>H-((v-lo)/(hi-lo))*H;
+    const cndl=vis.map((c,k)=>{const x=k*cw+cw/2,up=c.c>=c.o,col=up?"#35c46f":"#d6493f",bt=y(Math.max(c.o,c.c)),bb=y(Math.min(c.o,c.c));
+      return `<line x1="${x}" x2="${x}" y1="${y(c.h).toFixed(1)}" y2="${y(c.l).toFixed(1)}" stroke="${col}" stroke-width="1"/><rect x="${(x-bw/2).toFixed(1)}" y="${bt.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,bb-bt).toFixed(1)}" fill="${col}"/>`;}).join("");
+    const yy=TB.you, eL=yy.pos?`<line x1="0" x2="${W}" y1="${y(yy.entry).toFixed(1)}" y2="${y(yy.entry).toFixed(1)}" stroke="#3d86cf" stroke-width="1" stroke-dasharray="5 4"/>`:"";
+    return `<svg class="tb-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${eL}${cndl}</svg>`;
+  }
   function viewTraining(){
     const r=eloLoad();
+    if(TB) return tbView();
     return `<div class="training">
-      <div class="p-card sr-hero"><div class="sr-eyebrow">1v1 battles</div>
+      <div class="p-card sr-hero"><div class="sr-eyebrow">1v1 · you vs the bot</div>
         <h2 class="sr-h">Same replay. Same capital. <em>Best P&L wins.</em></h2>
-        <p class="sr-p">You and your opponent get the identical past session — nobody knows what comes next. Trade it out; when the clock runs out, the better P&L takes the Elo.</p></div>
+        <p class="sr-p">Load a blind replay of a session and trade it out against the bot — neither of you knows what comes next. Better P&L at the buzzer takes the Elo.</p>
+        <div class="sl-actions"><button class="btn fill lg" data-a="tbnew" data-hover>▶ Play the bot</button></div></div>
       <div class="battle-grid">
         <div class="p-card rank-card"><div class="c-t">Your rank</div>
           <div class="rk-elo">${r.elo}</div><div class="rk-sub">Elo · ${r.w+r.l?`${r.w}W · ${r.l}L`:"unranked"}</div></div>
-        <div class="p-card"><div class="c-t">Quick match</div>
-          <p class="home-p">Get paired with a trader near your Elo.</p>
-          ${BATTLE.searching
-            ?`<div class="searching"><span class="sl-dot"></span> Searching for an opponent…</div>
-              <p class="home-note">Live matchmaking turns on with the community backend — meanwhile, call someone out in the room.</p>
-              <div class="sl-actions"><a class="btn accent" href="${DISCORD}" target="_blank" rel="noopener" data-hover>Challenge in Discord →</a><button class="btn ghost" data-a="findmatch" data-hover>Cancel</button></div>`
-            :`<button class="btn fill" data-a="findmatch" data-hover>Find match →</button>`}</div>
-        <div class="p-card"><div class="c-t">Private lobby</div>
-          <p class="home-p">Create a room and battle a friend.</p>
+        <div class="p-card"><div class="c-t">Private lobby · a friend</div>
+          <p class="home-p">Create a room and battle a friend on the same replay.</p>
           ${BATTLE.lobby
-            ?`<div class="lobby-code">${BATTLE.lobby}</div>
-              <div class="sl-actions"><a class="btn" href="${DISCORD}" target="_blank" rel="noopener" data-hover>Share the code →</a><button class="btn ghost" data-a="createlobby" data-hover>New code</button></div>`
-            :`<button class="btn" data-a="createlobby" data-hover>Create lobby</button>`}</div>
+            ?`<div class="lobby-code">${BATTLE.lobby}</div><div class="sl-actions"><a class="btn" href="${DISCORD}" target="_blank" rel="noopener" data-hover>Share the code →</a><button class="btn ghost" data-a="createlobby" data-hover>New code</button></div>`
+            :`<button class="btn" data-a="createlobby" data-hover>Create lobby</button>`}
+          <p class="home-note">Live friend matches turn on with the community backend.</p></div>
       </div>
       <div class="p-card"><div class="c-t">How a battle works</div>
         <div class="vs-grid">
-          <div class="vs-step"><b>1 · Same past session</b><p>Both traders load the identical historical replay — blind to what comes next.</p></div>
-          <div class="vs-step"><b>2 · Trade the tape</b><p>Speed it up or slow it down. Enter, manage, close — your rules, your calls.</p></div>
-          <div class="vs-step"><b>3 · Clock runs out</b><p>Best P&L takes the match and the Elo. Review both traders' entries after.</p></div>
+          <div class="vs-step"><b>1 · Same blind replay</b><p>You and the bot load the identical historical chart — neither knows what's next.</p></div>
+          <div class="vs-step"><b>2 · Trade the tape</b><p>Go long or short, manage the trade, close it. Advance the candles one by one.</p></div>
+          <div class="vs-step"><b>3 · Buzzer</b><p>Best P&L at the final candle wins the match and moves your Elo.</p></div>
         </div></div>
-      <div class="p-card"><div class="c-t">Recent matches</div><p class="home-note">No battles yet — your match history and the ladder live here.</p></div>
     </div>`;
+  }
+  function tbView(){
+    const y=TB.you,b=TB.bot,cur=TB.cs[TB.i-1].c;
+    const yP=y.pnl+(y.pos?(cur-y.entry)*y.pos:0), bP=b.pnl+(b.pos?(cur-b.entry)*b.pos:0);
+    if(TB.done){const R=TB.res;
+      return `<div class="training"><div class="p-card tb-result ${R.outcome}">
+        <div class="tb-res-h">${R.outcome==="win"?"You win 🏆":R.outcome==="loss"?"The bot wins":"Dead heat"}</div>
+        <div class="tb-res-grid"><div><span>You</span><b class="${R.you>=0?'up':'down'}">${R.you>0?"+":""}${R.you} pts</b></div><div class="tb-vs">vs</div><div><span>Bot</span><b class="${R.bot>=0?'up':'down'}">${R.bot>0?"+":""}${R.bot} pts</b></div></div>
+        <div class="tb-elo">New Elo · <b>${R.elo}</b></div>
+        <div class="sl-actions"><button class="btn fill" data-a="tbnew" data-hover>Play again →</button><button class="btn ghost" data-a="tbback" data-hover>Back</button></div>
+      </div></div>`;}
+    const prog=Math.round(TB.i/TB.cs.length*100), op=y.pos?((cur-y.entry)*y.pos):0;
+    return `<div class="training"><div class="p-card tb-live">
+      <div class="tb-top"><div class="tb-score"><span>You</span><b class="${yP>=0?'up':'down'}">${yP>0?"+":""}${yP.toFixed(1)}</b></div>
+        <div class="tb-prog"><div class="tb-prog-bar" style="width:${prog}%"></div><span>${TB.i}/${TB.cs.length}</span></div>
+        <div class="tb-score right"><span>Bot</span><b class="${bP>=0?'up':'down'}">${bP>0?"+":""}${bP.toFixed(1)}</b></div></div>
+      ${tbChart()}
+      <div class="tb-controls">
+        ${y.pos===0
+          ?`<button class="btn up-btn" data-a="tblong" data-hover>▲ Long</button><button class="btn dn-btn" data-a="tbshort" data-hover>▼ Short</button>`
+          :`<button class="btn fill" data-a="tbclose" data-hover>Close ${y.pos>0?"long":"short"} · ${op>=0?"+":""}${op.toFixed(1)}</button>`}
+        <button class="btn accent nextc" data-a="tbnext" data-hover>Next candle →</button>
+      </div>
+      <p class="home-note">${y.pos===0?"Flat — go long or short, then advance the tape.":"In a "+(y.pos>0?"long":"short")+" — advance the tape, close when you're ready. The bot is trading too."}</p>
+    </div></div>`;
   }
   /* ---------- Progress · EVAL | FUNDED | EDEN (his sketch) ---------- */
   function viewProgress(){
@@ -1964,6 +2080,7 @@
           <div class="rc-run me" data-pos="${pos.toFixed(1)}" style="left:2%;background:${ph.c}">${initials(you.u)}</div></div>
         <p class="home-note">${you.phase==="eval"?`$${toGo.toLocaleString("en-US")} of profit to clear the eval — then you're funded, and then Eden: the payout zone.`:you.phase==="funded"?"Funded. Build the buffer and your first payout opens Eden.":"Eden — you're cashing. Keep the discipline, keep withdrawing."}</p>
       </div>
+      <div class="p-card"><div class="c-t">The room race</div>${buildRace()}</div>
       <div class="kpis">
         <div class="kpi"><div class="k-l">Accounts</div><div class="k-v">${accts.length||1}</div></div>
         <div class="kpi"><div class="k-l">Profit</div><div class="k-v ${profit>=0?"up":"down"}">${money(profit)}</div></div>
