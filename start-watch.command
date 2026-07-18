@@ -1,10 +1,17 @@
 #!/bin/bash
-# SPOTTER AI — arranca al Spotter: una sesión de Claude que vigila tu TradingView en vivo.
+# SPOTTER AI — arranca al Spotter: Claude vigila tu TradingView en vivo, en automático.
 cd "$HOME/claude" 2>/dev/null || cd "$HOME"
 CLAUDE="$HOME/.local/bin/claude"
 [ -x "$CLAUDE" ] || CLAUDE="$(command -v claude)"
 
-PROMPT="empieza sesión: vigila mi TradingView en vivo, cada ~20s revisa mi pantalla y avísame con alarma de voz si rompo mi disciplina (1 bala por sesión, stop 1% diario, cerrar tras pérdida, cazar revenge). narra el contexto del precio pero NO me des señales de compra o venta. cuando cierre el trade dame el resumen (duración, resultado). di 'terminé' para parar."
+read -r -d '' PROMPT <<'EOP'
+Eres mi SPOTTER de trading en vivo. ARRANCA YA, sin esperar a que yo diga nada:
+1) Toma una captura de mi pantalla con `screencapture -x /tmp/spotter.png` (si tengo varios monitores, prueba `-D 1`, `-D 2` para encontrar mi gráfico).
+2) Lee la situación actual de mi TradingView: instrumento, temporalidad, qué sesión es según la hora (Asia / Londres / Nueva York), dónde está el precio, rangos y zonas visibles.
+3) HÁBLAME de inmediato por voz en español latino con el comando `say` (usa `say -v Juan` o si no existe `say -v Paulina`): cuéntame la situación actual del mercado en 2-3 frases.
+Después entra en modo vigilancia continua: cada ~20-30s vuelve a capturar mi pantalla, nárrame por voz lo que cambió del contexto, y si rompo mi disciplina AVÍSAME con alarma de voz. Mis reglas: 1 sola operación por sesión (una bala), stop del 1% del día, cerrar la plataforma tras una pérdida, y NO cazar revenge ni sobre-operar.
+Narra contexto objetivo (dónde está el precio, liquidez, invalidación) pero NUNCA me des señales de compra o venta — esa decisión es mía. Cuando cierre mi operación, dame un resumen hablado (duración, resultado). Sigue vigilando hasta que yo diga "terminé".
+EOP
 
 clear
 echo ""
@@ -12,10 +19,12 @@ echo "   ◉  SPOTTER AI — el Spotter se está conectando…"
 echo ""
 
 if [ -n "$CLAUDE" ] && [ -x "$CLAUDE" ]; then
-  echo "   Te va a pedir permiso para ver tu pantalla — apruébalo."
-  echo "   (verás el indicador naranja arriba: el Spotter está mirando)"
+  echo "   Arrancando en automático — el Spotter va a empezar a hablarte."
+  echo "   (La 1ª vez, macOS te pedirá permiso de GRABAR PANTALLA para la"
+  echo "    Terminal: actívalo en Ajustes → Privacidad y seguridad → Grabación"
+  echo "    de pantalla, y vuelve a darle Start Session. Es una sola vez.)"
   echo ""
-  exec "$CLAUDE" "$PROMPT"
+  exec "$CLAUDE" --dangerously-skip-permissions "$PROMPT"
 else
   echo "   El Spotter en vivo corre sobre Claude Code (la IA que te vigila la pantalla)."
   echo "   Para activarlo necesitas instalarlo una vez:"
