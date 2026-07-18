@@ -874,6 +874,7 @@
   .spot-none{color:var(--ink2)}
   .spot-chip{background:rgba(61,134,207,.12);border:1px solid rgba(61,134,207,.3);border-radius:7px;color:var(--accent);font-family:var(--sans);font-size:.76rem;font-weight:600;padding:4px 9px;cursor:pointer;transition:all .15s}
   .spot-chip:hover{background:rgba(61,134,207,.22)}
+  [hidden]{display:none!important}  /* el atributo hidden debe ganarle a cualquier display de clase (p.ej. .spot-modal{display:flex}) */
   .spot-modal{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)}
   .spot-card{position:relative;width:min(680px,100%);max-height:88vh;overflow-y:auto;background:var(--bg1);border:1px solid var(--line);border-radius:16px;padding:26px}
   .spot-x{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--ink2);font-size:1.5rem;line-height:1;cursor:pointer}
@@ -960,6 +961,10 @@
   .dash-filter{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
   .src-toggle,.acct-chips{display:flex;gap:8px;flex-wrap:wrap}
   .ses-acct{margin:2px 0 14px}.sa-k{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink1);display:block;margin-bottom:8px}
+  .econ-blank{padding:18px;border:1px dashed var(--line);border-radius:12px;color:var(--ink1);font-size:.9rem;line-height:1.55}.econ-blank b{color:var(--ink)}
+  .econ-editor .home-editor{width:100%;min-height:130px;font-family:var(--sans);font-size:.9rem}
+  .crew-card{max-width:460px}
+  .crew-code{font-family:var(--serif);font-size:2rem;letter-spacing:.06em;text-align:center;color:var(--accent);background:rgba(61,134,207,.08);border:1px solid rgba(61,134,207,.3);border-radius:10px;padding:14px;margin:14px 0}
   .buddy-card select{width:100%;background:#000;border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:10px;font:inherit}
   .buddy-card .lnk{background:none;border:0;color:var(--accent);cursor:pointer;font-size:.8rem;float:right}
   .buddy-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0 4px}
@@ -1258,7 +1263,7 @@
     const base={ id:deviceId(), handle:(p.handle||"trader").toString().slice(0,24), firm:a.firm||null, phase:yr.phase||"eval",
       elo:(r.elo||1200)|0, net_pnl:Math.round(totalProfit()||0), win_rate:done.length?Math.round(wins/done.length*100):0,
       trades:done.length, eval_pct:Math.round(yr.evalPct||0), updated_at:new Date().toISOString() };
-    const ss=seasonStats(), full=Object.assign({},base,{season:seasonId(),season_pnl:ss.pnl,season_sessions:ss.sessions,season_disc:ss.disc});
+    const ss=seasonStats(), full=Object.assign({},base,{season:seasonId(),season_pnl:ss.pnl,season_sessions:ss.sessions,season_disc:ss.disc,crew:crewLoad()||null});
     const H=supaHead({Prefer:"resolution=merge-duplicates,return=minimal"});
     fetch(SUPA_URL+"/rest/v1/profiles",{method:"POST",headers:H,body:JSON.stringify(full)})
       .then(r=>{ if(!r.ok){ fetch(SUPA_URL+"/rest/v1/profiles",{method:"POST",headers:H,body:JSON.stringify(base)}).catch(()=>{}); } }) // season columns not migrated yet → upload the base
@@ -1367,7 +1372,7 @@
   /* ---------- events ---------- */
   document.addEventListener("click",e=>{
     const b=e.target.closest("button[data-a]");if(!b)return;
-    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,shareshot:sealPoster,tradenew:tradeNew,tradesave:tradeSave,tradedel:tradeDelete,csvimport:csvImportClick,tfclear:()=>{TRADE_FILTER={result:"",setup:"",session:""};mostrar("trades");},buddyclear:()=>{try{localStorage.removeItem("candado_buddy");}catch(e){}mostrar("progreso");},exportdata:exportData,importdata:importDataClick,guardreset:()=>{const a=acctLoad()||{};delete a.dailyLoss;delete a.maxDD;delete a.consistency;delete a.minDays;acctSave(a);mostrar("settings");},pmspeak:()=>spkr(premarketText()),dismissnudge:()=>{TRADING_NUDGE="";statusPush(sessLoad().phase||"ready");mostrar(vistaActual);},replayonb:startOnb,practicenow:practiceNow,joinrace:()=>{raceJoin();mostrar("progreso");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,spkr:spkToggle,invite:()=>{try{window.open("https://wa.me/?text="+encodeURIComponent("Try SPOTTER AI with me — the trading platform built on discipline: https://studioamr.github.io/spotter-ai/landing.html"),"_blank");}catch(e){}},logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
+    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,shareshot:sealPoster,tradenew:tradeNew,tradesave:tradeSave,tradedel:tradeDelete,csvimport:csvImportClick,tfclear:()=>{TRADE_FILTER={result:"",setup:"",session:""};mostrar("trades");},buddyclear:()=>{try{localStorage.removeItem("candado_buddy");}catch(e){}mostrar("progreso");},exportdata:exportData,importdata:importDataClick,guardreset:()=>{const a=acctLoad()||{};delete a.dailyLoss;delete a.maxDD;delete a.consistency;delete a.minDays;acctSave(a);mostrar("settings");},pmspeak:()=>spkr(premarketText()),dismissnudge:()=>{TRADING_NUDGE="";statusPush(sessLoad().phase||"ready");mostrar(vistaActual);},replayonb:startOnb,practicenow:practiceNow,crewopen:crewOpen,crewjoin:crewJoin,crewleave:crewLeave,crewshare:crewShare,econedit:()=>{econEdit=true;mostrar("home");},econcancel:()=>{econEdit=false;mostrar("home");},econsave:()=>{const i=$("#econ-input");if(i)econSave(econParse(i.value));econEdit=false;mostrar("home");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,spkr:spkToggle,invite:()=>{try{window.open("https://wa.me/?text="+encodeURIComponent("Try SPOTTER AI with me — the trading platform built on discipline: https://studioamr.github.io/spotter-ai/landing.html"),"_blank");}catch(e){}},logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
   });
   document.addEventListener("input",e=>{ if(!e.target)return;
     if(ONB&&e.target.id&&e.target.id.startsWith("onb-")){ const d=ONB.data, id=e.target.id, v=e.target.value;
@@ -1956,7 +1961,20 @@
       <div class="kpis"><div class="kpi"><div class="k-l">Worst drawdown</div><div class="k-v ${worstDD>0?"down":""}">${worstDD>0?"−$"+Math.round(worstDD).toLocaleString("en-US"):"$0"}</div></div>
         <div class="kpi"><div class="k-l">Closest to blow-up</div><div class="k-v ${closest<maxDD$*0.35?"down":""}">$${Math.max(0,Math.round(closest)).toLocaleString("en-US")}</div></div></div></div>`; }
   /* ---------- Premarket brief (calendar + your leak + plan) ---------- */
-  function todayEcon(){ const idx=new Date().getDay()-1; if(idx<0||idx>4)return []; return (HOME_DATA.econ[idx]||{}).events||[]; }
+  /* Economic calendar — YOUR events, not a canned list. Empty until you add them. */
+  const DOWK=["Mon","Tue","Wed","Thu","Fri"];
+  var econEdit=false;
+  function econLoad(){ try{const e=JSON.parse(localStorage.getItem("candado_econ")); if(Array.isArray(e))return e;}catch(x){} return []; }
+  function econSave(a){ try{localStorage.setItem("candado_econ",JSON.stringify(a));}catch(e){} }
+  function econText(){ return econLoad().map(e=>`${e.day} | ${e.time} | ${e.name} | ${e.imp}`).join("\n"); }
+  function econParse(txt){ const out=[];
+    String(txt||"").split(/\r?\n/).forEach(l=>{ const p=l.split("|").map(s=>s.trim()); if(p.length<3)return;
+      const d=DOWK.find(x=>x.toLowerCase()===(p[0]||"").slice(0,3).toLowerCase()); if(!d)return;
+      const imp=(p[3]||"med").toLowerCase();
+      out.push({day:d,time:p[1]||"",name:p[2]||"",imp:(imp==="high"||imp==="low")?imp:"med"}); });
+    return out; }
+  function todayEcon(){ const idx=new Date().getDay()-1; if(idx<0||idx>4)return [];
+    return econLoad().filter(e=>e.day===DOWK[idx]).map(e=>[e.name,e.time,e.imp]); }
   function premarketText(){ const name=spotName(), ev=todayEcon(), leak=topLeak(), highs=ev.filter(e=>e[2]==="high");
     let t="Good morning, "+name+". ";
     if(highs.length)t+="Today we have "+highs.map(e=>e[0]+" at "+e[1]).join(", and ")+", high impact. Careful around those times. ";
@@ -2021,13 +2039,6 @@
       {name:"Lucid Trading",maxFunding:"$600K",split:"90%",cost:"$100",tags:["EOD drawdowns","No hard breach"]},
       {name:"Apex",maxFunding:"$6.0M",split:"—",cost:"$155",tags:["No daily drawdown","Trade holidays"]},
     ],
-    econ:[
-      {day:"Mon",events:[["Fed speakers","07:00","high"]]},
-      {day:"Tue",events:[["S&P Global PMI","09:45","high"],["2-yr auction","13:00","med"]]},
-      {day:"Wed",events:[["FOMC minutes","14:00","high"],["Crude inventories","10:30","med"]]},
-      {day:"Thu",events:[["Jobless Claims","08:30","high"],["Core PCE","08:30","high"]]},
-      {day:"Fri",events:[["Non-Farm Payrolls","08:30","high"],["Michigan sentiment","10:00","med"]]},
-    ],
   };
   const homeSec=(l,body,note)=>`<section class="home-sec"><div class="sec-label">${l}</div>${body}${note?`<div class="home-note">${note}</div>`:""}</section>`;
   const PH_RACE={eval:{c:"#C9A24B",l:"In eval"},funded:{c:"var(--accent)",l:"Funded"},payout:{c:"#35c46f",l:"Eden"}};
@@ -2041,23 +2052,28 @@
     if(prof>=tgt) return {u:name,you:true,phase:"funded",balance:size+prof,bufferPct:Math.min(100,Math.round((prof-tgt)/(tgt*0.6)*100))};
     return {u:name,you:true,phase:"eval",balance:size+prof,evalPct:Math.max(0,Math.min(100,Math.round(prof/tgt*100)))};
   }
-  function raceJoined(){ return localStorage.getItem("candado_race")==="1"; }
-  function raceCrew(){ try{const c=JSON.parse(localStorage.getItem("candado_racecrew"));if(Array.isArray(c)&&c.length)return c;}catch(e){} return []; }
-  function raceJoin(){
-    const pool=["Nash","Vera","Koa","Sol","Rhea","Dex","Mika","Bo","Ari","Zane","Cleo","Remy"];
-    const pick=pool.slice().sort(()=>Math.random()-0.5).slice(0,6);
-    const size=(acctLoad()||{}).size||50000;
-    const crew=pick.map(u=>{
-      const r=Math.random(); let m;
-      if(r<0.5) m={u,bot:true,phase:"eval",evalPct:15+Math.floor(Math.random()*80)};
-      else if(r<0.82) m={u,bot:true,phase:"funded",bufferPct:5+Math.floor(Math.random()*85)};
-      else m={u,bot:true,phase:"payout",payouts:1+Math.floor(Math.random()*3)};
-      m.balance=size+Math.floor(Math.random()*9000-1000);
-      return m;
-    });
-    localStorage.setItem("candado_racecrew",JSON.stringify(crew));
-    localStorage.setItem("candado_race","1");
-  }
+  /* ---------- Community: join a REAL crew with a shared code (no bots) ---------- */
+  function crewLoad(){ try{return localStorage.getItem("candado_crew")||"";}catch(e){return "";} }
+  function crewSave(c){ try{ if(c)localStorage.setItem("candado_crew",c); else localStorage.removeItem("candado_crew"); }catch(e){} supaUpsert(); }
+  function crewMates(){ const c=crewLoad(), me=deviceId(); if(!c)return []; return (SUPA_PROFILES||[]).filter(p=>p.id!==me&&(p.crew||"")===c); }
+  function closeCrewModal(){ const m=document.getElementById("crew-modal"); if(m){m.hidden=true;m.innerHTML="";} }
+  function crewOpen(){ const cur=crewLoad();
+    let m=document.getElementById("crew-modal"); if(!m){m=document.createElement("div");m.id="crew-modal";m.className="spot-modal";document.body.appendChild(m);}
+    m.innerHTML=`<div class="spot-card crew-card"><button class="spot-x" data-crewclose>×</button>
+      <div class="c-t">${cur?"Your community":"Join a community"}</div>
+      ${cur?`<p class="home-p">You're in <b>${esc(cur)}</b>. Everyone who enters this code races with you — real people, real numbers. Share it with your crew.</p>
+        <div class="crew-code">${esc(cur)}</div>
+        <div class="trade-actions"><button class="btn fill" data-a="crewshare" data-hover>Share code</button><button class="btn danger" data-a="crewleave" data-hover>Leave</button><button class="btn ghost" data-crewclose data-hover>Close</button></div>`
+      :`<p class="home-p">Enter your crew's code to race together. Everyone with the same code shows up on the race and the leaderboard — <b>real traders, real numbers, no bots</b>. Don't have one? Invent a code and share it.</p>
+        <input id="crew-code" class="onb-big" placeholder="e.g. AMR-CREW" maxlength="24" autocomplete="off">
+        <div class="trade-actions"><button class="btn fill" data-a="crewjoin" data-hover>Join</button><button class="btn ghost" data-crewclose data-hover>Cancel</button></div>`}
+    </div>`;
+    m.hidden=false; const i=document.getElementById("crew-code"); if(i)setTimeout(()=>i.focus(),50); }
+  function crewJoin(){ const i=document.getElementById("crew-code"), v=((i&&i.value)||"").trim().toUpperCase().slice(0,24);
+    if(!v)return; crewSave(v); closeCrewModal(); supaRefresh(); mostrar(vistaActual); }
+  function crewLeave(){ if(!confirm("Leave this community? You can rejoin with the code any time."))return; crewSave(""); closeCrewModal(); mostrar(vistaActual); }
+  function crewShare(){ const c=crewLoad(); if(!c)return;
+    try{ window.open("https://wa.me/?text="+encodeURIComponent("Join my SPOTTER AI crew — community code: "+c+" · https://studioamr.github.io/spotter-ai/landing.html"),"_blank"); }catch(e){} }
   function raceLane(m){ const ph=PH_RACE[m.phase]||PH_RACE.eval; return `<div class="race-lane ${m.you?"me":""}" ${m.you||m.bot?"":`data-uprofile="${esc(m.u||"")}"`}>
       <div class="race-info"><span class="rl-name">${esc(m.u)}${m.you?' <em>you</em>':m.bot?' <span class="rl-bot">pacer</span>':""}</span>
         <span class="rl-meta"><span class="rl-badge" style="color:${ph.c};border-color:${ph.c}">${ph.l}</span><span class="rl-bal">$${(m.balance||0).toLocaleString("en-US")}</span></span></div>
@@ -2065,20 +2081,19 @@
         <div class="rc-run ${m.you?"me":""}" data-pos="${(m.pos||2).toFixed(1)}" style="left:2%;background:${ph.c}">${initials(m.u)}</div></div>
     </div>`; }
   function buildRace(){
-    const yr=youRacer(); const you={...yr,pos:racePos(yr)};
-    const joined=raceJoined();
-    let racers=[you]; const me=deviceId(), live=joined&&SUPA_PROFILES.length>1;
-    if(joined){
-      if(live) racers=racers.concat(SUPA_PROFILES.filter(p=>p.id!==me).slice(0,8).map(p=>{const m={u:p.handle||"trader",phase:p.phase||"eval",evalPct:p.eval_pct||0,bufferPct:0,payouts:0};m.pos=racePos(m);return m;}));
-      else racers=racers.concat(raceCrew().map(m=>({...m,pos:racePos(m)})));
-    }
-    racers.sort((a,b)=>b.pos-a.pos);
+    const yr=youRacer(), you={...yr,pos:racePos(yr)};
+    const code=crewLoad(), mates=crewMates();
+    const racers=[you].concat(mates.slice(0,9).map(p=>{const m={u:p.handle||"trader",phase:p.phase||"eval",evalPct:p.eval_pct||0,bufferPct:0,payouts:0};m.pos=racePos(m);return m;}))
+      .sort((a,b)=>b.pos-a.pos);
+    const foot = !code
+      ? `<div class="race-join"><p>You're not in a community yet — <b>join one with a code</b> and line up against your crew. Real traders, real numbers.</p><button class="btn fill" data-a="crewopen" data-hover>Join a community →</button></div>`
+      : mates.length
+        ? `<div class="race-empty"><b>● ${esc(code)}</b> — ${mates.length+1} traders racing, each moving with their real profit. <button class="lnk" data-a="crewopen" data-hover>manage</button></div>`
+        : `<div class="race-empty">You're the first in <b>${esc(code)}</b>. Share the code and your crew lines up right here. <button class="lnk" data-a="crewshare" data-hover>share code</button> · <button class="lnk" data-a="crewopen" data-hover>manage</button></div>`;
     return `<div class="race">
       <div class="race-zones"><span>Eval</span><span>Funded</span><span>Eden →</span></div>
       ${racers.map(raceLane).join("")}
-      ${joined
-        ? `<div class="race-empty">${live?'<b>● Live</b> — real traders from the SPOTTER AI community, moving with their real profit.':"You're racing the <b>pace-setters</b> — pass them to reach Eden. The live crew replaces the pacers as the community grows."}</div>`
-        : `<div class="race-join"><p>You're not in a race yet — <b>join one</b> to line up and see where you stand.</p><button class="btn fill" data-a="joinrace" data-hover>Join a race →</button></div>`}
+      ${foot}
     </div>`;
   }
   function viewHome(){
@@ -2097,7 +2112,14 @@
     const firms=`<div class="hscroll firm-row">${HOME_DATA.firms.map(f=>`<div class="firm"><div class="firm-top"><span class="firm-logo">${initials(f.name)}</span><div><div class="firm-name">${f.name}</div></div></div><div class="firm-stats"><div><span>Max funding</span><b class="up">${f.maxFunding}</b></div><div><span>Split</span><b>${f.split}</b></div><div><span>From</span><b>${f.cost}</b></div></div><div class="firm-tags">${f.tags.map(t=>`<span class="ftag">${t}</span>`).join("")}</div></div>`).join("")}</div>`;
     // ECON
     const todayIdx=new Date().getDay()-1; // Mon..Fri → 0..4; weekend marks none
-    const econ=`<div class="econ-grid">${HOME_DATA.econ.map((d,i)=>{const isT=i===todayIdx;return `<div class="econ-col ${isT?"today":""}"><div class="econ-dh">${d.day}${isT?' <em>today</em>':""}</div><div class="econ-evs">${d.events.length?d.events.map(e=>`<div class="econ-ev"><span class="imp imp-${e[2]}"></span><div class="econ-ei"><div class="econ-en">${e[0]}</div><div class="econ-tm">${e[1]} ET</div></div></div>`).join(""):'<div class="econ-empty">—</div>'}</div></div>`;}).join("")}</div>`;
+    const econ=(()=>{ const all=econLoad();
+      if(econEdit) return `<div class="econ-editor"><textarea id="econ-input" class="home-editor" rows="6" placeholder="Fri | 08:30 | Non-Farm Payrolls | high">${esc(econText())}</textarea>
+        <div class="sl-actions"><button class="btn fill" data-a="econsave" data-hover>Save</button><button class="btn ghost" data-a="econcancel" data-hover>Cancel</button></div>
+        <p class="home-note">One per line: <b>Day | time ET | event | high/med/low</b>. The Spotter reads these in your premarket brief.</p></div>`;
+      if(!all.length) return `<div class="econ-blank">Nothing on your calendar yet — <b>add this week's events</b> and the Spotter will flag them in your premarket brief.<div class="sl-actions" style="margin-top:12px"><button class="btn" data-a="econedit" data-hover>Add events</button></div></div>`;
+      return `<div class="econ-grid">${DOWK.map((d,i)=>{const isT=i===todayIdx, evs=all.filter(e=>e.day===d);
+        return `<div class="econ-col ${isT?"today":""}"><div class="econ-dh">${d}${isT?' <em>today</em>':""}</div><div class="econ-evs">${evs.length?evs.map(e=>`<div class="econ-ev"><span class="imp imp-${e.imp}"></span><div class="econ-ei"><div class="econ-en">${esc(e.name)}</div><div class="econ-tm">${esc(e.time)} ET</div></div></div>`).join(""):'<div class="econ-empty">—</div>'}</div></div>`;}).join("")}</div>
+        <div class="sl-actions" style="margin-top:10px"><button class="btn ghost" data-a="econedit" data-hover>Edit calendar</button></div>`; })();
     return `<div class="home2">
       ${tradeNudgeBanner()}
       <div class="home-hero"><h1 class="home-h1">Hi, <input id="pf-handle" class="hero-name" value="${esc(name)}" placeholder="trader">.</h1><p class="home-tag">Your trading platform — learn the system, take the one bullet, and measure your path to payout.</p></div>
@@ -2411,18 +2433,17 @@
     const t=tLoad(); try{const log=JSON.parse(localStorage.getItem("candado_trainlog")||"[]"); log.unshift({fecha:hoy(),durMin:t.durMin||null,outcome,elo:r.elo}); localStorage.setItem("candado_trainlog",JSON.stringify(log.slice(0,50)));}catch(e){}
     tSave({phase:"ready"}); supaUpsert(); mostrar("training"); }
   function trainBoard(r){
-    const me=deviceId(), live=SUPA_PROFILES.length>1; let crew;
-    if(live){
-      crew=SUPA_PROFILES.map(p=>({name:p.handle||"trader",elo:p.elo||1200,you:p.id===me})).sort((a,b)=>b.elo-a.elo).slice(0,10);
-      if(!crew.some(m=>m.you)) crew.push({name:(profileLoad()||{}).handle||"you",elo:r.elo,you:true});
-    }else{
-      const you={name:(profileLoad()||{}).handle||"you",elo:r.elo,you:true};
-      crew=[["NY_killer",42],["liq_hunter",-31],["one_shot",63],["asia_range",-58],["fvg_god",95]]
-        .map(([n,dd])=>({name:n,elo:Math.max(800,r.elo+dd),you:false})).concat([you]).sort((a,b)=>b.elo-a.elo);
-    }
-    return `<div class="p-card"><div class="c-t">Leaderboard <span class="room-agg">Elo · ${live?'<span class="live-tag">● live</span> community':'you vs the crew'}</span></div>
-      <div class="lead">${crew.map((m,i)=>`<div class="lead-row ${m.you?'me':''}" ${(!m.you&&live)?`data-uprofile="${esc(m.name)}"`:""}><span class="lead-rk">#${i+1}</span><span class="lead-nm">${esc(m.name)}${m.you?' <em>you</em>':''}</span><span class="lead-el">${m.elo}</span></div>`).join("")}</div>
-      <p class="home-note">${live?"Live — real traders from the SPOTTER AI community.":"Sample crew — real ranks appear as the community grows."}</p></div>`;
+    const code=crewLoad(), mates=crewMates();
+    const you={name:(profileLoad()||{}).handle||"you",elo:r.elo,you:true};
+    const board=[you].concat(mates.map(p=>({name:p.handle||"trader",elo:p.elo||1200,you:false}))).sort((a,b)=>b.elo-a.elo).slice(0,10);
+    const note = !code
+      ? `Ranked against your crew once you <b>join a community</b>. <button class="lnk" data-a="crewopen" data-hover>Join with a code →</button>`
+      : mates.length
+        ? `Live — real traders in <b>${esc(code)}</b>, ranked by their real Elo.`
+        : `You're the first in <b>${esc(code)}</b>. <button class="lnk" data-a="crewshare" data-hover>Share the code</button> and the board fills up.`;
+    return `<div class="p-card"><div class="c-t">Leaderboard <span class="room-agg">Elo${code?` · ${esc(code)}`:""}</span></div>
+      <div class="lead">${board.map((m,i)=>`<div class="lead-row ${m.you?'me':''}" ${(!m.you)?`data-uprofile="${esc(m.name)}"`:""}><span class="lead-rk">#${i+1}</span><span class="lead-nm">${esc(m.name)}${m.you?' <em>you</em>':''}</span><span class="lead-el">${m.elo}</span></div>`).join("")}</div>
+      <p class="home-note">${note}</p></div>`;
   }
   function viewTraining(){
     const t=tLoad(), r=eloLoad();
@@ -2643,7 +2664,7 @@
     {id:"reps",ic:"🔁",t:"Rep machine",d:"10 training sessions",ok:()=>trainLog().length>=10,pr:()=>trainLog().length/10},
     {id:"scholar",ic:"📚",t:"Student of the game",d:"Finish the course",ok:()=>{const cp=progLoad(),lc=allLessons();return lc.length&&lc.every(l=>cp[l.id]);},pr:()=>{const cp=progLoad(),lc=allLessons();return lc.length?lc.filter(l=>cp[l.id]).length/lc.length:0;}},
     {id:"in_room",ic:"🤝",t:"In the room",d:"Join the community",ok:()=>{const c=(profileLoad()||{}).communities||{};return Object.keys(c).some(k=>c[k]);}},
-    {id:"racer",ic:"🏁",t:"On the grid",d:"Join a race",ok:()=>localStorage.getItem("candado_race")==="1"},
+    {id:"racer",ic:"🏁",t:"On the grid",d:"Join a community",ok:()=>!!crewLoad()},
     {id:"funded",ic:"🥇",t:"Funded",d:"Reach the funded phase",ok:()=>{const ph=youRacer().phase;return ph&&ph!=="eval";}},
   ];
   function achEarned(A){try{return !!A.ok();}catch(e){return false;}}
@@ -2715,6 +2736,7 @@
     const da=e.target.closest("[data-dashacct]"); if(da){DASH_ACCT=da.dataset.dashacct||"";mostrar("dashboard");return;}
     const te=e.target.closest("[data-tedit]"); if(te){tradeEdit(te.dataset.tedit);return;}
     if(e.target.closest("[data-tradeclose]")||e.target.id==="trade-modal"){closeTradeModal();return;}
+    if(e.target.closest("[data-crewclose]")||e.target.id==="crew-modal"){closeCrewModal();return;}
     const fp=e.target.closest("[data-firmpreset]"); if(fp){const a=acctLoad()||{size:50000,evalTarget:1000};a.firm=fp.dataset.firmpreset;delete a.dailyLoss;delete a.maxDD;delete a.consistency;delete a.minDays;acctSave(a);mostrar("settings");return;} // firm → automatic rules by phase
     const gph=e.target.closest("[data-guardphase]"); if(gph){const a=acctLoad()||{size:50000,evalTarget:1000},k=gph.dataset.guardphase;if(k==="auto")delete a.guardPhase;else a.guardPhase=k;acctSave(a);mostrar("settings");return;}
     const a=e.target.closest("[data-route]"); if(a){mostrar(a.dataset.route);return;}
