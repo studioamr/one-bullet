@@ -34,14 +34,29 @@ class Delegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDeleg
         }
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+        startLive()   // consulta periódica del estado EN VIVO
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ s: NSApplication) -> Bool { true }
 
     // Al volver a la app (tras una sesión), importa lo que el Spotter dejó en el journal.
     func applicationDidBecomeActive(_ n: Notification) { importJournal() }
-    // Al terminar de cargar la plataforma, importa también.
-    func webView(_ w: WKWebView, didFinish navigation: WKNavigation!) { importJournal() }
+    // Al terminar de cargar la plataforma, importa el journal y checa si André está EN VIVO.
+    func webView(_ w: WKWebView, didFinish navigation: WKNavigation!) { importJournal(); pollLive() }
+
+    // El app nativo (file://) no puede fetch a github.io por CORS → lo consulta Swift y lo inyecta.
+    var liveTimer: Timer?
+    func startLive() {
+        pollLive()
+        liveTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in self?.pollLive() }
+    }
+    func pollLive() {
+        guard let url = URL(string: "https://studioamr.github.io/spotter-ai/live.json?t=\(Int(Date().timeIntervalSince1970))") else { return }
+        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
+            guard let data = data, let s = String(data: data, encoding: .utf8) else { return }
+            DispatchQueue.main.async { self?.webView?.evaluateJavaScript("window.__liveStatus&&window.__liveStatus(\(s))", completionHandler: nil) }
+        }.resume()
+    }
 
     // Lee ~/Library/Application Support/SpotterAI/journal/<fecha>.json (+ .png) que guardó el
     // Spotter y los inyecta al journal de la app (captura como data-URI + resumen de sesión).

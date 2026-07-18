@@ -6,6 +6,8 @@
 !sw.js
 !start-watch.command
 !SPOTTER-PLAYBOOK.md
+!live.json
+!golive.command
 !.gitignore
 !assets
 !vendor
