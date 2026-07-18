@@ -923,6 +923,9 @@
   .pace-big small{font-family:var(--sans);font-size:.9rem;color:var(--ink1);font-weight:500}
   .pace-meta{display:flex;flex-direction:column;gap:5px;font-size:.92rem;color:var(--ink1)}.pace-meta b{color:var(--ink)}
   .risk-calc{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-size:.92rem;color:var(--ink1);font-variant-numeric:tabular-nums}.risk-calc b{color:var(--ink)}
+  .trade-nudge{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:rgba(61,134,207,.09);border-color:rgba(61,134,207,.4)}
+  .trade-nudge .tn-txt{font-size:.95rem;line-height:1.5}.trade-nudge .tn-txt b{color:var(--accent)}
+  .trade-nudge .tn-actions{display:flex;gap:8px;flex-shrink:0}
   .comm2{gap:14px}
   .room-pulse{padding:20px 22px}
   .rp-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
@@ -1416,7 +1419,7 @@
   /* ---------- events ---------- */
   document.addEventListener("click",e=>{
     const b=e.target.closest("button[data-a]");if(!b)return;
-    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,shareshot:sealPoster,addinvest:addInvest,replayonb:startOnb,createlobby:battleLobby,practicenow:practiceNow,joinrace:()=>{raceJoin();mostrar("progreso");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,spkr:spkToggle,wallpost:()=>{const i=$("#wall-input"),v=i&&i.value.trim();if(v){supaPost(v);if(i)i.value="";}},invite:()=>{try{window.open("https://wa.me/?text="+encodeURIComponent("Prueba SPOTTER AI conmigo — la plataforma de trading con disciplina: https://studioamr.github.io/spotter-ai/landing.html"),"_blank");}catch(e){}},logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
+    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,shareshot:sealPoster,dismissnudge:()=>{TRADING_NUDGE="";statusPush(sessLoad().phase||"ready");mostrar(vistaActual);},addinvest:addInvest,replayonb:startOnb,createlobby:battleLobby,practicenow:practiceNow,joinrace:()=>{raceJoin();mostrar("progreso");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,spkr:spkToggle,wallpost:()=>{const i=$("#wall-input"),v=i&&i.value.trim();if(v){supaPost(v);if(i)i.value="";}},invite:()=>{try{window.open("https://wa.me/?text="+encodeURIComponent("Prueba SPOTTER AI conmigo — la plataforma de trading con disciplina: https://studioamr.github.io/spotter-ai/landing.html"),"_blank");}catch(e){}},logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
   });
   document.addEventListener("input",e=>{ if(!e.target)return;
     if(ONB&&e.target.id&&e.target.id.startsWith("onb-")){ const d=ONB.data, id=e.target.id, v=e.target.value;
@@ -1921,6 +1924,7 @@
     const todayIdx=new Date().getDay()-1; // Mon..Fri → 0..4; weekend marks none
     const econ=`<div class="econ-grid">${HOME_DATA.econ.map((d,i)=>{const isT=i===todayIdx;return `<div class="econ-col ${isT?"today":""}"><div class="econ-dh">${d.day}${isT?' <em>today</em>':""}</div><div class="econ-evs">${d.events.length?d.events.map(e=>`<div class="econ-ev"><span class="imp imp-${e[2]}"></span><div class="econ-ei"><div class="econ-en">${e[0]}</div><div class="econ-tm">${e[1]} ET</div></div></div>`).join(""):'<div class="econ-empty">—</div>'}</div></div>`;}).join("")}</div>`;
     return `<div class="home2">
+      ${tradeNudgeBanner()}
       <div class="home-hero"><h1 class="home-h1">Hi, <input id="pf-handle" class="hero-name" value="${esc(name)}" placeholder="trader">.</h1><p class="home-tag">Your trading platform — learn the system, take the one bullet, and measure your path to payout.</p></div>
       ${welcomeBack()}
       ${sec("For you",forYou)}
@@ -1955,9 +1959,12 @@
     }catch(e){ return {handle:"trader"}; }
   }
   /* puente al Spotter de la barra de menú (app nativa); no-op en web */
-  function statusLabel(kind){ return ({ready:"◉ 1 bala lista",live:"◉ Sesión · en la mira",fired:"● En el aire",won:"✓ Tiro limpio",lost:"— Día cerrado",flat:"— Sin disparo"})[kind]||"SPOTTER AI"; }
+  function statusLabel(kind){ return ({ready:"◉ 1 bala lista",live:"◉ Sesión · en la mira",fired:"● En el aire",won:"✓ Tiro limpio",lost:"— Día cerrado",flat:"— Sin disparo",detected:"◉ Trading detectado · arma tu bala"})[kind]||"SPOTTER AI"; }
   function statusPush(kind){ try{ if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.status){ window.webkit.messageHandlers.status.postMessage(statusLabel(kind)); } }catch(e){} }
-  function startSession(){ const already=sesModeLoad()!=="sim"&&todaySealed();
+  /* nudge de auto-detección: "detecté TradingView, ¿arrancamos?" (banner en Home/Session) */
+  var TRADING_NUDGE="";
+  function tradeNudgeBanner(){ if(!TRADING_NUDGE)return""; return `<div class="p-card trade-nudge"><div class="tn-txt"><b>Detecté ${esc(TRADING_NUDGE)}.</b> ¿Arrancamos tu sesión? Una sola bala.</div><div class="tn-actions"><button class="btn fill" data-a="startsession" data-hover>▶ Arranca</button><button class="btn ghost" data-a="dismissnudge" data-hover>Ahora no</button></div></div>`; }
+  function startSession(){ const already=sesModeLoad()!=="sim"&&todaySealed(); TRADING_NUDGE="";
     sessSave({phase:"live",startedAt:Date.now(),sim:sesModeLoad()==="sim"});
     try{window.open(TV_URL,"_blank","noopener");}catch(e){} // abre tu TradingView
     // en la app nativa: manda tu perfil + lanza el Spotter (Claude Code vigilando tu pantalla)
@@ -2033,6 +2040,7 @@
     if(s.phase==="done") return sesFase3(s);
     const mode=sesModeLoad(), a=acctLoad()||{firm:"Tradeify"};
     return `<div class="sess-ready">
+      ${tradeNudgeBanner()}
       <div class="p-card sr-hero">
         <div class="sr-eyebrow">SPOTTER AI · trading session</div>
         <h2 class="sr-h">Start your <em>session.</em></h2>
@@ -2779,6 +2787,18 @@
     }else if(bar){ bar.remove(); }
   }
   window.__liveStatus=applyLive;                 // el app nativo inyecta el estado por aquí
+  /* --- auto-detección de sesión + hotkey global ⌘⇧B (inyectados por la app nativa) --- */
+  window.__tradingDetected=function(platform){ try{
+    const s=sessLoad(); if(s.phase==="live"||s.phase==="fired")return; if(todaySealed())return;
+    const last=+localStorage.getItem("candado_tradenudge")||0; if(Date.now()-last<600000)return; // no molestar más de 1 vez/10min
+    localStorage.setItem("candado_tradenudge",String(Date.now()));
+    TRADING_NUDGE=platform||"tu plataforma"; statusPush("detected");
+    if(vistaActual==="home"||vistaActual==="sesion")mostrar(vistaActual);
+    spkr("Detecté "+(platform||"tu plataforma")+". ¿Arrancamos tu sesión? Recuerda, una sola bala.");
+  }catch(e){} };
+  window.__hotkeyFire=function(){ try{ const s=sessLoad();
+    if(s.phase==="live")fireBullet(); else if(s.phase==="fired")mostrar("sesion"); else startSession();
+  }catch(e){} };
   function pollLive(){ fetch("live.json?t="+Date.now()).then(r=>r.ok?r.json():null).then(d=>{if(d)applyLive(d);}).catch(()=>{}); }
   if(location.protocol!=="file:"){ pollLive(); setInterval(pollLive,60000); } // web: fetch directo; nativo: vía Swift
 })();

@@ -7,6 +7,8 @@ class Delegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDeleg
     var window: NSWindow!
     var webView: WKWebView!
     var statusItem: NSStatusItem?
+    var hotkeyGlobal: Any?
+    var hotkeyLocal: Any?
 
     func applicationDidFinishLaunching(_ n: Notification) {
         let rect = NSRect(x: 0, y: 0, width: 1280, height: 840)
@@ -38,8 +40,42 @@ class Delegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDeleg
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         setupStatusItem()    // Spotter en la barra de menú (siempre visible)
+        setupWorkspaceWatch()// detecta cuando abres TradingView/Tradovate
+        setupHotkey()        // ⌘⇧B global: dispara/arranca desde donde estés
         startLive()          // consulta periódica del estado EN VIVO
         scheduleReminders()  // recordatorios (apertura de Nueva York)
+    }
+
+    // Auto-detección de sesión: cuando tu plataforma pasa al frente, el Spotter te avisa (sin forzar).
+    func setupWorkspaceWatch() {
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self, selector: #selector(appActivated(_:)),
+            name: NSWorkspace.didActivateApplicationNotification, object: nil)
+    }
+    @objc func appActivated(_ n: Notification) {
+        guard let app = n.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
+        let name = (app.localizedName ?? "").lowercased(), bid = (app.bundleIdentifier ?? "").lowercased()
+        let isTrading = name.contains("tradingview") || name.contains("tradovate") || bid.contains("tradingview") || bid.contains("tradovate")
+        guard isTrading else { return }
+        let safe = (app.localizedName ?? "tu plataforma").replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"")
+        DispatchQueue.main.async { self.webView?.evaluateJavaScript("window.__tradingDetected&&window.__tradingDetected(\"\(safe)\")", completionHandler: nil) }
+    }
+
+    // Hotkey global ⌘⇧B: dispara la bala / arranca sesión aunque estés en TradingView.
+    // El monitor LOCAL siempre jala (app al frente); el GLOBAL requiere permiso de "Monitoreo de entrada".
+    func setupHotkey() {
+        let handler: (NSEvent) -> Void = { [weak self] ev in
+            if ev.modifierFlags.contains([.command, .shift]) && ev.charactersIgnoringModifiers?.lowercased() == "b" { self?.hotkeyFired() }
+        }
+        hotkeyGlobal = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { handler($0) }
+        hotkeyLocal = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { ev in handler(ev); return ev }
+    }
+    func hotkeyFired() {
+        DispatchQueue.main.async {
+            self.window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            self.webView?.evaluateJavaScript("window.__hotkeyFire&&window.__hotkeyFire()", completionHandler: nil)
+        }
     }
 
     // Spotter de la barra de menú: refleja el estado de tu sesión aunque la ventana esté cerrada/atrás.
