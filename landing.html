@@ -964,6 +964,169 @@
   function seedFeed(f){ const an=rnd()*6.283, rr=24+rnd()*26;
     f.x=Math.cos(an)*rr; f.y=Math.sin(an)*rr*.66; f.z=(rnd()-.5)*15; f.t=0; f.v=.0035+rnd()*.011; }
   for(let i=0;i<FEED;i++){ const o={}; seedFeed(o); o.t=rnd(); FD.push(o); }
+  /* ---- LO QUE EL OJO ANALIZA: gráficas de velas flotando en el campo ----
+     No son decoración: son el mercado. El ojo las barre y se clava en una. */
+  const CH=8, CN=20, CSEG=CH*CN*5;                       // 5 segmentos por vela: mecha + cuerpo
+  const chPos=new Float32Array(CSEG*2*3), chCol=new Float32Array(CSEG*2*3);
+  const chartGeo=new T.BufferGeometry();
+  chartGeo.setAttribute("position",new T.BufferAttribute(chPos,3));
+  chartGeo.setAttribute("color",new T.BufferAttribute(chCol,3));
+  const chartMat=new T.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending});
+  world.add(new T.LineSegments(chartGeo,chartMat));
+  const CHARTS=[];
+  function seedChart(c,i){
+    const an=(i/CH)*6.283+rnd()*.55, rr=17+rnd()*15;
+    c.x=Math.cos(an)*rr; c.y=(rnd()-.5)*15; c.z=-11+rnd()*15;
+    c.w=5.5+rnd()*3.5; c.h=2.3+rnd()*2.2; c.ph=rnd()*6.283;
+    const tr=(rnd()-.5)*.10; let p=0; c.d=[];         // caminata con tendencia: se ve a mercado
+    for(let k=0;k<CN;k++){ const o=p; p+=tr+gauss()*.28;
+      c.d.push([o,p,Math.max(o,p)+Math.abs(gauss())*.22,Math.min(o,p)-Math.abs(gauss())*.22]); }
+    let mn=1e9,mx=-1e9; for(const q of c.d){ if(q[3]<mn)mn=q[3]; if(q[2]>mx)mx=q[2]; }
+    c.mn=mn; c.rg=(mx-mn)||1;
+  }
+  for(let i=0;i<CH;i++){ const o={}; seedChart(o,i); CHARTS.push(o); }
+  let lockIdx=0, cw=0;
+  function chSeg(ax,ay,az,bx,by,bz,r,g,b){
+    chPos[cw*3]=ax;chPos[cw*3+1]=ay;chPos[cw*3+2]=az;chCol[cw*3]=r;chCol[cw*3+1]=g;chCol[cw*3+2]=b;cw++;
+    chPos[cw*3]=bx;chPos[cw*3+1]=by;chPos[cw*3+2]=bz;chCol[cw*3]=r;chCol[cw*3+1]=g;chCol[cw*3+2]=b;cw++; }
+  /* ---- APOYO VISUAL POR SECCIÓN ----
+     Cada sección dibuja atrás lo que su texto promete. Nada decorativo:
+     si el texto habla de un calendario, se dibuja un calendario. */
+  const VZMAX=520;
+  const vzPos=new Float32Array(VZMAX*2*3), vzCol=new Float32Array(VZMAX*2*3);
+  const vizGeo=new T.BufferGeometry();
+  vizGeo.setAttribute("position",new T.BufferAttribute(vzPos,3));
+  vizGeo.setAttribute("color",new T.BufferAttribute(vzCol,3));
+  const vizMat=new T.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending});
+  const vizObj=new T.LineSegments(vizGeo,vizMat);
+  vizObj.position.set(0,-4.0,0);      // franja baja: no pelea con la tarjeta del centro
+  vizObj.scale.set(1,.62,1);          // ancho y bajo, como una lectura de instrumento
+  world.add(vizObj);
+  const CUP=[.34,.86,.62], CDN=[.92,.36,.44], CAC=[.42,.66,.95], CBN=[.50,.49,.46];
+  const VS=1.30, VZD=6.5;                      // delante de la nube: si no se lee, no es apoyo
+  let vzN=0;
+  function vzL(x0,y0,x1,y1,c){ if(vzN>=VZMAX)return; const i=vzN*6;
+    vzPos[i]=x0*VS; vzPos[i+1]=y0*VS; vzPos[i+2]=VZD;
+    vzPos[i+3]=x1*VS; vzPos[i+4]=y1*VS; vzPos[i+5]=VZD;
+    vzCol[i]=c[0];vzCol[i+1]=c[1];vzCol[i+2]=c[2];
+    vzCol[i+3]=c[0];vzCol[i+4]=c[1];vzCol[i+5]=c[2]; vzN++; }
+  const vzRect=(x0,y0,x1,y1,c)=>{vzL(x0,y0,x1,y0,c);vzL(x1,y0,x1,y1,c);vzL(x1,y1,x0,y1,c);vzL(x0,y1,x0,y0,c);};
+  const vzPath=(p,c,rev)=>{const n=Math.max(1,Math.floor((p.length-1)*rev));
+    for(let i=1;i<=n&&i<p.length;i++)vzL(p[i-1][0],p[i-1][1],p[i][0],p[i][1],c);};
+  const vzAxis=()=>{vzL(-7.2,-3.2,7.2,-3.2,CBN); vzL(-7.2,-3.2,-7.2,3.2,CBN);};
+  let _sd=1; const sr=()=>{_sd=(_sd*1664525+1013904223)&0x7fffffff; return _sd/0x7fffffff;};
+  /* una vela: mecha + cuerpo, en coordenadas locales del diagrama */
+  function vzCandle(x,hw,o,cl,hi,lo){ const c=cl>=o?CUP:CDN;
+    vzL(x,lo,x,hi,c); vzRect(x-hw,o,x+hw,cl===o?o+.04:cl,c); }
+
+  const VIZ={
+    /* pierdes: la curva sangra, y cada intento de venganza cava más hondo */
+    equityDown(rev){ vzAxis(); _sd=7; const p=[[-7,2.4]]; let y=2.4;
+      for(let i=1;i<=34;i++){ const rage=(i%7===0)?-1.15:0;      // el día de venganza
+        y+=-.10+ (sr()-.62)*.42 + rage; p.push([-7+i*(14/34), Math.max(-3,y)]); }
+      vzPath(p,CDN,rev);
+      const last=p[p.length-1];                                   // el fondo, marcado
+      vzL(-7.2,last[1],7.2,last[1],CDN); vzL(last[0],last[1],last[0],last[1]-.5,CDN); },
+    /* ganas: la misma curva, pero escalonada — una operación por mañana */
+    equityUp(rev){ vzAxis(); _sd=3; const p=[[-7,-2.6]]; let y=-2.6,x=-7;
+      for(let i=0;i<16;i++){ const st=(sr()<.24)?-.18:.34;        // hay días rojos, pocos
+        x+=14/16; p.push([x,y]); y+=st; p.push([x,y]); }
+      vzPath(p,CUP,rev); },
+    /* el mentor: operas en vivo. La última vela se está formando ahora mismo */
+    liveCandle(rev,t){ vzAxis(); _sd=11; const n=11, w=14/n, hw=w*.3;
+      let base=-.6;
+      for(let i=0;i<n-1;i++){ const o=base, cl=o+(sr()-.45)*1.5;
+        vzCandle(-7+i*w+w/2, hw, o, cl, Math.max(o,cl)+sr()*.4, Math.min(o,cl)-sr()*.4); base=cl; }
+      const o=base, grow=Math.sin(t*.05)*.9+.5;                   // la vela viva respira
+      const cl=o+grow, x=-7+(n-1)*w+w/2;
+      vzCandle(x,hw,o,cl,Math.max(o,cl)+.5+Math.abs(Math.sin(t*.09))*.3,Math.min(o,cl)-.35);
+      vzL(x+hw*2,cl,7.2,cl,CAC);                                  // el precio ahora
+      vzL(7.2,cl-.22,7.2,cl+.22,CAC); },
+    /* el sistema: antes de abrir ya sabes dónde entras, dónde sales y dónde cobras */
+    tradeLevels(rev){ _sd=5; const n=13, w=14/n, hw=w*.3;
+      let base=-.4; const ys=[];
+      for(let i=0;i<n;i++){ const o=base, cl=o+(sr()-.42)*1.1;
+        vzCandle(-7+i*w+w/2,hw,o,cl,Math.max(o,cl)+sr()*.35,Math.min(o,cl)-sr()*.35);
+        ys.push(cl); base=cl; }
+      const en=ys[3], sl=en-1.5, tp=en+2.6;
+      for(const [y,c] of [[en,CAC],[sl,CDN],[tp,CUP]]){           // los tres niveles: en frío
+        for(let x=-7;x<7;x+=.62) vzL(x,y,x+.34,y,c); }
+      vzL(-6.6,sl,-6.6,tp,CBN); vzL(-6.85,tp,-6.35,tp,CUP); vzL(-6.85,sl,-6.35,sl,CDN); },
+    /* la app: tu calendario, el resultado de cada día */
+    calendar(rev){ _sd=13; const cols=10, rows=4, cw=13.6/cols, chh=5.6/rows;
+      const total=cols*rows, shown=Math.floor(total*rev);
+      for(let r=0;r<rows;r++)for(let cI=0;cI<cols;cI++){
+        const k=r*cols+cI; if(k>=shown)continue;
+        const x0=-6.8+cI*cw+.09, y0=2.8-r*chh-chh+.09, x1=x0+cw-.18, y1=y0+chh-.18;
+        const v=sr(); const c=v<.18?CDN:(v<.32?CBN:CUP);
+        vzRect(x0,y0,x1,y1,CBN);
+        const f=(y1-y0)*(v<.32?.25:.35+v*.4);                     // la barra del día
+        vzL(x0+.12,y0+.12,x1-.12,y0+.12,c); vzL(x0+.12,y0+.12+f,x1-.12,y0+.12+f,c); } },
+    /* la comunidad: mismo mercado, mismo capital, gana el más disciplinado */
+    duel(rev){ vzAxis(); vzL(-7.2,0,7.2,0,CBN);
+      _sd=21; let a=.25,b=.25; const pa=[[-7,.25]], pb=[[-7,.25]];
+      for(let i=1;i<=26;i++){ a+=.09+(sr()-.42)*.30; b+=(sr()-.58)*.42;
+        pa.push([-7+i*(14/26),a]); pb.push([-7+i*(14/26),b]); }
+      vzPath(pa,CUP,rev); vzPath(pb,CDN,rev);
+      const la=pa[pa.length-1], lb=pb[pb.length-1];
+      vzL(la[0],la[1],la[0]+.4,la[1],CUP); vzL(lb[0],lb[1],lb[0]+.4,lb[1],CDN); },
+    /* el plan: cuatro fases, cada una más alta que la anterior */
+    ladder(rev){ vzAxis(); const n=4, w=13.6/n;
+      const h=[-1.5,-.2,1.1,2.5];
+      const shown=Math.max(1,Math.floor(n*rev));
+      for(let i=0;i<shown;i++){ const x0=-6.8+i*w+.3, x1=x0+w-.6, y=h[i];
+        vzL(x0,y,x1,y,CAC);                                       // el escalón
+        vzL(x0,-3.2,x0,y,CBN);                                    // la subida
+        for(let k=0;k<3;k++){ const bx=x0+.5+k*((x1-x0-1)/2.6);   // las cuentas de esa fase
+          vzRect(bx,y+.12,bx+.36,y+.12+.34+k*.14,CUP); }
+        if(i>0) vzL(-6.8+i*w+.3,h[i-1],-6.8+i*w+.3,y,CUP); } },
+    /* el camino: examen → fondeada → pago. Un medidor, no una promesa */
+    evalMeter(rev,t){ const y=0, x0=-6.8, x1=6.8, mid=x0+(x1-x0)*.42, mid2=x0+(x1-x0)*.78;
+      vzL(x0,y-.45,x0,y+.45,CBN); vzL(x1,y-.45,x1,y+.45,CBN);
+      vzL(x0,y-.45,x1,y-.45,CBN); vzL(x0,y+.45,x1,y+.45,CBN);
+      vzL(mid,y-.45,mid,y+.45,CBN); vzL(mid2,y-.45,mid2,y+.45,CBN);
+      const prog=x0+(x1-x0)*Math.min(1,rev*.95);
+      for(let x=x0+.12;x<prog;x+=.30) vzL(x,y-.3,x,y+.3,x<mid?CAC:(x<mid2?CUP:CUP));
+      vzL(prog,y-.9,prog,y+.9,CBN);                               // dónde vas
+      for(const [mx,lab] of [[x0,1],[mid,1],[mid2,1],[x1,1]]) vzL(mx,y-1.15,mx,y-.6,CBN);
+      const pulse=.25+Math.abs(Math.sin(t*.04))*.5;               // el pago late al final
+      vzRect(x1-.55,y-pulse,x1+.55,y+pulse,CUP); },
+    /* la escuela: la misma vela, pero explicada */
+    lessons(rev){ _sd=9; const n=9, w=14/n, hw=w*.28; let base=-.8; const xs=[],ys=[];
+      for(let i=0;i<n;i++){ const o=base, cl=o+(sr()-.4)*1.3;
+        vzCandle(-7+i*w+w/2,hw,o,cl,Math.max(o,cl)+sr()*.4,Math.min(o,cl)-sr()*.4);
+        xs.push(-7+i*w+w/2); ys.push(Math.max(o,cl)); base=cl; }
+      const marks=[2,5,7];                                        // tres momentos señalados
+      const shown=Math.max(1,Math.floor(marks.length*rev));
+      for(let m=0;m<shown;m++){ const i=marks[m], x=xs[i], y=ys[i]+.7;
+        vzL(x,y,x,y+.7,CAC); vzL(x-.5,y+.7,x+.5,y+.7,CAC);        // el corchete que señala
+        vzL(x-.5,y+.7,x-.5,y+.45,CAC); vzL(x+.5,y+.7,x+.5,y+.45,CAC); } },
+    /* la primera semana: siete días, y se van llenando */
+    week(rev){ const n=7, w=13.6/n; const shown=Math.max(1,Math.round(n*rev));
+      for(let i=0;i<n;i++){ const x0=-6.8+i*w+.22, x1=x0+w-.44;
+        vzRect(x0,-1.6,x1,1.6,i<shown?CAC:CBN);
+        if(i<shown){ const fill=-1.6+3.2*(.2+i*.115);             // el día ya vivido
+          vzL(x0+.18,-1.42,x1-.18,-1.42,CUP); vzL(x0+.18,fill,x1-.18,fill,CUP);
+          vzL(x0+.18,-1.42,x0+.18,fill,CUP); vzL(x1-.18,-1.42,x1-.18,fill,CUP); } } },
+    /* el cierre: dentro de un año, dos caminos desde el mismo punto */
+    diverge(rev){ vzAxis(); _sd=31; let a=0,b=0; const pa=[[-7,0]], pb=[[-7,0]];
+      for(let i=1;i<=30;i++){ a+=.115+(sr()-.45)*.20; b+=(sr()-.55)*.30;
+        pa.push([-7+i*(14/30),a]); pb.push([-7+i*(14/30),b]); }
+      vzPath(pa,CUP,rev); vzPath(pb,CDN,rev);
+      const la=pa[pa.length-1], lb=pb[pb.length-1];               // la brecha del año
+      if(rev>.9){ for(let y=lb[1];y<la[1];y+=.42) vzL(la[0]+.35,y,la[0]+.75,y,CBN); } }
+  };
+  const VIZ_SECS=[["#mentor","liveCandle"],["#sistema","tradeLevels"],["#app","calendar"],
+    ["#comunidad","duel"],["#extras","ladder"],["#camino","evalMeter"],["#educacion","lessons"],
+    ["#semana","week"],["#cierre","diverge"]]
+    .map(([q,k])=>[document.querySelector(q),k]).filter(x=>x[0]);
+  let vizKey=null, vizAge=0;
+  /* la mira: corchetes que encuadran la gráfica bajo análisis */
+  const lockPos=new Float32Array(8*2*3);
+  const lockGeo=new T.BufferGeometry();
+  lockGeo.setAttribute("position",new T.BufferAttribute(lockPos,3));
+  const lockMat=new T.LineBasicMaterial({color:0xbfe0ff,transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending});
+  world.add(new T.LineSegments(lockGeo,lockMat));
   /* polvo lejano */
   const M=900,dp=new Float32Array(M*3);
   for(let i=0;i<M;i++){const v=new T.Vector3(rnd()-.5,rnd()-.5,rnd()-.5).normalize().multiplyScalar(40+rnd()*60);
@@ -990,6 +1153,7 @@
     else if(r<.45){ gaze.tx=(rnd()-.5)*.22; gaze.ty=(rnd()-.5)*.12; gaze.hold=40+rnd()*60; }  // micro-ajuste
     else { gaze.tx=(rnd()-.5)*.72; gaze.ty=(rnd()-.5)*.32; gaze.hold=60+rnd()*140; }          // barrido amplio
     gaze.flash=1;
+    lockIdx=Math.floor(rnd()*CH);   // cada salto de mirada encuadra otra gráfica
   }
   newGaze();
   const st={mx:0,my:0,smx:0,smy:0,p:0};
@@ -1056,7 +1220,8 @@
     for(let n2=0;n2<NN;n2++){const i=n2*NSTRIDE*3;
       na[n2*3]=pa[i];na[n2*3+1]=pa[i+1];na[n2*3+2]=pa[i+2];}
     nodeGeo.attributes.position.needsUpdate=true;
-    lineMat.opacity=.08+W.chaos*.07+Math.sin(frame*.02)*.02; // la red respira, más viva en la nube
+    const quiet=1-vizMat.opacity*.62;                        // el diagrama manda: lo demás baja la voz
+    lineMat.opacity=(.08+W.chaos*.07+Math.sin(frame*.02)*.02)*quiet; // la red respira, más viva en la nube
     nodeMat.opacity=.6+Math.sin(frame*.03)*.2;
     nodeMat.size=.16+Math.sin(frame*.05)*.03; // las neuronas laten
     /* señales disparando: cada pensamiento recorre una sinapsis; a veces sale a agarrar datos */
@@ -1085,13 +1250,57 @@
     world.rotation.y=Math.sin(frame*.0004)*.1+spin+gaze.x*W.eye;
     world.rotation.x=Math.sin(frame*.00055)*.05*W.chaos+gaze.y*W.eye; // la mente cabecea, viva
     world.scale.setScalar(1+Math.sin(frame*.026)*.02*(W.chaos+W.eye)); // respira
-    bone.material.opacity=.85-st.p*.15;
+    bone.material.opacity=(.85-st.p*.15)*quiet;
     bone.material.size=.07+Math.sin(frame*.045)*.006*W.chaos; // titila al pensar
     cam.position.x=st.smx*1.6;
     cam.position.y=-st.smy*1.1-W.spire*1.2;
     cam.position.z=24-st.p*3;
     cam.lookAt(0,W.spire*4,0); // al final, la mirada sube con la espiral
     stars.rotation.y=frame*.0004+st.p*.5;
+    /* ---- el apoyo visual de la sección: se dibuja lo que el texto promete ---- */
+    let vk=null;
+    if(t1>-.1&&t1<1.12)vk="equityDown";                 // etapa 1: así se pierde
+    else if(t2>-.1&&t2<1.12)vk="equityUp";              // etapa 2: así se gana
+    else for(const [el,k] of VIZ_SECS){const r=el.getBoundingClientRect();
+      if(r.top<vh*.62&&r.bottom>vh*.25)vk=k;}
+    if(vk!==vizKey){ vizKey=vk; vizAge=0; }
+    if(vizKey)vizAge++;
+    vzN=0;
+    if(vizKey&&VIZ[vizKey]){ VIZ[vizKey](Math.min(1,vizAge/70),frame); }
+    vizGeo.setDrawRange(0,vzN*2);
+    vizGeo.attributes.position.needsUpdate=true;
+    vizGeo.attributes.color.needsUpdate=true;
+    vizMat.opacity+=((vizKey?.72:0)-vizMat.opacity)*.05;
+    /* ---- el ojo analiza: las velas flotan y una queda bajo la mira ---- */
+    cw=0;
+    for(let ci=0;ci<CH;ci++){ const c=CHARTS[ci];
+      const dy=Math.sin(frame*.006+c.ph)*.55, lit=(ci===lockIdx)?1:0;
+      const bw=c.w/CN, base=c.y+dy, hw=bw*.32;
+      const Y=v=>base+((v-c.mn)/c.rg-.5)*c.h;
+      for(let k=0;k<CN;k++){ const d=c.d[k], up=d[1]>=d[0];
+        const px=c.x-c.w/2+k*bw+bw*.5;
+        const r=up?.42+lit*.5:.34+lit*.4, g=up?.66+lit*.34:.40+lit*.3, b=up?.95:.55+lit*.35;
+        chSeg(px,Y(d[3]),c.z, px,Y(d[2]),c.z, r,g,b);                    // mecha
+        const yo=Y(d[0]), yc=Y(d[1]);                                     // cuerpo
+        chSeg(px-hw,yo,c.z, px+hw,yo,c.z, r,g,b);
+        chSeg(px+hw,yo,c.z, px+hw,yc,c.z, r,g,b);
+        chSeg(px+hw,yc,c.z, px-hw,yc,c.z, r,g,b);
+        chSeg(px-hw,yc,c.z, px-hw,yo,c.z, r,g,b); } }
+    chartGeo.attributes.position.needsUpdate=true;
+    chartGeo.attributes.color.needsUpdate=true;
+    chartMat.opacity=(.09+W.eye*.40)*quiet;                                       // siempre tenues; vivas bajo el ojo
+    /* la mira encuadra la gráfica que el ojo está leyendo */
+    { const c=CHARTS[lockIdx], dy=Math.sin(frame*.006+c.ph)*.55;
+      const x0=c.x-c.w/2-.5, x1=c.x+c.w/2+.5, y0=c.y+dy-c.h/2-.5, y1=c.y+dy+c.h/2+.5;
+      const ax=(x1-x0)*.24, ay=(y1-y0)*.3; let w2=0;
+      const seg=(px,py,qx,qy)=>{ lockPos[w2*3]=px;lockPos[w2*3+1]=py;lockPos[w2*3+2]=c.z;w2++;
+                                 lockPos[w2*3]=qx;lockPos[w2*3+1]=qy;lockPos[w2*3+2]=c.z;w2++; };
+      seg(x0,y0,x0+ax,y0); seg(x0,y0,x0,y0+ay);
+      seg(x1,y0,x1-ax,y0); seg(x1,y0,x1,y0+ay);
+      seg(x0,y1,x0+ax,y1); seg(x0,y1,x0,y1-ay);
+      seg(x1,y1,x1-ax,y1); seg(x1,y1,x1,y1-ay);
+      lockGeo.attributes.position.needsUpdate=true;
+      lockMat.opacity=W.eye*(.22+gaze.flash*.65); }                       // destella al clavarse
     /* ---- la deidad se carga: los rayos caen del contorno al iris y estallan en oleadas ---- */
     if(W.eye>.02){
       const surge=Math.pow((Math.sin(frame*.021)+1)/2,3);          // ciclo lento de carga → descarga
