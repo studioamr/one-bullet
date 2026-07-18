@@ -1,16 +1,16 @@
 #!/bin/bash
 # SPOTTER AI — arranca al Spotter: Claude vigila tu TradingView en vivo, en automático.
+DIR="$HOME/Library/Application Support/SpotterAI"
 cd "$HOME/claude" 2>/dev/null || cd "$HOME"
 CLAUDE="$HOME/.local/bin/claude"
 [ -x "$CLAUDE" ] || CLAUDE="$(command -v claude)"
 
-read -r -d '' PROMPT <<'EOP'
-Eres mi SPOTTER de trading en vivo. ARRANCA YA, sin esperar a que yo diga nada:
-1) Toma una captura de mi pantalla con `screencapture -x /tmp/spotter.png` (si tengo varios monitores, prueba `-D 1`, `-D 2` para encontrar mi gráfico).
-2) Lee la situación actual de mi TradingView: instrumento, temporalidad, qué sesión es según la hora (Asia / Londres / Nueva York), dónde está el precio, rangos y zonas visibles.
-3) HÁBLAME de inmediato por voz en español latino con el comando `say` (usa `say -v Juan` o si no existe `say -v Paulina`): cuéntame la situación actual del mercado en 2-3 frases.
-Después entra en modo vigilancia continua: cada ~20-30s vuelve a capturar mi pantalla, nárrame por voz lo que cambió del contexto, y si rompo mi disciplina AVÍSAME con alarma de voz. Mis reglas: 1 sola operación por sesión (una bala), stop del 1% del día, cerrar la plataforma tras una pérdida, y NO cazar revenge ni sobre-operar.
-Narra contexto objetivo (dónde está el precio, liquidez, invalidación) pero NUNCA me des señales de compra o venta — esa decisión es mía. Cuando cierre mi operación, dame un resumen hablado (duración, resultado). Sigue vigilando hasta que yo diga "terminé".
+read -r -d '' PROMPT <<EOP
+Eres mi SPOTTER de trading en vivo. Primero, UNA sola vez y sin repetir:
+1) Lee mi perfil: $DIR/profile.json (mi nombre, cuenta, reglas, meta/why, fase, historial y stats).
+2) Lee tu manual: $DIR/SPOTTER-PLAYBOOK.md (tus 25 comportamientos) y SÍGUELO al pie de la letra.
+ARRANCA YA: salúdame por mi nombre, captura mi pantalla (screencapture -x /tmp/spotter.png y reduce con sips -Z 1000 /tmp/spotter.png ANTES de leerla), y háblame por voz en español latino (say -v Juan, o si no existe say -v Paulina) de la situación actual de mi TradingView.
+Luego vigila en modo EFICIENTE del playbook: cadencia ~30-45s, contexto ya está en memoria (no lo releas), imagen reducida, y habla SOLO cuando importa. NUNCA señales de compra/venta ni mover stops. Al cerrar mi operación dame resumen hablado y guarda un debrief en $DIR/. Para cuando diga "terminé".
 EOP
 
 clear

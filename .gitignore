@@ -5,6 +5,7 @@
 !manifest.json
 !sw.js
 !start-watch.command
+!SPOTTER-PLAYBOOK.md
 !.gitignore
 !assets
 !vendor

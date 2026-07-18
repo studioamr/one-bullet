@@ -40,27 +40,35 @@ class Delegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDeleg
 
     // Start Session pide lanzar el Spotter (Claude Code vigilando la pantalla)
     func userContentController(_ u: WKUserContentController, didReceive message: WKScriptMessage) {
-        if message.name == "spotter" { launchSpotter() }
+        if message.name == "spotter" { launchSpotter(profile: message.body as? String ?? "") }
     }
-    func launchSpotter() {
+    func launchSpotter(profile: String) {
         guard let res = Bundle.main.resourceURL else { return }
-        let src = res.appendingPathComponent("start-watch.command")
         let fm = FileManager.default
-        // Copiamos el script a Application Support y le quitamos la cuarentena que heredó de la
-        // descarga; así Gatekeeper NO lo bloquea al abrirlo (self-heal).
+        // Carpeta de trabajo del Spotter en Application Support.
         let dir = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Library/Application Support/SpotterAI")
-        let dst = dir.appendingPathComponent("start-watch.command")
         try? fm.createDirectory(at: dir, withIntermediateDirectories: true)
-        try? fm.removeItem(at: dst)
-        do { try fm.copyItem(at: src, to: dst) } catch { return }
-        try? fm.setAttributes([.posixPermissions: 0o755], ofItemAtPath: dst.path)
+        // 1) escribir el perfil que mandó la app (para que el Spotter te conozca)
+        if !profile.isEmpty && profile != "start" {
+            try? profile.write(to: dir.appendingPathComponent("profile.json"), atomically: true, encoding: .utf8)
+        }
+        // 2) copiar script + playbook (self-heal de cuarentena para que Gatekeeper no bloquee)
+        for name in ["start-watch.command", "SPOTTER-PLAYBOOK.md"] {
+            let src = res.appendingPathComponent(name)
+            let dst = dir.appendingPathComponent(name)
+            try? fm.removeItem(at: dst)
+            try? fm.copyItem(at: src, to: dst)
+        }
+        let scriptPath = dir.appendingPathComponent("start-watch.command").path
+        try? fm.setAttributes([.posixPermissions: 0o755], ofItemAtPath: scriptPath)
         let strip = Process()
         strip.executableURL = URL(fileURLWithPath: "/usr/bin/xattr")
-        strip.arguments = ["-cr", dst.path]     // quita com.apple.quarantine y demás
+        strip.arguments = ["-cr", dir.path]     // limpia cuarentena de toda la carpeta
         try? strip.run(); strip.waitUntilExit()
+        // 3) abrir la copia limpia en Terminal → arranca Claude
         let p = Process()
         p.executableURL = URL(fileURLWithPath: "/usr/bin/open")
-        p.arguments = [dst.path]                 // abre la copia limpia en Terminal → arranca Claude
+        p.arguments = [scriptPath]
         try? p.run()
     }
 

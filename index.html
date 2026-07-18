@@ -1810,10 +1810,26 @@
   function fmtDur(ms){ const m=Math.max(0,Math.floor(ms/60000)); return m>=60?Math.floor(m/60)+"h "+(m%60)+"m":m+" min"; }
   function sesModeLoad(){try{return localStorage.getItem("candado_sesmode")||"live";}catch(e){return "live";}}
   function sesModeSave(m){try{localStorage.setItem("candado_sesmode",m);}catch(e){}}
+  // foto del perfil que el Spotter lee para conocerte (metas, reglas, cuenta, historial)
+  function spotterSnapshot(){
+    try{
+      const p=profileLoad()||{}, a=acctLoad()||{}, r=rulesLoad()||{}, h=histLoad()||[];
+      const done=h.filter(x=>x.outcome), wins=done.filter(x=>x.outcome==="GANADA");
+      const net=h.reduce((s,x)=>s+(+x.pnl||0),0);
+      return {
+        handle:p.handle||"trader",
+        firm:a.firm||null, accountSize:a.size||null, evalTarget:a.evalTarget||null,
+        risk1pct:a.size?Math.round(a.size*0.01):null, why:a.why||"",
+        rules:r, communities:p.communities||{},
+        stats:{trades:done.length, wins:wins.length, winRate:done.length?Math.round(wins.length/done.length*100):0, netPnl:Math.round(net)},
+        recent:h.slice(0,8).map(x=>({fecha:x.fecha,outcome:x.outcome,pnl:x.pnl,setup:x.setup,emotion:x.emotion,revenges:x.revenges}))
+      };
+    }catch(e){ return {handle:"trader"}; }
+  }
   function startSession(){ sessSave({phase:"live",startedAt:Date.now(),sim:sesModeLoad()==="sim"});
     try{window.open(TV_URL,"_blank","noopener");}catch(e){} // abre tu TradingView
-    // en la app nativa: lanza el Spotter (Claude Code vigilando tu pantalla)
-    try{ if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.spotter){ window.webkit.messageHandlers.spotter.postMessage("start"); } }catch(e){}
+    // en la app nativa: manda tu perfil + lanza el Spotter (Claude Code vigilando tu pantalla)
+    try{ if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.spotter){ window.webkit.messageHandlers.spotter.postMessage(JSON.stringify(spotterSnapshot())); } }catch(e){}
     mostrar("sesion"); }
   function practiceNow(){ sesModeSave("sim"); mostrar("sesion"); }
   const simBadge=s=>s.sim?`<span class="sim-badge">SIM · practice</span>`:"";
