@@ -412,6 +412,9 @@
   .gate-err{color:var(--rojo);font-size:.8rem}
 
   #field{position:fixed;inset:0;z-index:0;opacity:.9;transition:opacity .8s;pointer-events:none}
+  .eye-bg{position:fixed;left:50%;top:46%;transform:translate(-50%,-50%);width:min(80vw,940px);height:auto;z-index:0;pointer-events:none;color:var(--ink);opacity:.075}
+  #eyeBall{transition:none}
+  @media(prefers-reduced-motion:reduce){.eye-bg{opacity:.05}}
   .amr-art{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.7}
   body[data-estado="BLOQUEADO"] .amr-art{display:none}
   .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
@@ -1202,6 +1205,14 @@
 <button id="pwa-install" class="pwa-install" data-hover>⬇ Instalar la app</button>
 
   <canvas id="field"></canvas>
+  <!-- el Spotter: un ojo de fondo que te vigila (misma proporción que el ojo de la landing) -->
+  <svg class="eye-bg" aria-hidden="true" viewBox="0 0 440 200" preserveAspectRatio="xMidYMid meet">
+    <ellipse cx="220" cy="100" rx="200" ry="91" fill="none" stroke="currentColor" stroke-width="1.7" opacity=".55"/>
+    <g id="eyeBall">
+      <circle cx="220" cy="100" r="56" fill="none" stroke="var(--accent)" stroke-width="1.7" opacity=".7"/>
+      <circle cx="220" cy="100" r="21" fill="var(--accent)" opacity=".55"/>
+    </g>
+  </svg>
   <svg class="amr-art" id="amrArt" aria-hidden="true" viewBox="0 0 1200 1600" preserveAspectRatio="xMidYMid slice">
     <defs>
       <filter id="amrInk" x="-25%" y="-25%" width="150%" height="150%">
@@ -1896,7 +1907,7 @@
       consistency:(a.consistency!=null?a.consistency:r.consistency),
       minDays:(a.minDays!=null?a.minDays:r.minDays) }; }
   function guardStats(){ const g=guardLoad(), size=g.size;
-    const h=histLoad().filter(x=>!x.sim&&x.pnl!=null).slice().sort((a,b)=>(a.fecha||"").localeCompare(b.fecha||""));
+    const h=currentTrades(); // solo la cuenta VIVA: al pasar el eval la cuenta reinicia en el tamaño base
     let eq=size, peak=size; const dayPnl={};
     h.forEach(x=>{ eq+=x.pnl; if(eq>peak)peak=eq; dayPnl[x.fecha]=(dayPnl[x.fecha]||0)+x.pnl; });
     const dd=Math.max(0,peak-eq), todayPnl=dayPnl[hoy()]||0, days=Object.keys(dayPnl).length;
@@ -1930,7 +1941,7 @@
       <p class="home-note">Your <b>${g.phaseLabel.toLowerCase()}</b> rules, auto-applied · distances from your journal. Adjust in Settings — confirm with your plan, every firm differs.</p></div>`; }
   /* Equity curve + blow-up line (trailing-peak drawdown − max DD) */
   function equityCard(){ const g=guardLoad(), size=g.size, maxDD$=Math.round(size*g.maxDD);
-    const h=histLoad().filter(x=>!x.sim&&x.pnl!=null).slice().sort((a,b)=>(a.fecha||"").localeCompare(b.fecha||""));
+    const h=currentTrades(); // solo la cuenta VIVA: al pasar el eval la cuenta reinicia en el tamaño base
     if(h.length<2||maxDD$<=0)return "";
     let eq=size,peak=size,worstDD=0,closest=maxDD$; const eqS=[size],flS=[size-maxDD$],dayMap={};
     h.forEach(x=>{ eq+=x.pnl; if(eq>peak)peak=eq; const floor=peak-maxDD$; eqS.push(eq); flS.push(floor);
@@ -1954,7 +1965,7 @@
       `<polygon points="${eqArea}" fill="url(#${gid})"/>`+
       `<polyline points="${eqPts}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`+
       `<circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="4" fill="var(--accent)"/></svg>`;
-    return `<div class="p-card"><div class="c-t">Your equity vs the blow-up <span class="room-agg">red line = drawdown limit</span></div>
+    return `<div class="p-card"><div class="c-t">Your equity vs the blow-up <span class="room-agg">${evalPassSplit().passed?`funded account · restarted at $${size.toLocaleString("en-US")}`:"red line = drawdown limit"}</span></div>
       ${svg}
       <div class="eq-legend"><span><i class="eq-dot acc"></i>Your equity</span><span><i class="eq-dot dn"></i>Blow-up (peak − $${maxDD$.toLocaleString("en-US")})</span></div>
       ${survival!=null?`<div class="eq-survival ${svClass}"><span class="sv-n">${survival}</span><div><b>days of margin</b><small>you can take ~${survival} ${survival===1?"day":"days"} of $${badDay.toLocaleString("en-US")} (${svLabel}) before the blow-up</small></div></div>`:""}
@@ -1990,6 +2001,17 @@
   function poutLoad(){try{return JSON.parse(localStorage.getItem("candado_payouts"))||[];}catch(e){return[];}}
   function poutSave(p){try{localStorage.setItem("candado_payouts",JSON.stringify(p));}catch(e){}}
   function totalProfit(){ return NPtrades().filter(t=>t.pnl!=null&&!t.sim).reduce((a,t)=>a+t.pnl,0); }
+  /* REGLA REAL: al pasar el eval, la cuenta fondeada ARRANCA otra vez en el tamaño base
+     (los $50k) — el profit del eval no se hereda. Partimos el journal en ese punto. */
+  function evalPassSplit(){
+    const acc=acctLoad()||{}, tgt=acc.evalTarget||1000;
+    const h=histLoad().filter(x=>!x.sim&&x.pnl!=null).slice().sort((a,b)=>(a.fecha||"").localeCompare(b.fecha||""));
+    let cum=0, idx=-1;
+    for(let i=0;i<h.length;i++){ cum+=h[i].pnl||0; if(cum>=tgt){ idx=i; break; } }
+    return { all:h, passed:idx>=0, evalTrades:idx>=0?h.slice(0,idx+1):h, fundedTrades:idx>=0?h.slice(idx+1):[] };
+  }
+  function currentTrades(){ const s=evalPassSplit(); return s.passed?s.fundedTrades:s.evalTrades; } // la cuenta VIVA
+  function currentProfit(){ return currentTrades().reduce((a,t)=>a+(t.pnl||0),0); }
   function avgGreen(){ const w=NPtrades().filter(t=>t.pnl>0&&!t.sim); return w.length?w.reduce((a,t)=>a+t.pnl,0)/w.length:0; }
   function simProfit(){ return NPtrades().filter(t=>t.pnl!=null&&t.sim).reduce((a,t)=>a+t.pnl,0); }
   function firmar(){ try{localStorage.setItem("candado_pledge",hoy());}catch(e){} if(vistaActual==="progreso")mostrar("progreso"); }
@@ -2048,8 +2070,9 @@
   function youRacer(){
     const name=profileLoad().handle||"trader";
     const prof=totalProfit(), acc=acctLoad()||{evalTarget:1000,size:50000}, tgt=acc.evalTarget||1000, size=acc.size||50000, cashedN=poutLoad().length;
-    if(cashedN>0) return {u:name,you:true,phase:"payout",balance:size+prof,payouts:cashedN};
-    if(prof>=tgt) return {u:name,you:true,phase:"funded",balance:size+prof,bufferPct:Math.min(100,Math.round((prof-tgt)/(tgt*0.6)*100))};
+    const live=currentProfit(); // al pasar el eval la cuenta reinicia en el tamaño base: el balance cuenta desde ahí
+    if(cashedN>0) return {u:name,you:true,phase:"payout",balance:size+live,payouts:cashedN};
+    if(prof>=tgt) return {u:name,you:true,phase:"funded",balance:size+live,bufferPct:Math.min(100,Math.round(Math.max(0,live)/(tgt*0.6)*100))};
     return {u:name,you:true,phase:"eval",balance:size+prof,evalPct:Math.max(0,Math.min(100,Math.round(prof/tgt*100)))};
   }
   /* ---------- Community: join a REAL crew with a shared code (no bots) ---------- */
@@ -2711,7 +2734,7 @@
     const cp=progLoad(), lc=allLessons(), cpct=lc.length?Math.round(lc.filter(l=>cp[l.id]).length/lc.length*100):0;
     const items=NAV.map(it=>it.group?`<div class="nav-group">${it.group}</div>`
       :`<button class="navitem" data-route="${it.r}" data-hover><span>${it.label}</span>${it.r==="course"?`<span class="nav-badge">${cpct}%</span>`:""}</button>`).join("");
-    $("#sidebar").innerHTML=`<div class="sb-brand"><svg viewBox="0 0 32 32" class="brand-mark" aria-hidden="true"><g class="spin"><circle cx="16" cy="16" r="12.6" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".4"/><path d="M16 3.4v4.4M16 24.2v4.4M3.4 16h4.4M24.2 16h4.4" stroke="currentColor" stroke-width="1.4" opacity=".4" stroke-linecap="round"/></g><circle class="lock" cx="16" cy="16" r="5.4" fill="none" stroke="var(--accent)" stroke-width="1.35"/><circle cx="16" cy="16" r="2.2" fill="var(--accent)"/></svg>SPOTTER <i>AI</i></div>${userLoad()?`<div class="trial-badge">Full access</div>`:""}
+    $("#sidebar").innerHTML=`<div class="sb-brand"><svg viewBox="0 0 32 32" class="brand-mark" aria-hidden="true"><ellipse cx="16" cy="16" rx="13.2" ry="6" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".45"/><circle class="lock" cx="16" cy="16" r="3.7" fill="none" stroke="var(--accent)" stroke-width="1.35"/><circle cx="16" cy="16" r="1.5" fill="var(--accent)"/></svg>SPOTTER <i>AI</i></div>${userLoad()?`<div class="trial-badge">Full access</div>`:""}
       <button class="sb-profile" data-route="profile" data-hover><span class="tb-av">${(name.trim()[0]||"T").toUpperCase()}</span><span class="sb-pinfo"><b>${esc(name)}</b><small>your profile</small></span></button>
       <nav class="navlist">${items}</nav>
       <div class="sb-foot"><button class="navitem" data-route="settings" data-hover><span>Settings</span></button><a class="navitem" href="${DISCORD}" target="_blank" rel="noopener" data-hover><span>Discord →</span></a></div>`;
@@ -2807,7 +2830,7 @@
     const d=ONB.data, s=ONB.step, last=ONB_STEPS.length-1;
     const prog=`<div class="onb-prog">${ONB_STEPS.map((_,i)=>`<span class="${i<=s?"on":""}"></span>`).join("")}</div>`;
     let body="";
-    if(s===0) body=`<div class="onb-brand"><svg viewBox="0 0 32 32" class="brand-mark" aria-hidden="true"><g class="spin"><circle cx="16" cy="16" r="12.6" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".4"/><path d="M16 3.4v4.4M16 24.2v4.4M3.4 16h4.4M24.2 16h4.4" stroke="currentColor" stroke-width="1.4" opacity=".4" stroke-linecap="round"/></g><circle class="lock" cx="16" cy="16" r="5.4" fill="none" stroke="var(--accent)" stroke-width="1.35"/><circle cx="16" cy="16" r="2.2" fill="var(--accent)"/></svg>SPOTTER <i>AI</i></div>
+    if(s===0) body=`<div class="onb-brand"><svg viewBox="0 0 32 32" class="brand-mark" aria-hidden="true"><ellipse cx="16" cy="16" rx="13.2" ry="6" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".45"/><circle class="lock" cx="16" cy="16" r="3.7" fill="none" stroke="var(--accent)" stroke-width="1.35"/><circle cx="16" cy="16" r="1.5" fill="var(--accent)"/></svg>SPOTTER <i>AI</i></div>
       <h1 class="onb-h">From zero<br>to <em>payout.</em></h1>
       <p class="onb-p">Two minutes to set up your platform — your profile, your rules, your room. Everything stays yours and editable.</p>
       <button class="btn fill lg" data-onb="next" data-hover>Start →</button>`;
@@ -2898,6 +2921,16 @@
       bar.innerHTML=`<span class="lb-dot"></span><b>LIVE</b> · ${esc(d.title||"André is streaming")} · ${plat} <span class="lb-cta">Watch now →</span>`;
     }else if(bar){ bar.remove(); }
   }
+  /* --- the Spotter's eye: the pupil tracks your cursor; when you stop, it drifts on its own --- */
+  (function(){ const g=document.getElementById("eyeBall"); if(!g)return;
+    let tx=0,ty=0,cx=0,cy=0,idle=999;
+    addEventListener("mousemove",e=>{ tx=((e.clientX/innerWidth)-.5)*2; ty=((e.clientY/innerHeight)-.5)*2; idle=0; },{passive:true});
+    (function loop(){ idle++;
+      if(idle>200){ const t=Date.now()*0.00035; tx=Math.cos(t)*.55; ty=Math.sin(t*0.8)*.4; } // a wandering gaze
+      cx+=((tx*104)-cx)*.055; cy+=((ty*30)-cy)*.055;   // the iris moves INSIDE the eye
+      g.setAttribute("transform","translate("+cx.toFixed(1)+","+cy.toFixed(1)+")");
+      requestAnimationFrame(loop); })();
+  })();
   window.__liveStatus=applyLive;                 // the native app injects the status here
   /* --- session auto-detection + global hotkey ⌘⇧B (injected by the native app) --- */
   window.__tradingDetected=function(platform){ try{
