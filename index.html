@@ -938,7 +938,7 @@
   .sb-u{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .sb-pnl{font-variant-numeric:tabular-nums;font-weight:600}
   .sb-meta{color:var(--ink1);font-size:.78rem;font-variant-numeric:tabular-nums;min-width:78px;text-align:right}
-  .trades-head{display:flex;justify-content:flex-end;margin-bottom:14px}
+  .trades-head{display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px}
   .tr-edit{cursor:pointer;color:var(--ink1);text-align:center;width:34px;transition:color .15s}.tr-edit:hover{color:var(--accent)}
   .trade-card{max-width:520px}
   .trade-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
@@ -947,6 +947,19 @@
   .trade-form label.td-rev input{width:auto}
   .trade-form input,.trade-form select{background:#000;border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:9px 10px;font:inherit;font-size:.92rem}
   .trade-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .guard-card .grd-row{margin:12px 0}
+  .grd-top{display:flex;justify-content:space-between;gap:10px;font-size:.86rem;margin-bottom:6px}.grd-top span{color:var(--ink1)}.grd-top b{color:var(--ink);font-variant-numeric:tabular-nums;text-align:right}
+  .grd-bar{height:7px;border-radius:99px;background:rgba(244,241,234,.08);overflow:hidden}
+  .grd-bar span{display:block;height:100%;border-radius:99px;transition:width .4s var(--ease)}
+  .guard-edit span{font-size:.78rem}.guard-edit input{width:100%}
+  .pm-card{background:linear-gradient(180deg,rgba(61,134,207,.06),transparent);border-color:rgba(61,134,207,.22)}
+  .pm-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  .pm-k{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink1)}
+  .pm-h{font-family:var(--serif);font-size:1.35rem;margin-top:2px}
+  .pm-evs{display:flex;flex-wrap:wrap;gap:8px 16px;margin:12px 0}
+  .pm-ev{display:inline-flex;align-items:center;gap:7px;font-size:.86rem;color:var(--ink)}
+  .pm-none{font-size:.86rem;color:var(--ink1)}
+  .pm-leak{font-size:.86rem;color:#C9A24B;margin-bottom:4px}.pm-leak b{color:#C9A24B}
   .comm2{gap:14px}
   .room-pulse{padding:20px 22px}
   .rp-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
@@ -1466,7 +1479,7 @@
   /* ---------- events ---------- */
   document.addEventListener("click",e=>{
     const b=e.target.closest("button[data-a]");if(!b)return;
-    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,shareshot:sealPoster,tradenew:tradeNew,tradesave:tradeSave,tradedel:tradeDelete,dismissnudge:()=>{TRADING_NUDGE="";statusPush(sessLoad().phase||"ready");mostrar(vistaActual);},addinvest:addInvest,replayonb:startOnb,createlobby:battleLobby,practicenow:practiceNow,joinrace:()=>{raceJoin();mostrar("progreso");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,spkr:spkToggle,wallpost:()=>{const i=$("#wall-input"),v=i&&i.value.trim();if(v){supaPost(v);if(i)i.value="";}},invite:()=>{try{window.open("https://wa.me/?text="+encodeURIComponent("Prueba SPOTTER AI conmigo — la plataforma de trading con disciplina: https://studioamr.github.io/spotter-ai/landing.html"),"_blank");}catch(e){}},logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
+    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,shareshot:sealPoster,tradenew:tradeNew,tradesave:tradeSave,tradedel:tradeDelete,csvimport:csvImportClick,pmspeak:()=>spkr(premarketText()),dismissnudge:()=>{TRADING_NUDGE="";statusPush(sessLoad().phase||"ready");mostrar(vistaActual);},addinvest:addInvest,replayonb:startOnb,createlobby:battleLobby,practicenow:practiceNow,joinrace:()=>{raceJoin();mostrar("progreso");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,spkr:spkToggle,wallpost:()=>{const i=$("#wall-input"),v=i&&i.value.trim();if(v){supaPost(v);if(i)i.value="";}},invite:()=>{try{window.open("https://wa.me/?text="+encodeURIComponent("Prueba SPOTTER AI conmigo — la plataforma de trading con disciplina: https://studioamr.github.io/spotter-ai/landing.html"),"_blank");}catch(e){}},logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
   });
   document.addEventListener("input",e=>{ if(!e.target)return;
     if(ONB&&e.target.id&&e.target.id.startsWith("onb-")){ const d=ONB.data, id=e.target.id, v=e.target.value;
@@ -1491,7 +1504,10 @@
       else if(e.target.id==="acct-firm")a.firm=e.target.value;
       else if(e.target.id==="acct-size")a.size=parseFloat(e.target.value)||0;
       else if(e.target.id==="acct-target")a.evalTarget=parseFloat(e.target.value)||0;
-      acctSave(a);}});
+      acctSave(a);}
+    else if(e.target.id&&e.target.id.indexOf("guard-")===0){ const a=acctLoad()||{firm:"Tradeify",size:50000,evalTarget:1000}; const v=parseFloat(e.target.value)||0;
+      if(e.target.id==="guard-daily")a.dailyLoss=Math.max(0,v)/100; else if(e.target.id==="guard-maxdd")a.maxDD=Math.max(0,v)/100; else if(e.target.id==="guard-cons")a.consistency=Math.max(0,v)/100; else if(e.target.id==="guard-mindays")a.minDays=Math.max(0,Math.round(v));
+      acctSave(a); }});
   document.addEventListener("change",e=>{ if(!e.target)return;
     if(e.target.id==="ses-setup"){sessRecord({setup:e.target.value||null});}
     else if(e.target.id==="ses-emotion"){sessRecord({emotion:e.target.value||null});}
@@ -1599,6 +1615,29 @@
   }
   function tradeDelete(){ const id=EDITING_TRADE; if(!id)return; if(!confirm("¿Borrar este trade? No se puede deshacer."))return;
     histSave(histLoad().filter(x=>x.id!==id)); supaUpsert(); closeTradeModal(); mostrar("trades"); }
+  /* ---------- Importar CSV (Tradovate/TradingView/etc.) ---------- */
+  function csvImportClick(){ let inp=document.getElementById("csv-input");
+    if(!inp){ inp=document.createElement("input"); inp.type="file"; inp.accept=".csv,text/csv"; inp.id="csv-input"; inp.style.display="none"; inp.addEventListener("change",csvImportFile); document.body.appendChild(inp); }
+    inp.value=""; inp.click(); }
+  function csvImportFile(e){ const f=e.target.files&&e.target.files[0]; if(!f)return;
+    const r=new FileReader(); r.onload=()=>{ try{ csvParseAndAdd(String(r.result)); }catch(err){ alert("No pude leer el CSV. Necesita una columna de fecha y una de P&L."); } }; r.readAsText(f); }
+  function csvSplit(line){ const out=[]; let cur="",q=false; for(let i=0;i<line.length;i++){ const c=line[i];
+    if(c==='"'){ if(q&&line[i+1]==='"'){cur+='"';i++;} else q=!q; } else if(c===","&&!q){ out.push(cur); cur=""; } else cur+=c; } out.push(cur); return out.map(s=>s.trim()); }
+  function csvDate(s){ s=(s||"").trim(); if(!s)return null; let m=s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/); if(m)return m[1]+"-"+m[2].padStart(2,"0")+"-"+m[3].padStart(2,"0");
+    m=s.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/); if(m)return m[3]+"-"+m[1].padStart(2,"0")+"-"+m[2].padStart(2,"0");
+    const d=new Date(s); if(!isNaN(d.getTime()))return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); return null; }
+  function csvNum(s){ s=(s||"").replace(/[$\s,]/g,""); let neg=false; if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1);} if(/-$/.test(s)){neg=true;s=s.replace(/-$/,"");} const n=parseFloat(s); if(isNaN(n))return null; return neg?-Math.abs(n):n; }
+  function csvParseAndAdd(text){ const lines=text.split(/\r?\n/).filter(l=>l.trim()); if(lines.length<2){ alert("El CSV está vacío o sin filas de datos."); return; }
+    const header=csvSplit(lines[0]).map(h=>h.toLowerCase());
+    const dateCol=header.findIndex(h=>/date|fecha|day|opened|closed|time/.test(h));
+    const pnlCol=header.findIndex(h=>/p&l|p\/l|pnl|pl$|profit|net|realized|result|gain/.test(h));
+    if(dateCol<0||pnlCol<0){ alert("No encontré columnas de fecha y P&L.\nEncabezados en tu CSV: "+header.join(", ")+"\n\nNecesito una columna con 'date/fecha' y una con 'pnl/profit/net'."); return; }
+    const h=histLoad(); let added=0,skipped=0;
+    for(let i=1;i<lines.length;i++){ const c=csvSplit(lines[i]); const fecha=csvDate(c[dateCol]), pnl=csvNum(c[pnlCol]);
+      if(!fecha||pnl===null){ skipped++; continue; }
+      h.push({id:uid(),fecha,outcome:pnl>=0?"GANADA":"BLOQUEADO",pnl,durMin:null,setup:null,emotion:null,revenges:0,notes:"",sim:false,imported:true}); added++; }
+    h.sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||"")); histSave(h); supaUpsert();
+    alert("Importados "+added+" trades"+(skipped?" · "+skipped+" filas saltadas (sin fecha o P&L válidos)":"")+"."); mostrar("trades"); }
   function money(n){ if(n==null||isNaN(n))return "—"; const s=n<0?"−":(n>0?"+":""); return s+"$"+Math.abs(Math.round(n)).toLocaleString("en-US"); }
   function pf_txt(pf){ return pf===Infinity?"∞":pf.toFixed(2); }
   function groupBy(arr,fn){ const m={}; arr.forEach(t=>{const k=fn(t); if(k==null||k==="")return; (m[k]=m[k]||[]).push(t);}); return m; }
@@ -1706,7 +1745,7 @@
     <div class="p-card">${calendarFull(calMonth)}</div>`; }
 
   function viewTrades(){ ensureTradeIds(); const all=NPtrades();
-    const head=`<div class="trades-head"><button class="btn fill" data-a="tradenew" data-hover>+ Agregar trade</button></div>`;
+    const head=`<div class="trades-head"><button class="btn" data-a="csvimport" data-hover>⇪ Importar CSV</button><button class="btn fill" data-a="tradenew" data-hover>+ Agregar trade</button></div>`;
     const modals=`<div id="trade-modal" class="spot-modal" hidden></div><div id="spot-modal" class="spot-modal" hidden></div>`;
     if(!all.length)return head+emptyState("Aún no hay trades. Cada sesión sellada se registra aquí — o agrega los tuyos con “+ Agregar trade”. Toca cualquier fila para editar o borrar.")+modals;
     return head+`<table class="tbl"><thead><tr><th>Date</th><th>Result</th><th>Dur.</th><th>P&L</th><th>Setup</th><th>Emotion</th><th>Rev.</th><th>Spotter</th><th></th></tr></thead><tbody>`+
@@ -1890,6 +1929,68 @@
   const PLEDGE="I commit to respecting this structure above any emotional impulse. Profitability is not luck — it is the result of following my risk rules and my schedule without exception. One bullet a session. If I win, I stop. If I lose, I close and come back cold. I show up, I follow the plan, and I trade until I cash the payout. My discipline is my financial freedom.";
   function acctLoad(){try{return JSON.parse(localStorage.getItem("candado_account"))||null;}catch(e){return null;}}
   function acctSave(a){try{localStorage.setItem("candado_account",JSON.stringify(a));}catch(e){}}
+  /* ---------- Motor de reglas de fondeadora + guardián de blow-up ---------- */
+  /* valores TÍPICOS como % del tamaño de cuenta — editables; el usuario confirma con su firma */
+  const FIRM_PRESETS={
+    "Tradeify":     {dailyLoss:0.03, maxDD:0.06,  consistency:0.20, minDays:0},
+    "Lucid Trading":{dailyLoss:0.03, maxDD:0.045, consistency:0.30, minDays:0},
+    "Lucid":        {dailyLoss:0.03, maxDD:0.045, consistency:0.30, minDays:0},
+    "Apex":         {dailyLoss:0,    maxDD:0.06,  consistency:0.30, minDays:0},
+    "Topstep":      {dailyLoss:0.02, maxDD:0.04,  consistency:0.50, minDays:2},
+    "_default":     {dailyLoss:0.03, maxDD:0.06,  consistency:0.30, minDays:0}
+  };
+  function firmPreset(f){ return FIRM_PRESETS[f]||FIRM_PRESETS._default; }
+  function guardLoad(){ const a=acctLoad()||{}, p=firmPreset(a.firm);
+    return { firm:a.firm||"tu firma", size:a.size||50000,
+      dailyLoss:(a.dailyLoss!=null?a.dailyLoss:p.dailyLoss),
+      maxDD:(a.maxDD!=null?a.maxDD:p.maxDD),
+      consistency:(a.consistency!=null?a.consistency:p.consistency),
+      minDays:(a.minDays!=null?a.minDays:p.minDays) }; }
+  function guardStats(){ const g=guardLoad(), size=g.size;
+    const h=histLoad().filter(x=>!x.sim&&x.pnl!=null).slice().sort((a,b)=>(a.fecha||"").localeCompare(b.fecha||""));
+    let eq=size, peak=size; const dayPnl={};
+    h.forEach(x=>{ eq+=x.pnl; if(eq>peak)peak=eq; dayPnl[x.fecha]=(dayPnl[x.fecha]||0)+x.pnl; });
+    const dd=Math.max(0,peak-eq), todayPnl=dayPnl[hoy()]||0, days=Object.keys(dayPnl).length;
+    const totalProfit=eq-size, bestDay=Object.values(dayPnl).reduce((m,v)=>Math.max(m,v),0);
+    return { g, size, eq, peak, dd, todayPnl, days, totalProfit, bestDay,
+      dailyLoss$:Math.round(size*g.dailyLoss), maxDD$:Math.round(size*g.maxDD) }; }
+  // devuelve la regla MÁS cercana a romperse (para el aviso en sesión)
+  function guardClosest(){ const s=guardStats(), risks=[];
+    if(s.dailyLoss$>0){ const used=Math.max(0,-s.todayPnl), frac=used/s.dailyLoss$; risks.push({k:"daily",frac,room:s.dailyLoss$-used,txt:"límite diario"}); }
+    if(s.maxDD$>0){ const frac=s.dd/s.maxDD$; risks.push({k:"dd",frac,room:s.maxDD$-s.dd,txt:"drawdown máximo"}); }
+    risks.sort((a,b)=>b.frac-a.frac); return risks[0]||null; }
+  function guardWarning(){ const r=guardClosest(); if(!r||r.frac<0.6)return ""; const red=r.frac>=0.85;
+    return `<div class="p-card tilt-warn"${red?"":` style="background:rgba(201,162,75,.09);border-color:rgba(201,162,75,.45)"`}><b${red?"":' style="color:#C9A24B"'}>⚠ ${red?"Cuidado":"Ojo"} con tu ${r.txt}.</b> Te quedan <b>$${Math.max(0,Math.round(r.room)).toLocaleString("en-US")}</b> de margen. ${red?"Un trade más y puedes romper la cuenta — cierra.":"Baja el tamaño y sé selectivo."}</div>`; }
+  function guardMeter(label,frac,detail,invert){ frac=Math.max(0,Math.min(1,frac||0));
+    const st=invert?(frac>=1?"ok":frac>=.5?"warn":"bad"):(frac>=.85?"bad":frac>=.6?"warn":"ok");
+    const col=st==="bad"?"var(--rojo)":st==="warn"?"#C9A24B":"#35c46f";
+    return `<div class="grd-row"><div class="grd-top"><span>${label}</span><b>${detail}</b></div><div class="grd-bar"><span style="width:${Math.round(frac*100)}%;background:${col}"></span></div></div>`; }
+  function guardCard(){ const s=guardStats(), g=s.g, rows=[];
+    if(s.dailyLoss$>0){ const used=Math.max(0,-s.todayPnl), room=s.dailyLoss$-used;
+      rows.push(guardMeter("Límite de pérdida diaria",used/s.dailyLoss$,`$${Math.max(0,Math.round(room)).toLocaleString("en-US")} de margen hoy · máx $${s.dailyLoss$.toLocaleString("en-US")}`)); }
+    if(s.maxDD$>0){ const room=s.maxDD$-s.dd;
+      rows.push(guardMeter("Drawdown (distancia al blow-up)",s.dd/s.maxDD$,`$${Math.max(0,Math.round(room)).toLocaleString("en-US")} antes de romper · máx $${s.maxDD$.toLocaleString("en-US")}`)); }
+    if(g.consistency>0&&s.totalProfit>0){ const share=s.bestDay/s.totalProfit;
+      rows.push(guardMeter("Regla de consistencia",share/g.consistency,`tu mejor día = ${Math.round(share*100)}% del total · máx ${Math.round(g.consistency*100)}%`)); }
+    if(g.minDays>0){ rows.push(guardMeter("Días mínimos de trading",s.days/g.minDays,`${s.days} de ${g.minDays} días`,true)); }
+    if(!rows.length)return "";
+    return `<div class="p-card guard-card"><div class="c-t">Reglas de ${esc(g.firm)} <span class="room-agg">guardián de blow-up</span></div>
+      ${rows.join("")}
+      <p class="home-note">Distancias calculadas de tu journal. Los límites son <b>editables en Settings</b> — confírmalos con tu fondeadora, cada plan cambia.</p></div>`; }
+  /* ---------- Brief de premarket (calendario + tu fuga + plan) ---------- */
+  function todayEcon(){ const idx=new Date().getDay()-1; if(idx<0||idx>4)return []; return (HOME_DATA.econ[idx]||{}).events||[]; }
+  function premarketText(){ const name=spotName(), ev=todayEcon(), leak=topLeak(), highs=ev.filter(e=>e[2]==="high");
+    let t="Buenos días, "+name+". ";
+    if(highs.length)t+="Hoy hay "+highs.map(e=>e[0]+" a las "+e[1]).join(", y ")+", alto impacto. Cuidado alrededor de esas horas. ";
+    else if(ev.length)t+="Hoy no hay eventos de alto impacto marcados. ";
+    if(leak)t+=leak.voz+" ";
+    return t+"Una sola bala, tu setup A más, stop al uno por ciento. Espera tu entrada."; }
+  function premarketBrief(){ const ev=todayEcon(), leak=topLeak();
+    const evHtml=ev.length?ev.map(e=>`<span class="pm-ev"><span class="imp imp-${e[2]}"></span>${esc(e[0])} · ${e[1]} ET</span>`).join(""):`<span class="pm-none">Sin eventos de alto impacto marcados hoy</span>`;
+    return `<div class="p-card pm-card"><div class="pm-top"><div><div class="pm-k">Brief de premarket · Spotter</div><h3 class="pm-h">Antes de la apertura.</h3></div><button class="btn accent" data-a="pmspeak" data-hover>▶ Escuchar</button></div>
+      <div class="pm-evs">${evHtml}</div>
+      ${leak?`<div class="pm-leak">⚠ Hoy el Spotter vigila: <b>${esc(leak.txt)}</b></div>`:""}
+      <p class="home-note">Una bala, tu A+, stop 1%. El brief junta el calendario económico y tu journal.</p></div>`; }
   function poutLoad(){try{return JSON.parse(localStorage.getItem("candado_payouts"))||[];}catch(e){return[];}}
   function poutSave(p){try{localStorage.setItem("candado_payouts",JSON.stringify(p));}catch(e){}}
   function totalProfit(){ return NPtrades().filter(t=>t.pnl!=null&&!t.sim).reduce((a,t)=>a+t.pnl,0); }
@@ -2023,6 +2124,7 @@
       ${tradeNudgeBanner()}
       <div class="home-hero"><h1 class="home-h1">Hi, <input id="pf-handle" class="hero-name" value="${esc(name)}" placeholder="trader">.</h1><p class="home-tag">Your trading platform — learn the system, take the one bullet, and measure your path to payout.</p></div>
       ${welcomeBack()}
+      ${premarketBrief()}
       ${sec("For you",forYou)}
       ${sec("Economic calendar",econ)}
       ${sec("Recommended prop firms",firms)}
@@ -2166,6 +2268,7 @@
     const tilt=already?`<div class="p-card tilt-warn"><b>⚠ Ya disparaste tu bala hoy${already.outcome==="GANADA"?" y la ganaste":""}.</b> Otra entrada hoy es ${already.outcome==="GANADA"?"sobre-operar":"revenge"}. El Spotter te recomienda cerrar. Una bala.</div>`:"";
     return `<div class="sess-live">
       ${tilt}
+      ${s.sim?"":guardWarning()}
       <div class="p-card sl-top"><div class="sl-status"><span class="sl-dot"></span> Phase 1 · live · <b>Spotter monitoring</b>${simBadge(s)}</div><div class="sl-time" id="sl-time">0m</div></div>
       <div class="ses-grid">
         <div class="p-card ses-main">
@@ -2181,6 +2284,7 @@
   }
   function sesFase2(s){
     return `<div class="sess-live">
+      ${s.sim?"":guardWarning()}
       <div class="p-card sl-top"><div class="sl-status"><span class="sl-dot fired"></span> Phase 2 · bullet fired · <b>trade open</b>${simBadge(s)}</div><div class="sl-time" id="sl-trade">0m</div></div>
       <div class="ses-grid">
         <div class="p-card ses-main">
@@ -2464,6 +2568,7 @@
           <div class="rc-run me" data-pos="${pos.toFixed(1)}" style="left:2%;background:${ph.c}">${initials(you.u)}</div></div>
         <p class="home-note">${you.phase==="eval"?`$${toGo.toLocaleString("en-US")} of profit to clear the eval — then you're funded, and then Eden: the payout zone.`:you.phase==="funded"?"Funded. Build the buffer and your first payout opens Eden.":"Eden — you're cashing. Keep the discipline, keep withdrawing."}</p>
       </div>
+      ${guardCard()}
       ${seasonCard()}
       ${(()=>{ if(you.phase!=="eval")return""; const avg=avgGreen(), left=avg>0?Math.ceil(toGo/avg):null;
         return `<div class="p-card pace-card"><div class="c-t">Tu ritmo <span class="room-agg">al paso actual</span></div>
@@ -2630,6 +2735,10 @@
         <div class="acct-edit"><span>Handle <input id="pf-handle" value="${esc(name)}" placeholder="your handle"></span></div></div>
       <div class="p-card"><div class="c-t">Trading account</div>
         <div class="acct-edit"><span>Firm <input id="acct-firm" value="${esc(a.firm||"")}"></span><span>Size $<input id="acct-size" type="number" value="${a.size||50000}"></span><span>Eval target $<input id="acct-target" type="number" value="${a.evalTarget||1000}"></span></div></div>
+      ${(()=>{ const g=guardLoad(); return `<div class="p-card"><div class="c-t">Reglas de tu fondeadora <span class="room-agg">el guardián las usa en vivo</span></div>
+        <div class="onb-row" style="margin-bottom:12px">${["Tradeify","Lucid","Apex","Topstep"].map(f=>`<button class="onb-pill" data-firmpreset="${f}" data-hover>${f}</button>`).join("")}</div>
+        <div class="acct-edit guard-edit"><span>Pérdida diaria máx % <input id="guard-daily" type="number" step="0.1" value="${(g.dailyLoss*100).toFixed(1)}"></span><span>Drawdown máx % <input id="guard-maxdd" type="number" step="0.1" value="${(g.maxDD*100).toFixed(1)}"></span><span>Consistencia máx % <input id="guard-cons" type="number" step="1" value="${Math.round(g.consistency*100)}"></span><span>Días mínimos <input id="guard-mindays" type="number" step="1" value="${g.minDays}"></span></div>
+        <p class="home-note">% del tamaño de cuenta. Pon 0 para desactivar una regla. <b>Confírmalos con tu firma</b> — cada plan cambia.</p></div>`; })()}
       <div class="p-card"><div class="c-t">Data</div>
         <div class="sl-actions"><button class="btn" data-a="replayonb" data-hover>Replay setup</button>
         <a class="btn" href="landing.html" target="_blank" rel="noopener" data-hover>Course page →</a>
@@ -2724,6 +2833,7 @@
     if(e.target.closest("[data-spotclose]")||e.target.id==="spot-modal"){const m=document.getElementById("spot-modal");if(m){m.hidden=true;m.innerHTML="";}return;}
     const te=e.target.closest("[data-tedit]"); if(te){tradeEdit(te.dataset.tedit);return;}
     if(e.target.closest("[data-tradeclose]")||e.target.id==="trade-modal"){closeTradeModal();return;}
+    const fp=e.target.closest("[data-firmpreset]"); if(fp){const f=fp.dataset.firmpreset,p=firmPreset(f),a=acctLoad()||{size:50000,evalTarget:1000};a.firm=f;a.dailyLoss=p.dailyLoss;a.maxDD=p.maxDD;a.consistency=p.consistency;a.minDays=p.minDays;acctSave(a);mostrar("settings");return;}
     const a=e.target.closest("[data-route]"); if(a){mostrar(a.dataset.route);return;}
     const les=e.target.closest("[data-lesson]"); if(les){courseLesson=les.dataset.lesson;mostrar("course");return;}
     if(e.target.closest("[data-back]")){courseLesson=null;mostrar("course");return;}
