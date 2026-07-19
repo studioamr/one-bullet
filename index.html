@@ -109,6 +109,23 @@
   @media(prefers-reduced-motion:reduce){.bub{animation:none}}
   .pp-mix{display:flex;flex-direction:column;gap:3px;margin-top:10px;padding-top:9px;border-top:1px solid var(--line)}
   .pp-mix span{font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:var(--ink2)}
+  /* ---- duelo 1v1 ---- */
+  .du-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:620px){.du-grid{grid-template-columns:1fr}}
+  .du-side{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--bg1)}
+  .du-side.me{border-color:rgba(61,134,207,.45);background:rgba(61,134,207,.06)}
+  .du-side.pend{opacity:.6;display:flex;flex-direction:column;justify-content:center;min-height:150px}
+  .du-h{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+  .du-pnl{font-family:var(--serif);font-size:1.9rem;margin:5px 0 10px;font-variant-numeric:tabular-nums}
+  .du-wait{font-family:var(--sans);font-size:.85rem;color:var(--ink2);margin-top:8px}
+  .du-rows{display:flex;flex-direction:column;gap:5px;padding-top:9px;border-top:1px solid var(--line)}
+  .du-rows>div{display:flex;justify-content:space-between;gap:10px}
+  .du-rows span{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
+  .du-rows b{font-family:var(--sans);font-size:.9rem;font-variant-numeric:tabular-nums}
+  .du-win{margin-top:12px;padding:12px 14px;border-radius:10px;border:1px solid rgba(53,196,111,.4);
+    background:rgba(53,196,111,.08);font-family:var(--sans);font-size:.92rem}
+  .du-win.tie{border-color:var(--line);background:var(--bg1)}
+  .du-win.pend{border-color:rgba(201,162,75,.4);background:rgba(201,162,75,.07)}
   /* ---- opciones de plan y fases ---- */
   .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:10px}
   .opt{text-align:left;background:var(--bg1);border:1px solid var(--line);border-radius:12px;padding:14px;
@@ -1442,7 +1459,7 @@
   /* ---------- events ---------- */
   document.addEventListener("click",e=>{
     const b=e.target.closest("button[data-a]");if(!b)return;
-    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,lockoverride:lockOverride,addacctgo:()=>{addAccount();mostrar("cuentas");},acctcancel:()=>{ACCT_EDIT=-1;mostrar("cuentas");},startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,shareshot:sealPoster,tradenew:tradeNew,tradesave:tradeSave,tradedel:tradeDelete,csvimport:csvImportClick,tfclear:()=>{TRADE_FILTER={result:"",setup:"",session:""};mostrar("trades");},buddyclear:()=>{try{localStorage.removeItem("candado_buddy");}catch(e){}mostrar("progreso");},exportdata:exportData,importdata:importDataClick,rulesedit:()=>{FIRM_EDIT=true;mostrar(vistaActual);},rulesapply:()=>{const a=acctLoad()||{};const f=$("#re-firmsel"),p=$("#re-plansel");if(f)a.firm=f.value;if(p&&firmPlans(a.firm).includes(p.value))a.plan=p.value;else a.plan=firmPlans(a.firm)[0]||"";const zs=firmSizes(a.firm,a.plan);if(zs.length&&!zs.includes(a.size))a.size=zs[0];["target","dailyLoss","maxDD","consistency","minDays"].forEach(k=>delete a[k]);acctSave(a);mostrar(vistaActual);},rulescancel:()=>{FIRM_EDIT=false;mostrar(vistaActual);},rulessave:firmRulesSave,guardreset:()=>{const A=activeAcct(),a=A||acctLoad()||{},L=acctsLoad();["target","dailyLoss","maxDD","consistency","minDays"].forEach(k=>delete a[k]);delete a.firmCustom;if(A&&L)acctsSave(L);else acctSave(a);mostrar(vistaActual);},pmspeak:()=>spkr(premarketText()),dismissnudge:()=>{TRADING_NUDGE="";statusPush(sessLoad().phase||"ready");mostrar(vistaActual);},replayonb:startOnb,practicenow:practiceNow,crewopen:crewOpen,crewjoin:crewJoin,crewleave:crewLeave,crewshare:crewShare,econedit:()=>{econEdit=true;mostrar("home");},econcancel:()=>{econEdit=false;mostrar("home");},econsave:()=>{const i=$("#econ-input");if(i)econSave(econParse(i.value));econEdit=false;mostrar("home");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,spkr:spkToggle,invite:()=>{try{window.open("https://wa.me/?text="+encodeURIComponent("Try SPOTTER AI with me — the trading platform built on discipline: https://studioamr.github.io/spotter-ai/landing.html"),"_blank");}catch(e){}},logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
+    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,duelcreate:duelCreate,dueljoin:duelJoin,duelleave:duelLeave,duelshare:duelShare,duelpull:duelPull,lockoverride:lockOverride,addacctgo:()=>{addAccount();mostrar("cuentas");},acctcancel:()=>{ACCT_EDIT=-1;mostrar("cuentas");},startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,shareshot:sealPoster,tradenew:tradeNew,tradesave:tradeSave,tradedel:tradeDelete,csvimport:csvImportClick,tfclear:()=>{TRADE_FILTER={result:"",setup:"",session:""};mostrar("trades");},buddyclear:()=>{try{localStorage.removeItem("candado_buddy");}catch(e){}mostrar("progreso");},exportdata:exportData,importdata:importDataClick,rulesedit:()=>{FIRM_EDIT=true;mostrar(vistaActual);},rulesapply:()=>{const a=acctLoad()||{};const f=$("#re-firmsel"),p=$("#re-plansel");if(f)a.firm=f.value;if(p&&firmPlans(a.firm).includes(p.value))a.plan=p.value;else a.plan=firmPlans(a.firm)[0]||"";const zs=firmSizes(a.firm,a.plan);if(zs.length&&!zs.includes(a.size))a.size=zs[0];["target","dailyLoss","maxDD","consistency","minDays"].forEach(k=>delete a[k]);acctSave(a);mostrar(vistaActual);},rulescancel:()=>{FIRM_EDIT=false;mostrar(vistaActual);},rulessave:firmRulesSave,guardreset:()=>{const A=activeAcct(),a=A||acctLoad()||{},L=acctsLoad();["target","dailyLoss","maxDD","consistency","minDays"].forEach(k=>delete a[k]);delete a.firmCustom;if(A&&L)acctsSave(L);else acctSave(a);mostrar(vistaActual);},pmspeak:()=>spkr(premarketText()),dismissnudge:()=>{TRADING_NUDGE="";statusPush(sessLoad().phase||"ready");mostrar(vistaActual);},replayonb:startOnb,practicenow:practiceNow,crewopen:crewOpen,crewjoin:crewJoin,crewleave:crewLeave,crewshare:crewShare,econedit:()=>{econEdit=true;mostrar("home");},econcancel:()=>{econEdit=false;mostrar("home");},econsave:()=>{const i=$("#econ-input");if(i)econSave(econParse(i.value));econEdit=false;mostrar("home");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,spkr:spkToggle,invite:()=>{try{window.open("https://wa.me/?text="+encodeURIComponent("Try SPOTTER AI with me — the trading platform built on discipline: https://studioamr.github.io/spotter-ai/landing.html"),"_blank");}catch(e){}},logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
   });
   document.addEventListener("input",e=>{ if(!e.target)return;
     if(ONB&&e.target.id&&e.target.id.startsWith("onb-")){ const d=ONB.data, id=e.target.id, v=e.target.value;
@@ -3053,10 +3070,10 @@
   function prefillReview(sim,result){ const rec=histLoad().find(x=>x.fecha===hoy()&&!!x.sim===!!sim); if(rec&&!(rec.notes||"").trim())sessRecord({notes:autoReview(result)}); }
   function wonSession(){ const s=sessLoad(); s.phase="done"; s.result="won"; s.endedAt=Date.now();
     s.tradeMin=s.firedAt?Math.max(1,Math.round((s.endedAt-s.firedAt)/60000)):null; sessSave(s);
-    sessRecord({outcome:"GANADA",durMin:s.tradeMin,sim:!!s.sim}); prefillReview(s.sim,"won"); supaUpsert(); statusPush("won"); { const r=stats().racha; spkr("Good shot. You sealed your session with discipline"+(r>=2?", "+r+" clean in a row":"")+". Close the platform for today."); } mostrar("sesion"); }
+    sessRecord({outcome:"GANADA",durMin:s.tradeMin,sim:!!s.sim}); prefillReview(s.sim,"won"); supaUpsert(); if(!s.sim)duelPush(); statusPush("won"); { const r=stats().racha; spkr("Good shot. You sealed your session with discipline"+(r>=2?", "+r+" clean in a row":"")+". Close the platform for today."); } mostrar("sesion"); }
   function lostSession(){ const s=sessLoad(); s.phase="done"; s.result="lost"; s.endedAt=Date.now();
     s.tradeMin=s.firedAt?Math.max(1,Math.round((s.endedAt-s.firedAt)/60000)):null; sessSave(s);
-    sessRecord({outcome:"BLOQUEADO",durMin:s.tradeMin,sim:!!s.sim}); prefillReview(s.sim,"lost"); supaUpsert(); statusPush("lost"); spkr("That's the day. One bullet, you respected it. Close the platform and come back cold tomorrow. Don't chase revenge."); mostrar("sesion"); }
+    sessRecord({outcome:"BLOQUEADO",durMin:s.tradeMin,sim:!!s.sim}); prefillReview(s.sim,"lost"); supaUpsert(); if(!s.sim)duelPush(); statusPush("lost"); spkr("That's the day. One bullet, you respected it. Close the platform and come back cold tomorrow. Don't chase revenge."); mostrar("sesion"); }
   function endSession(){ const s=sessLoad(); s.phase="done"; s.result=s.result||"flat"; s.endedAt=Date.now(); sessSave(s); statusPush("flat"); mostrar("sesion"); }
   function newSession(){ sessSave({phase:"ready"}); statusPush("ready"); mostrar("sesion"); }
   /* ---------- Shareable sealed-session poster (editorial 1/1) ---------- */
@@ -3334,6 +3351,89 @@
   function eloSave(e){try{localStorage.setItem("candado_elo",JSON.stringify(e));}catch(x){}}
   function tLoad(){try{return JSON.parse(localStorage.getItem("candado_training"))||{phase:"ready"};}catch(e){return{phase:"ready"};}}
   function tSave(t){try{localStorage.setItem("candado_training",JSON.stringify(t));}catch(e){}}
+  /* ================= DUELO 1 CONTRA 1 (real) =================================
+     Cada quien opera SU sesión con SU Spotter. Al sellarla, el resultado se
+     publica al duelo. Cuando los dos sellaron, salen los dos resúmenes.
+     Gana el más disciplinado, no el que más ganó — esa es la tesis.
+     Se monta sobre la tabla `posts` que ya existe: cero migraciones. */
+  function duelLoad(){ try{ return JSON.parse(localStorage.getItem("candado_duel")||"null"); }catch(e){ return null; } }
+  function duelSave(d){ try{ d?localStorage.setItem("candado_duel",JSON.stringify(d)):localStorage.removeItem("candado_duel"); }catch(e){} }
+  function duelCode(){ const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let c=""; for(let i=0;i<5;i++)c+=A[Math.floor(Math.random()*A.length)]; return c; }
+  var DUEL_POSTS=[], DUEL_LOADING=false;
+
+  function duelCreate(){ const d={code:duelCode(), fecha:hoy(), rol:"reto"}; duelSave(d); duelPush(); mostrar("training"); }
+  function duelJoin(){ const c=(prompt("Código del duelo (te lo pasa el otro trader):")||"").trim().toUpperCase();
+    if(!c)return; duelSave({code:c, fecha:hoy(), rol:"acepto"}); duelPull(); mostrar("training"); }
+  function duelLeave(){ if(!confirm("¿Salir del duelo? Tu sesión sigue igual, solo dejas de competir."))return; duelSave(null); mostrar("training"); }
+  function duelShare(){ const d=duelLoad(); if(!d)return;
+    const txt=`Te reto a un duelo de disciplina en SPOTTER AI. Código: ${d.code}\nCada quien opera su sesión; al cerrar salen los dos resúmenes.\nhttps://studioamr.github.io/spotter-ai/`;
+    try{ navigator.clipboard.writeText(txt); }catch(e){}
+    try{ window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank"); }catch(e){} }
+
+  /* publica TU resultado del día al duelo */
+  function duelPush(){ const d=duelLoad(); if(!d)return;
+    const rec=histLoad().find(x=>x.fecha===hoy()&&!x.sim);
+    const p=profileLoad()||{};
+    const cuerpo={ code:d.code, fecha:hoy(), handle:(p.handle||"trader"),
+      pnl:(rec&&rec.pnl!=null)?rec.pnl:null, outcome:rec?rec.outcome:null,
+      revenges:rec?(rec.revenges||0):0, overrides:rec?(rec.overrides||0):0,
+      trades:rec?1:0, sellada:!!(rec&&rec.outcome) };
+    fetch(SUPA_URL+"/rest/v1/posts",{method:"POST",headers:supaHead(),
+      body:JSON.stringify({author:cuerpo.handle, kind:"duel", body:JSON.stringify(cuerpo)})})
+      .then(()=>duelPull()).catch(()=>{}); }
+
+  function duelPull(){ const d=duelLoad(); if(!d||DUEL_LOADING)return; DUEL_LOADING=true;
+    fetch(SUPA_URL+"/rest/v1/posts?select=*&kind=eq.duel&order=created_at.desc&limit=120",{headers:supaHead()})
+      .then(r=>r.ok?r.json():[]).then(rows=>{
+        const vistos={};
+        DUEL_POSTS=(rows||[]).map(r=>{ try{ return JSON.parse(r.body); }catch(e){ return null; } })
+          .filter(x=>x&&x.code===d.code&&x.fecha===d.fecha)
+          .filter(x=>{ if(vistos[x.handle])return false; vistos[x.handle]=1; return true; });  // el más reciente por persona
+        DUEL_LOADING=false; if(vistaActual==="training")mostrar("training");
+      }).catch(()=>{DUEL_LOADING=false;}); }
+
+  /* la disciplina manda: sin venganzas, sin overrides, sesión sellada */
+  function duelScore(x){ let s=0;
+    if(x.sellada)s+=50;                       // cerrar el día como se debe
+    s-=(x.revenges||0)*25;                    // la venganza es lo que trona cuentas
+    s-=(x.overrides||0)*20;                   // saltarse el candado cuesta
+    if(x.outcome==="GANADA")s+=10;
+    return s; }
+
+  function duelCard(){
+    const d=duelLoad();
+    if(!d) return `<div class="p-card"><div class="c-t">Duelo 1 contra 1 <span class="room-agg">disciplina, no suerte</span></div>
+      <p class="home-note" style="margin:0 0 12px">Cada quien opera <b>su</b> sesión con su propio Spotter. Al cerrar el día salen los dos resúmenes y gana el más disciplinado — no el que más ganó.</p>
+      <div class="re-btns"><button class="btn" data-a="duelcreate" data-hover>Retar a alguien</button>
+        <button class="btn ghost" data-a="dueljoin" data-hover>Tengo un código</button></div></div>`;
+    const mios=DUEL_POSTS.filter(x=>x.handle===((profileLoad()||{}).handle||"trader"));
+    const otros=DUEL_POSTS.filter(x=>x.handle!==((profileLoad()||{}).handle||"trader"));
+    const yo=mios[0], rival=otros[0];
+    const fila=(x,esYo)=>{ if(!x) return `<div class="du-side pend"><div class="du-h">${esYo?"Tú":"Tu rival"}</div>
+        <div class="du-wait">esperando a que cierre su sesión</div></div>`;
+      return `<div class="du-side${esYo?" me":""}"><div class="du-h">${esc(x.handle)}${esYo?" · tú":""}</div>
+        <div class="du-pnl ${x.pnl>=0?"up":"down"}">${x.pnl!=null?money(x.pnl):"—"}</div>
+        <div class="du-rows">
+          <div><span>Sesión</span><b>${x.sellada?"sellada ✓":"abierta"}</b></div>
+          <div><span>Venganzas</span><b class="${x.revenges?"down":""}">${x.revenges||0}</b></div>
+          <div><span>Candado saltado</span><b class="${x.overrides?"down":""}">${x.overrides||0}</b></div>
+          <div><span>Disciplina</span><b>${duelScore(x)}</b></div>
+        </div></div>`; };
+    let veredicto="";
+    if(yo&&rival&&yo.sellada&&rival.sellada){
+      const a=duelScore(yo), b=duelScore(rival);
+      veredicto = a===b
+        ? `<div class="du-win tie">Empate en disciplina. Los dos cerraron el día como se debe.</div>`
+        : `<div class="du-win">Gana <b>${esc(a>b?yo.handle:rival.handle)}</b> por disciplina${(a>b?yo.pnl:rival.pnl)<(a>b?rival.pnl:yo.pnl)?" — y no fue quien más dinero hizo":""}.</div>`;
+    } else if(yo&&yo.sellada){ veredicto=`<div class="du-win pend">Tu parte está lista. Falta que tu rival cierre.</div>`; }
+    return `<div class="p-card"><div class="c-t">Duelo · ${esc(d.code)} <span class="room-agg">${esc(d.fecha)}</span></div>
+      <div class="du-grid">${fila(yo,true)}${fila(rival,false)}</div>
+      ${veredicto}
+      <div class="re-btns"><button class="btn ghost sm" data-a="duelshare" data-hover>Compartir el código</button>
+        <button class="btn ghost sm" data-a="duelpull" data-hover>Actualizar</button>
+        <button class="btn ghost sm" data-a="duelleave" data-hover>Salir</button></div>
+      <p class="home-note" style="margin:10px 0 0;opacity:.7">Tu resultado se publica solo al sellar tu sesión. No hay forma de editarlo después.</p></div>`; }
+
   function trainStart(){ tSave({phase:"live",startedAt:Date.now()});
     try{window.open(TV_URL,"_blank","noopener");}catch(e){}                 // opens TradingView (paper account)
     try{ if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.spotter){ window.webkit.messageHandlers.spotter.postMessage(JSON.stringify(spotterSnapshot())); } }catch(e){} // the Spotter watches and records
@@ -3355,7 +3455,9 @@
       <div class="lead">${board.map((m,i)=>`<div class="lead-row ${m.you?'me':''}" ${(!m.you)?`data-uprofile="${esc(m.name)}"`:""}><span class="lead-rk">#${i+1}</span><span class="lead-nm">${esc(m.name)}${m.you?' <em>you</em>':''}</span><span class="lead-el">${m.elo}</span></div>`).join("")}</div>
       <p class="home-note">${note}</p></div>`;
   }
-  function viewTraining(){
+  function viewTraining(){ if(duelLoad()&&!DUEL_POSTS.length)setTimeout(duelPull,60);
+    return duelCard()+viewTrainingBody(); }
+  function viewTrainingBody(){
     const t=tLoad(), r=eloLoad();
     if(t.phase==="live"){
       return `<div class="training"><div class="p-card sl-top"><div class="sl-status"><span class="sl-dot fired"></span> Training live · <b>paper</b> · the Spotter is recording</div><div class="sl-time" id="tr-time">0m 00s</div></div>
