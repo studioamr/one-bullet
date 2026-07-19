@@ -95,12 +95,67 @@
   .sv-list li{font-family:var(--sans);font-size:.84rem;color:var(--ink1);line-height:1.45}
   .guard-who{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
   .guard-who .sa-k{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin-bottom:7px}
+  /* ---- el mapa: burbujas y raíces ---- */
+  .bub-field{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:center;padding:12px 0 6px}
+  .bub{border-radius:50%;border:1px solid var(--line);background:radial-gradient(120% 120% at 32% 24%,rgba(61,134,207,.16),rgba(15,15,17,.5));
+    color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;flex:none;
+    animation:bubFloat 9s ease-in-out infinite;transition:border-color .2s,transform .2s,background .2s}
+  .bub b{font-family:var(--serif);font-size:clamp(.95rem,2.2vw,1.5rem);line-height:1}
+  .bub i{font-family:var(--mono);font-style:normal;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+  .bub:hover{border-color:var(--accent);transform:translateY(-3px)}
+  .bub.on{border-color:var(--accent);background:radial-gradient(120% 120% at 32% 24%,rgba(61,134,207,.42),rgba(15,15,17,.6));box-shadow:0 0 0 1px var(--accent) inset}
+  .bub.on b{color:#fff}
+  @keyframes bubFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  @media(prefers-reduced-motion:reduce){.bub{animation:none}}
+  .pp-mix{display:flex;flex-direction:column;gap:3px;margin-top:10px;padding-top:9px;border-top:1px solid var(--line)}
+  .pp-mix span{font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:var(--ink2)}
+  /* ---- opciones de plan y fases ---- */
+  .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:10px}
+  .opt{text-align:left;background:var(--bg1);border:1px solid var(--line);border-radius:12px;padding:14px;
+    color:inherit;font:inherit;cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:border-color .2s,background .2s}
+  .opt:hover{border-color:var(--ink2)}
+  .opt.on{border-color:var(--accent);background:rgba(61,134,207,.07)}
+  .op-f{font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink2)}
+  .op-p{font-family:var(--sans);font-size:.9rem;font-weight:600;line-height:1.25}
+  .op-big{font-family:var(--serif);font-size:1.5rem;color:var(--accent);margin:6px 0 2px;display:flex;flex-direction:column}
+  .op-big small{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
+  .op-rows{display:flex;flex-direction:column;gap:2px;margin-top:6px;padding-top:8px;border-top:1px solid var(--line)}
+  .op-rows>div{display:flex;justify-content:space-between;gap:8px}
+  .op-rows span{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
+  .op-rows b{font-family:var(--mono);font-size:10.5px;font-variant-numeric:tabular-nums}
+  .fases{list-style:none;margin:0;padding:0}
+  .fase{display:flex;gap:16px;position:relative;padding-bottom:18px}
+  .fase:not(.last)::before{content:"";position:absolute;left:29px;top:34px;bottom:0;width:1.5px;background:var(--line)}
+  .fa-n{flex:none;width:60px;padding:6px 0;font-family:var(--mono);font-size:9px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--accent);text-align:center;border:1px solid var(--line);border-radius:8px;height:fit-content;background:var(--bg1);position:relative;z-index:2}
+  .fa-b{flex:1;min-width:0;border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--bg1)}
+  .fa-t{font-family:var(--sans);font-size:1rem;font-weight:600}
+  .fa-big{font-family:var(--serif);font-size:1.7rem;color:var(--accent);line-height:1.15;margin:2px 0 10px}
+  .fa-rows{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+  .fa-rows>div{display:flex;flex-direction:column;gap:2px}
+  .fa-rows span{font-family:var(--mono);font-size:8.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink2)}
+  .fa-rows b{font-family:var(--sans);font-size:.95rem;font-variant-numeric:tabular-nums}
+  .fa-b p{margin:10px 0 0;font-family:var(--sans);font-size:.84rem;color:var(--ink2);line-height:1.5}
+  .tree{position:relative}
+  .tree-lines{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+  .tree-list{list-style:none;margin:0;padding:0;position:relative}
+  .tree-node{display:flex;gap:16px;align-items:flex-start;padding:0 0 34px;position:relative}
+  .tn-dot{flex:none;width:11px;height:11px;border-radius:50%;margin-top:5px;margin-left:39px;
+    background:var(--bg1);border:1.5px solid var(--line2,var(--line));position:relative;z-index:2}
+  .tree-node.root .tn-dot{border-color:var(--accent);background:var(--accent);box-shadow:0 0 0 4px rgba(61,134,207,.16)}
+  .tree-node.leaf .tn-dot{border-color:#35c46f;background:#35c46f;box-shadow:0 0 0 4px rgba(53,196,111,.16)}
+  .tn-k{font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink2)}
+  .tn-v{font-family:var(--serif);font-size:1.35rem;line-height:1.2;margin:3px 0 2px}
+  .tree-node.root .tn-v,.tree-node.leaf .tn-v{color:var(--accent)}
+  .tree-node.leaf .tn-v{color:#35c46f}
+  .tn-s{font-family:var(--sans);font-size:.82rem;color:var(--ink2);line-height:1.5}
   .lock-card{display:flex;gap:14px;align-items:flex-start;border-color:rgba(214,69,69,.45);background:rgba(214,69,69,.07)}
   .lock-card.bypassed{border-color:rgba(201,162,75,.45);background:rgba(201,162,75,.07)}
   .lock-ic{font-size:1.5rem;line-height:1;flex:none}
   .rules-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
   .rules-edit{margin-top:10px;padding-top:12px;border-top:1px solid var(--line)}
   .re-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .re-grid select{max-width:100%;text-overflow:ellipsis}
   .re-grid label{display:flex;flex-direction:column;gap:5px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
   .re-grid input{background:var(--bg1);border:1px solid var(--line);border-radius:7px;padding:8px 10px;color:var(--ink);font-family:var(--sans);font-size:.88rem}
   .re-grid input:focus{outline:none;border-color:var(--accent)}
@@ -1360,12 +1415,6 @@
     let racha=0; for(const x of h){ if((x.revenges||0)===0)racha++; else break; }
     return {h,g,b,tot,wr:tot?Math.round(g/tot*100):0,racha};
   }
-  function within(f,days){const p=(f||"").split("-").map(Number);if(p.length<3)return false;const d=new Date(p[0],p[1]-1,p[2]);return (new Date()-d)/86400000<=days;}
-  function periodo(days){const h=histLoad().filter(x=>within(x.fecha,days));
-    const g=h.filter(x=>x.outcome==="GANADA").length;
-    const disc=h.length?Math.round(h.filter(x=>(x.revenges||0)===0).length/h.length*100):0;
-    const pnl=h.reduce((a,x)=>a+(x.pnl||0),0);
-    return {n:h.length,g,disc,pnl};}
   function insight(){const h=histLoad();if(!h.length)return "No data yet. Today: wait only for your A+, one bullet.";
     const rev=h.slice(0,10).reduce((a,x)=>a+(x.revenges||0),0);
     const recent=h.slice(0,6),blk=recent.filter(x=>x.outcome==="BLOQUEADO").length;
@@ -1440,6 +1489,7 @@
       else if(e.target.id==="tl-losses")T.losses=Math.max(0,parseInt(e.target.value)||0);
       else if(e.target.id==="tl-sessions")T.maxSessions=Math.max(0,parseInt(e.target.value)||0);
       tiltSave(T); mostrar(vistaActual); return; }
+    if(e.target.id==="gl-n"){GOAL_N=Math.max(1,Math.min(30,parseInt(e.target.value)||1));mostrar("mapa");return;}
     if(e.target.id==="sv-firm"){SURV_FIRM=e.target.value;SURV_PLAN="";mostrar("progreso");return;}
     if(e.target.id==="sv-plan"){SURV_PLAN=e.target.value;mostrar("progreso");return;}
     if(e.target.id==="sz-instr"){SZ_INSTR=e.target.value;mostrar("progreso");return;}
@@ -1574,7 +1624,6 @@
     alert("Imported "+added+" trades"+(skipped?" · "+skipped+" rows skipped (no valid date or P&L)":"")+"."); mostrar("trades"); }
   function money(n){ if(n==null||isNaN(n))return "—"; const s=n<0?"−":(n>0?"+":""); return s+"$"+Math.abs(Math.round(n)).toLocaleString("en-US"); }
   function pf_txt(pf){ return pf===Infinity?"∞":pf.toFixed(2); }
-  function groupBy(arr,fn){ const m={}; arr.forEach(t=>{const k=fn(t); if(k==null||k==="")return; (m[k]=m[k]||[]).push(t);}); return m; }
   function NPstats(arr){
     const wp=arr.filter(t=>t.pnl!=null), pos=wp.filter(t=>t.pnl>0), neg=wp.filter(t=>t.pnl<0);
     const wins=arr.filter(t=>t.result==="win"), losses=arr.filter(t=>t.result==="loss"), closed=wins.length+losses.length;
@@ -1934,11 +1983,6 @@
   function viewCourseRouter(){ return courseLesson?viewLesson():viewCourse(); }
 
   /* ===================== PAYOUT · the path (NorthPoint engine) ===================== */
-  function funnelFor(target){ const t="$"+(target||1000).toLocaleString("en-US"); return [
-    {label:"Eval",note:`hit ${t} profit`},
-    {label:"Funded",note:"trade firm capital"},
-    {label:"Payout",note:"withdraw your split"},
-    {label:"Scale",note:"repeat & compound"}]; }
   const PLEDGE="I commit to respecting this structure above any emotional impulse. Profitability is not luck — it is the result of following my risk rules and my schedule without exception. One bullet a session. If I win, I stop. If I lose, I close and come back cold. I show up, I follow the plan, and I trade until I cash the payout. My discipline is my financial freedom.";
   function acctLoad(){try{return JSON.parse(localStorage.getItem("candado_account"))||null;}catch(e){return null;}}
   function acctSave(a){try{localStorage.setItem("candado_account",JSON.stringify(a));}catch(e){}}
@@ -2048,11 +2092,11 @@
         },
         "Select Evaluation": {
           phase:"eval", ddType:"eod", lockAtProfit:null,
-          consistency:0.40, minDays:3,
+          consistency:0.40, consistencyRaisesTarget:true, minDays:3,
           sizes:{ 50000:{target:3000, dailyLoss:0, maxDD:2000},
                   100000:{target:6000, dailyLoss:0, maxDD:3000},
                   150000:{target:9000, dailyLoss:0, maxDD:4500} },
-          note:"SIN límite diario en evaluación. Consistencia 40% obliga a un mínimo de 3 días. Drawdown más apretado que Growth en 100k/150k."
+          note:"SIN límite diario. La consistencia de 40% no te reprueba: te SUBE el objetivo (mejor día ÷ 0.40 = total necesario). Por eso el examen es de mínimo 3 días. En una cuenta de $50k el tope por día ronda los $1,100–$1,200. Drawdown más apretado que Growth en 100k/150k."
         },
         "Select Flex (fondeada)": {
           phase:"funded", ddType:"eod", lockAtProfit:100,
@@ -2201,6 +2245,169 @@
 
   };
 
+  /* ---- DATOS DE RUTA, POR PLAN — verificado 18-jul-2026 en fuentes oficiales ----
+     Lo que la versión anterior tenía mal y aquí se corrige:
+      · El tope de retiro NO es fijo: sube con cada pago. Escalera completa por plan.
+      · El precio no siempre es de una sola vez: Topstep, MFFU y TPT cobran MENSUALIDAD
+        mientras pasas el examen, y algunas cobran activación aparte al pasar.
+      · Un "día ganador" no es cualquier día verde: casi todas piden un mínimo.
+      · Flex de Tradeify y de Lucid pagan el 50% de tu ganancia, no el total.
+     caps = escalera por número de pago (el último valor se repite en adelante). */
+  const PLAN_ROUTE={
+    "Tradeify|Select Daily (fondeada)":{ split:.90, cycleDays:1, maxAcc:5, payoutPct:1,
+      price:{mode:"once", list:{50000:165,100000:265,150000:369}, promoPct:.40, promoCode:"JULY"},
+      sizes:{50000:{buffer:2100,minPay:250,caps:[1000],minDay:null},
+             100000:{buffer:2600,minPay:250,caps:[1500],minDay:null},
+             150000:{buffer:3600,minPay:250,caps:[2500],minDay:null}},
+      note:"Regla de continuidad: solo puedes pedir 2× la ganancia desde tu último retiro, hasta el tope. Ganas $250 → sacas $500, no $1,000." },
+    "Tradeify|Select Flex (fondeada)":{ split:.90, cycleDays:5, maxAcc:5, payoutPct:.50,
+      price:{mode:"once", list:{50000:165,100000:265,150000:369}, promoPct:.40, promoCode:"JULY"},
+      sizes:{50000:{buffer:0,minPay:0,caps:[3000],minDay:150},
+             100000:{buffer:0,minPay:0,caps:[4000],minDay:200},
+             150000:{buffer:0,minPay:0,caps:[5000],minDay:250}},
+      note:"Paga el 50% de tu ganancia total, con tope: para retirar $3,000 necesitas $6,000 de ganancia. Pide 5 días ganadores." },
+    "Tradeify|Growth Sim Funded":{ split:.90, cycleDays:5, maxAcc:5, payoutPct:1,
+      price:{mode:"once", list:{50000:145,100000:255,150000:369}, promoPct:.40, promoCode:"JULY"},
+      sizes:{50000:{buffer:3000,minPay:500,caps:[1500,2000,2500,3000],minDay:150},
+             100000:{buffer:4500,minPay:1000,caps:[2000,2500,3000,4000],minDay:200},
+             150000:{buffer:6500,minPay:1500,caps:[2500,3000,4000,5000],minDay:250}},
+      note:"El tope sube con cada pago. Consistencia 35%." },
+    "Tradeify|Lightning Funded":{ split:.90, cycleDays:1, maxAcc:5, payoutPct:1,
+      price:{mode:"once", list:{50000:492,100000:660,150000:796}, promoPct:.40, promoCode:"JULY"},
+      sizes:{50000:{buffer:3000,goalAfter:2000,minPay:1000,caps:[2000,2000,2000,2500],minDay:null},
+             100000:{buffer:6000,goalAfter:3500,minPay:1000,caps:[2500,2500,2500,3000],minDay:null},
+             150000:{buffer:9000,goalAfter:4500,minPay:1000,caps:[3000,3000,3000,3500],minDay:null}},
+      note:"Sin examen. El 'colchón' es el objetivo del primer pago y BAJA para los siguientes. Consistencia progresiva 20% → 25% → 30%." },
+    "Lucid Trading|LucidPro · Fondeada":{ split:.90, cycleDays:5, maxAcc:5, payoutPct:1,
+      price:{mode:"once", list:{50000:185,100000:285,150000:370}, promoPct:.40, promoCode:"VAULT"},
+      sizes:{50000:{buffer:2100,minPay:500,goalCycle:500,caps:[2000,2500],minDay:null},
+             100000:{buffer:3100,minPay:500,goalCycle:750,caps:[2500,3000],minDay:null},
+             150000:{buffer:4600,minPay:500,goalCycle:1000,caps:[3000,3500],minDay:null}},
+      note:"El tope sube $500 a partir del segundo pago. Sin días mínimos, pero sí objetivo de ganancia por ciclo y consistencia 40%." },
+    "Lucid Trading|LucidFlex · Fondeada":{ split:.90, cycleDays:5, maxAcc:5, payoutPct:.50, maxPayouts:5,
+      price:{mode:"once", list:{50000:140,100000:225,150000:420}, promoPct:.40, promoCode:"VAULT"},
+      sizes:{50000:{buffer:0,minPay:500,caps:[2000],minDay:150},
+             100000:{buffer:0,minPay:500,caps:[2500],minDay:200},
+             150000:{buffer:0,minPay:500,caps:[3000],minDay:250}},
+      note:"Sin colchón, pero paga el 50% de tu ganancia con tope. Máximo 5 pagos y la cuenta pasa a real." },
+    "Apex Trader Funding|PA · Intraday Trail":{ split:1.00, cycleDays:5, maxAcc:20, payoutPct:1, maxPayouts:6,
+      price:{mode:"once", list:{25000:199,50000:249,100000:399,150000:599},
+             activation:{25000:59,50000:59,100000:59,150000:59}, promoPct:.90, promoCode:"SAVENOW", promoOnActivation:false},
+      sizes:{25000:{buffer:1100,minPay:500,caps:[1000],minDay:100},
+             50000:{buffer:2100,minPay:500,caps:[1500,2000,2500,2500,3000,3000],minDay:200},
+             100000:{buffer:3100,minPay:500,caps:[2000,2500,3000,3000,4000,4000],minDay:250},
+             150000:{buffer:4100,minPay:500,caps:[2500,3000,3000,4000,4000,5000],minDay:300}},
+      note:"Reparto 100%. El cupón NO aplica a la cuota de activación. Máximo 6 pagos y la cuenta se cierra; el colchón se mantiene toda la vida de la cuenta." },
+    "Apex Trader Funding|PA · EOD Trail":{ split:1.00, cycleDays:5, maxAcc:20, payoutPct:1, maxPayouts:6,
+      price:{mode:"once", list:{25000:390,50000:490,100000:790,150000:1490},
+             activation:{25000:99,50000:119,100000:139,150000:159}, promoPct:.90, promoCode:"SAVENOW", promoOnActivation:false},
+      sizes:{25000:{buffer:1100,minPay:500,caps:[1000],minDay:100},
+             50000:{buffer:2100,minPay:500,caps:[1500,1500,2000,2500,2500,3000],minDay:250},
+             100000:{buffer:3100,minPay:500,caps:[2000,2500,2500,3000,4000,4000],minDay:300},
+             150000:{buffer:4100,minPay:500,caps:[2500,3000,3000,3000,4000,5000],minDay:350}},
+      note:"Cuesta 2–2.5× más que Intraday y su escalera de pagos es más lenta: compras el drawdown más suave, no mejores pagos." },
+    "Topstep|Express Funded · Standard":{ split:.90, cycleDays:5, maxAcc:5, payoutPct:1,
+      price:{mode:"month", list:{50000:49,100000:99,150000:199},
+             activation:{50000:149,100000:149,150000:149}},
+      sizes:{50000:{buffer:0,minPay:125,caps:[2000],capDLL:4000,minDay:150},
+             100000:{buffer:0,minPay:125,caps:[3000],capDLL:6000,minDay:150},
+             150000:{buffer:0,minPay:125,caps:[5000],capDLL:10000,minDay:150}},
+      note:"El Combine es MENSUALIDAD hasta que pasas, más $149 de activación. No exige colchón: basta $0.01 de ganancia. Si agregas el límite diario EN EL CHECKOUT, el tope se DUPLICA — es irreversible y no se puede activar después." },
+    "Topstep|Express Funded · Consistency":{ split:.90, cycleDays:3, maxAcc:5, payoutPct:1,
+      price:{mode:"month", list:{50000:49,100000:99,150000:199},
+             activation:{50000:149,100000:149,150000:149}},
+      sizes:{50000:{buffer:0,minPay:125,caps:[3000],capDLL:6000,minDay:null},
+             100000:{buffer:0,minPay:125,caps:[4000],capDLL:8000,minDay:null},
+             150000:{buffer:0,minPay:125,caps:[6000],capDLL:12000,minDay:null}},
+      note:"3 días de operación en vez de 5 días ganadores, y tope más alto — pero tu mejor día no puede pasar del 40% de la ganancia." },
+    "MyFundedFutures|Rapid · Sim Funded":{ split:.90, cycleDays:1, maxAcc:5, maxAccBig:3, payoutPct:1,
+      price:{mode:"month", list:{50000:157,100000:267,150000:347}, promoPct:.50, promoCode:"300K"},
+      sizes:{50000:{buffer:2100,minPay:500,caps:[null],minDay:null},
+             100000:{buffer:3100,minPay:500,caps:[null],minDay:null},
+             150000:{buffer:4600,minPay:500,caps:[null],minDay:null}},
+      note:"MENSUALIDAD. Paga a diario tras limpiar el colchón. OJO: el máximo baja de 5 cuentas a 3 en cuanto tengas una de $100k o $150k. El tope por retiro no está publicado." },
+    "Take Profit Trader|PRO+ (en vivo)":{ split:.90, cycleDays:1, maxAcc:5, payoutPct:1,
+      price:{mode:"month", list:{25000:150,50000:170,75000:245,100000:330,150000:360},
+             activation:{25000:130,50000:130,75000:130,100000:130,150000:130}, promoPct:.40, promoCode:"NOFEE40"},
+      sizes:{25000:{buffer:0,minPay:0,caps:[null],minDay:null},50000:{buffer:0,minPay:0,caps:[null],minDay:null},
+             75000:{buffer:0,minPay:0,caps:[null],minDay:null},100000:{buffer:0,minPay:0,caps:[null],minDay:null},
+             150000:{buffer:0,minPay:0,caps:[null],minDay:null}},
+      note:"Mercado REAL, reparto 90/10 y SIN colchón — por eso es mejor que PRO, donde el colchón te cuesta la mitad. No se compra: te ascienden por desempeño, así que no puedes planearlo, solo llegar a él." },
+    "Take Profit Trader|PRO (fondeada)":{ split:.80, cycleDays:1, maxAcc:5, payoutPct:1,
+      price:{mode:"month", list:{25000:150,50000:170,75000:245,100000:330,150000:360},
+             activation:{25000:130,50000:130,75000:130,100000:130,150000:130}, promoPct:.40, promoCode:"NOFEE40"},
+      sizes:{25000:{buffer:1500,minPay:0,caps:[null],minDay:null},
+             50000:{buffer:2000,minPay:0,caps:[null],minDay:null},
+             75000:{buffer:2500,minPay:0,caps:[null],minDay:null},
+             100000:{buffer:3000,minPay:0,caps:[null],minDay:null},
+             150000:{buffer:4500,minPay:0,caps:[null],minDay:null}},
+      note:"MENSUALIDAD ($130 de activación al pasar, plano en todos los tamaños). Sin tope de retiro. La ganancia DENTRO del colchón solo se cobra al cerrar la cuenta — y aquí sus propias fuentes se contradicen: su centro de ayuda dice 50% si la cuenta duró 60 días o menos y 80% después, pero su calculadora de pagos en producción aplica 50% PLANO sin importar la duración. Asume 50%: si resulta ser 80%, te sobra dinero; al revés, te falta. Confírmalo por escrito con soporte antes de contar con esa parte." }
+  };
+  function routeSizes(key){ const P=PLAN_ROUTE[key]; return P?Object.keys(P.sizes).map(Number).sort((a,b)=>a-b):[]; }
+  function capAt(S,k){ const c=S.caps||[null]; return c[Math.min(k-1,c.length-1)]; }
+  function priceOf(P,size,meses){
+    const pr=P.price; if(!pr||pr.list[size]==null) return {total:null,base:null,act:null,mode:null};
+    const m=pr.mode==="month"?Math.max(1,meses||1):1;
+    const base=pr.list[size]*m;
+    const act=pr.activation?pr.activation[size]:0;
+    const baseP=pr.promoPct?base*(1-pr.promoPct):base;                 // el cupón casi nunca cubre la activación
+    const actP=(pr.promoPct&&pr.promoOnActivation)?act*(1-pr.promoPct):act;
+    return {mode:pr.mode, base, act, list:base+act, total:Math.round(baseP+actP),
+            code:pr.promoCode||null, meses:m}; }
+
+  /* ---- LA RUTA CON REINVERSIÓN ----
+     Lo que de verdad hace un trader que escala: cobra el primer pago, compra más
+     cuentas con él, y el siguiente pago es más grande. Se reinvierte hasta llegar
+     al máximo que permite la firma; de ahí en adelante todo va a tu bolsillo. */
+  function routeSteps(target,key,size,nIni,meses,reinvertir){
+    const P=PLAN_ROUTE[key], S=P.sizes[size]; if(!P||!S)return null;
+    const unit=priceOf(P,size,meses).total, cap1=capAt(S,1);
+    if(cap1==null) return null;
+    const maxA=((P.maxAccBig&&size>=100000)?P.maxAccBig:(P.maxAcc||99));
+    let n=Math.max(1,nIni), acum=0, k=1, pasos=[], compradas=0, invertido=0;
+    while(acum<target && k<=200){
+      const cap=capAt(S,k), bruto=cap*n;
+      let compra=0, gasto=0;
+      if(reinvertir && unit && n<maxA){
+        compra=Math.min(Math.floor(bruto/unit), maxA-n);
+        gasto=compra*unit; }
+      const neto=bruto-gasto;
+      acum+=neto; compradas+=compra; invertido+=gasto;
+      pasos.push({k, n, cap, bruto, compra, gasto, neto, acum:Math.min(acum,target), tope:n+compra>=maxA});
+      n+=compra; k++; }
+    return {pasos, cycles:pasos.length, nFinal:n, maxA, compradas, invertido,
+            ahorroCiclos:null, caps:pasos.map(p=>p.cap)}; }
+
+  /* ---- LA RUTA ----
+     Suma los pagos con la escalera real, no con un tope fijo. */
+  function routeTo(target,key,size,parallel,meses,reinvertir){
+    const P=PLAN_ROUTE[key]; if(!P)return null;
+    const S=P.sizes[size]; if(!S)return null;
+    const [firm,plan]=key.split("|");
+    const n=Math.max(1,parallel||1);
+    const plans=firmPlans(firm);
+    const evalPlan=plans.find(p=>FIRM_CATALOG[firm].plans[p].phase==="eval"&&FIRM_CATALOG[firm].plans[p].sizes[size]);
+    const E=evalPlan?planResolve(firm,evalPlan,size):null;
+    const pr=priceOf(P,size,meses);
+    const missing=[]; if(capAt(S,1)==null) missing.push("el tope de retiro");
+    if(pr.total==null) missing.push("el precio");
+    let cycles=null, days=null, capsUsed=[], steps=null;
+    if(capAt(S,1)!=null){
+      const R=routeSteps(target,key,size,n,meses,!!reinvertir);
+      steps=R.pasos; cycles=R.cycles; capsUsed=R.caps;
+      days=(S.buffer?Math.max(P.cycleDays,5):0)+cycles*P.cycleDays;
+    }
+    const maxAcc=(P.maxAccBig && size>=100000)?P.maxAccBig:(P.maxAcc||null);
+    const bufferTotal=(S.buffer||0)*n;
+    const pct=P.payoutPct||1;
+    return { firm, plan, key, size, n, maxAcc, price:pr, cap:capAt(S,1), caps:capsUsed, capLadder:S.caps,
+             buffer:S.buffer, bufferTotal, minPay:S.minPay, minDay:S.minDay, goalCycle:S.goalCycle,
+             capDLL:S.capDLL, payoutPct:pct, perCycle:capAt(S,1)!=null?capAt(S,1)*n:null,
+             cycles, days, steps, cost:pr.total!=null?pr.total*n:null, missing, split:P.split,
+             cycleDays:P.cycleDays, maxPayouts:P.maxPayouts||null,
+             gananciaTotal:cycles!=null?bufferTotal+Math.round(target/pct):null,
+             evalPlan, evalTarget:E?E.target:null, evalMinDays:E?E.minDays:null, note:P.note }; }
+
   /* Resuelve un plan concreto para un tamaño de cuenta. Devuelve el piso de
      congelamiento ya calculado, que es el número que de verdad truena cuentas. */
   function planResolve(firmName,planName,size){
@@ -2252,11 +2459,6 @@
     return a||L[0]; }
   function activeAcctLabel(){ const a=activeAcct(); return a?acctLabel(a):""; }
   /* Lee un campo de la cuenta activa, o de la global si no hay cuentas dadas de alta */
-  function acctField(k){ const a=activeAcct(); if(a&&a[k]!=null)return a[k];
-    if(a)return undefined; const g=acctLoad()||{}; return g[k]; }
-  function acctWrite(patch){ const L=acctsLoad()||[], a=activeAcct();
-    if(a){ Object.assign(a,patch); acctsSave(L); }
-    else { const g=acctLoad()||{}; Object.assign(g,patch); acctSave(g); } }
   /* Las operaciones de ESTA cuenta. Con una sola cuenta se cuentan también las
      sin etiquetar (son suyas); con varias, no se pueden atribuir y se excluyen. */
   function acctTrades(list){ const L=acctsLoad()||[]; if(!L.length)return list;
@@ -2322,7 +2524,7 @@
     return `<div class="p-card" style="border-color:rgba(201,162,75,.4);background:rgba(201,162,75,.06)">
       <div class="c-t" style="margin:0">Your target just moved <span class="room-agg">consistency rule</span></div>
       <p class="home-note" style="margin:6px 0 0">Your best day is <b>${Math.round(a.share*100)}%</b> of your total profit, over the ${Math.round(guardLoad().consistency*100)}% cap. Your firm doesn't fail you for this — it raises the bar.</p>
-      <p class="home-note" style="margin:6px 0 0">You now need <b>$${a.needed.toLocaleString("en-US")}</b> total, not $${a.nominal.toLocaleString("en-US")} — <b>$${a.extra.toLocaleString("en-US")}</b> more from here. Smaller, steadier days bring it back down.</p></div>`; }
+      <p class="home-note" style="margin:6px 0 0">You now need <b>$${a.needed.toLocaleString("en-US")}</b> total, not $${a.nominal.toLocaleString("en-US")} — <b>$${a.falta.toLocaleString("en-US")}</b> more from here. Smaller, steadier days bring it back down.</p></div>`; }
   function sizeCard(){ const g=guardLoad(); if(!g.known)return "";
     const c=sizeCalc(), money0=v=>v===Infinity?"—":"$"+Math.round(v).toLocaleString("en-US");
     return `<div class="p-card"><div class="c-t">Position size <span class="room-agg">what your stop actually allows</span></div>
@@ -2353,7 +2555,7 @@
     const share=s.bestDay/s.totalProfit;
     if(share<=g.consistency)return null;
     const needed=Math.ceil(s.bestDay/g.consistency);
-    return {share, needed, extra:Math.max(0,needed-s.totalProfit), nominal:g.target}; }
+    return {share, needed, falta:Math.max(0,needed-s.totalProfit), nominal:g.target}; }
 
   /* ============== ¿HABRÍA SOBREVIVIDO? ========================================
      Corre tu diario REAL contra otro plan y dice si habrías tronado la cuenta.
@@ -2685,37 +2887,6 @@
   function simProfit(){ return NPtrades().filter(t=>t.pnl!=null&&t.sim).reduce((a,t)=>a+t.pnl,0); }
   function firmar(){ try{localStorage.setItem("candado_pledge",hoy());}catch(e){} if(vistaActual==="progreso")mostrar("progreso"); }
   function logPayout(){ const inp=$("#pout-amount"); const v=parseFloat(inp&&inp.value); if(!v||v<=0)return; const p=poutLoad(); p.unshift({date:hoy(),amount:Math.round(v)}); poutSave(p); if(vistaActual==="payouts")mostrar("payouts"); }
-  function viewPayout(){
-    const a=acctLoad()||{firm:"Tradeify",size:50000,evalTarget:1000,why:""};
-    const profit=totalProfit(), target=evalTargetNow(), pct=Math.max(0,Math.min(100,Math.round(profit/target*100))), toGo=Math.max(0,target-profit), avg=avgGreen(), left=avg>0?Math.ceil(toGo/avg):null, passed=profit>=target;
-    const st=stats(), payouts=poutLoad(), cashed=payouts.reduce((s,p)=>s+p.amount,0), pledged=localStorage.getItem("candado_pledge"), stage=passed?2:0;
-    return `<div class="payout-hero">
-      <div class="ph-l">The path to your payout${passed?" · funded":" · phase 1 of 3"}</div>
-      <div class="ph-v">${passed?`<span>$${cashed.toLocaleString("en-US")}</span> cashed`:`<span>$${toGo.toLocaleString("en-US")}</span> to clear the eval`}</div>
-      <div class="prog-bar big"><span style="width:${passed?100:pct}%"></span></div>
-      <div class="ph-sub">${passed
-        ?"Evaluation cleared — you're funded. Now protect the buffer and withdraw your first payout. Every disciplined session from here is money you can cash."
-        :`${pct}% of your $${target.toLocaleString("en-US")} <b>evaluation</b> target · profit ${money(profit)}${left!=null?` · ~${left} green session${left!==1?"s":""} away`:""}. This clears <b>phase 1</b> — then you're funded, and <b>then</b> the payouts begin.`}</div></div>
-    <div class="funnel">${funnelFor(target).map((f,i)=>`<div class="fn ${i<stage?'done':i===stage?'now':''}"><div class="fn-i">${i+1}</div><div class="fn-n">${f.label}</div><div class="fn-note">${f.note}</div></div>`).join('<div class="fn-arr">→</div>')}</div>
-    <div class="p-grid">
-      <div class="p-card"><div class="c-t">Your engine</div><div class="alloc">
-        <div class="alloc-row"><span>Discipline streak</span><b class="up">${st.racha}</b></div>
-        <div class="alloc-row"><span>Avg green session</span><b>${avg>0?money(avg):"—"}</b></div>
-        <div class="alloc-row"><span>${passed?"Status":"Sessions to clear eval"}</span><b>${passed?"funded":(left!=null?"~"+left:"—")}</b></div>
-        <div class="alloc-row"><span>Account</span><b>${a.firm} · $${(a.size||0).toLocaleString("en-US")}</b></div></div>
-        <p class="cier-note">One bullet a session. Every disciplined green day moves this bar. That's the whole game — don't blow it before you cash it.</p></div>
-      <div class="p-card"><div class="c-t">The contract</div>
-        <p class="pledge-txt">${PLEDGE}</p>
-        ${pledged?`<div class="signed">✓ Signed · ${pledged}</div>`:`<button class="btn fill" data-a="sign" data-hover>Sign the contract</button>`}</div></div>
-    <div class="p-grid">
-      <div class="p-card"><div class="c-t">Your why</div>
-        <label class="plan-l" for="acct-why">What your first payout buys</label>
-        <textarea id="acct-why" placeholder="your apartment, your car, your freedom…">${(a.why||"").replace(/</g,"&lt;")}</textarea>
-        <div class="acct-edit"><span>Firm <input id="acct-firm" value="${(a.firm||"").replace(/"/g,"&quot;")}"></span><span>Size $<input id="acct-size" type="number" value="${a.size||50000}"></span><span>Eval target $<input id="acct-target" type="number" value="${target}"></span></div></div>
-      <div class="p-card"><div class="c-t">Payouts cashed <b>$${cashed.toLocaleString("en-US")}</b></div>
-        <div class="pout-add"><div class="inp-money">$<input id="pout-amount" type="number" placeholder="900"></div><button class="btn" data-a="logpayout" data-hover>Log payout</button></div>
-        <div class="alloc">${payouts.length?payouts.map(p=>`<div class="alloc-row"><span>${p.date.slice(5).replace("-","/")}</span><b class="up">${money(p.amount)}</b></div>`).join(""):`<div class="hempty" style="border:none;padding:10px 0">No payouts yet. Cash your first and log it here.</div>`}</div></div></div>`;
-  }
 
   /* ===================== VIEW ROUTER ===================== */
   /* ===================== HOME · profile + community ===================== */
@@ -3072,7 +3243,6 @@
     if(i>=0)a.splice(i,1); else a.push(label);
     sesAcctsSave(a); }
   function sesAcctLoad(){ return sesAcctsLoad()[0]||""; }        // la principal
-  function sesAcctSave(v){ sesAcctsSave(v?[v]:[]); }
   function addAccount(){const a=acctsLoad()||[];a.push({firm:"New firm",size:50000,phase:"eval",balance:50000,pnl:0});acctsSave(a);ACCT_EDIT=a.length-1;/* nace en edición: nadie quiere una cuenta llamada "New firm" */if(vistaActual==="cuentas")mostrar("cuentas");}
   function acctEditSave(i){ const a=acctsLoad()||[]; const x=a[i]; if(!x)return;
     const gv=id=>{const el=$("#ae-"+id);return el?el.value.trim():"";};
@@ -3150,14 +3320,6 @@
   function welcomeBack(){ const h=histLoad().filter(x=>x.outcome); if(!h.length)return ""; const net=totalProfit(),streak=discStreak(),name=(profileLoad()||{}).handle||"trader",leak=topLeak();
     return `<div class="p-card wb-card"><div class="wb-l">Welcome back, <b>${esc(name)}</b>.</div><div class="wb-r"><span class="wb-chip">🔥 ${streak} streak</span><span class="wb-chip ${net>=0?'up':'down'}">${money(net)} net</span><span class="wb-chip">${h.length} sessions</span>${leak?`<span class="wb-chip leak" title="What the Spotter is watching today">⚠ Leak: ${esc(leak.txt)}</span>`:""}</div></div>`; }
   /* --- weekly challenge --- */
-  function weeklyChallenge(){
-    const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-    const weekAgo=iso(new Date(Date.now()-6*864e5)), wk=histLoad().filter(x=>x.outcome&&(x.fecha||"")>=weekAgo);
-    const clean=wk.filter(x=>!x.revenges).length, target=5, pct=Math.min(100,Math.round(clean/target*100));
-    return `<div class="p-card chal-card"><div class="chal-top"><div><div class="chal-k">This week</div><h3 class="chal-h">5 sessions · 0 revenge</h3></div><div class="chal-n">${clean}<small>/${target}</small></div></div>
-      <div class="prog-bar"><span style="width:${pct}%"></span></div>
-      <p class="home-note">${clean>=target?"Challenge complete! 🏆 Steel discipline this week.":"Respect your bullet every session — no chasing revenge. You're at "+clean+" of "+target+"."}</p></div>`;
-  }
   /* --- public profile of another trader (click on the leaderboard/race) --- */
   function openUserProfile(handle){ const u=SUPA_PROFILES.find(p=>(p.handle||"")===handle); if(!u)return;
     let m=document.getElementById("spot-modal"); if(!m){m=document.createElement("div");m.id="spot-modal";m.className="spot-modal";document.body.appendChild(m);}
@@ -3264,38 +3426,184 @@
       <div class="p-grid">
         <div class="p-card"><div class="c-t">The contract</div><p class="pledge-txt">${PLEDGE}</p>
           ${pledged?`<div class="signed">✓ Signed · ${pledged}</div>`:`<button class="btn fill" data-a="sign" data-hover>Sign the contract</button>`}</div>
-        <div class="p-card"><div class="c-t">Your why</div>
-          <label class="plan-l" for="acct-why">What your first payout buys</label>
-          <textarea id="acct-why" placeholder="your apartment, your car, your freedom…">${(a.why||"").replace(/</g,"&lt;")}</textarea></div>
+        <div class="p-card"><div class="c-t">Tu meta</div>
+          <p class="home-note" style="margin:0 0 10px">${goalLoad()?`Vas por <b>${goalFmt(goalLoad())}</b>. El Mapa te dice cuántos ciclos y cuántas cuentas hacen falta.`:"Todavía no eliges un monto. Un número concreto sirve; una lista de compras no."}</p>
+          <button class="btn ghost sm" data-route="mapa" data-hover>${goalLoad()?"Ver mi ruta →":"Elegir mi meta →"}</button></div>
       </div>
     </div>`;
   }
+  /* ============== EL MAPA: de una burbuja a una ruta ==========================
+     En vez de preguntarte qué te vas a comprar (que no sirve de nada), te
+     preguntamos CUÁNTO quieres hacer y te dibujamos cómo llegar. */
+  const GOALS=[1000,2500,5000,10000,25000,50000,100000,250000,500000,1000000];
+  var GOAL=0, GOAL_FIRM="Tradeify|Select Daily (fondeada)", GOAL_SIZE=50000, GOAL_N=1;
+  function goalLoad(){ try{ return +localStorage.getItem("candado_goal")||0; }catch(e){ return 0; } }
+  function goalSave(v){ try{ localStorage.setItem("candado_goal",String(v||0)); }catch(e){} }
+  const goalFmt=v=>v>=1000000?"$"+(v/1000000)+"M":"$"+(v/1000)+"k";
+
+  function bubbleField(){
+    const cur=GOAL||goalLoad();
+    const min=Math.log(GOALS[0]), max=Math.log(GOALS[GOALS.length-1]);
+    return `<div class="bub-field">${GOALS.map((v,i)=>{
+      const t=(Math.log(v)-min)/(max-min);
+      const size=Math.round(76+t*104);                 // el tamaño habla: $1M no puede verse igual que $1k
+      const dur=(7+((i*13)%9)).toFixed(1), delay=((i*7)%11)/2;
+      return `<button class="bub ${cur===v?"on":""}" data-goal="${v}" data-hover
+        style="width:${size}px;height:${size}px;animation-duration:${dur}s;animation-delay:-${delay}s">
+        <b>${goalFmt(v)}</b><i>${v>=100000?"al año":"al mes"}</i></button>`; }).join("")}</div>`; }
+
+  /* ---- EL PLAN POR FASES ----
+     La decisión que de verdad importa no es "qué firma", es CUÁNTAS CUENTAS.
+     Si el primer retiro topa en $1,000 y quieres $5,000, no necesitas más tiempo:
+     necesitas 5 cuentas. Y eso depende de cuánto puedes invertir hoy. */
+  var GOAL_MESES=1, GOAL_REINV=true;
+  const BASE_INVERSION=100;   // todos empiezan con $100: una cuenta, y el resto lo paga el negocio   // siempre reinvierte: es la jugada real al escalar   // GOAL_MESES fijo en 1: las mensualidades se muestran como tal, sin pedir el dato   // reinvertir los primeros pagos es la jugada normal al escalar   // meses que tardas en pasar: cambia el costo real de las mensualidades
+
+  function planPhases(key,size,budget,target){
+    const r0=routeTo(target,key,size,1,GOAL_MESES,GOAL_REINV); if(!r0)return null;
+    const unit=r0.price.total, cap1=r0.cap;
+    const alcanzables = unit? Math.max(0,Math.floor(budget/unit)) : null;
+    const necesarias  = cap1 ? Math.ceil(target/cap1) : null;
+    const tope        = r0.maxAcc||Infinity;
+    let n=1;
+    if(cap1){ n=Math.min(necesarias,tope); if(alcanzables!=null) n=Math.min(n,Math.max(1,alcanzables)); }
+    n=Math.max(1,n);
+    const r=routeTo(target,key,size,n,GOAL_MESES,GOAL_REINV);
+    const ideal=cap1?Math.min(necesarias,tope):1;
+    const falta=(unit!=null&&alcanzables!=null&&alcanzables<ideal)?Math.max(0,unit*ideal-budget):0;
+    const limitadoPor = !cap1?null
+      : (alcanzables!=null&&alcanzables<Math.min(necesarias,tope))?"tu presupuesto"
+      : (tope<necesarias?"el máximo de cuentas de la firma":null);
+    return { r, n, ideal, unit, costo:r.cost, alcanzables, necesarias, tope:r.maxAcc, limitadoPor, faltaPresupuesto:falta }; }
+
+  /* ---- EL CALENDARIO ----
+     Cuántos días de operación toma cada etapa. Si tienes diario, los días salen
+     de TU promedio real; si no, del mínimo que exige la firma (y se dice). */
+
+  function viewMap(){
+    GOAL=GOAL||goalLoad();
+    const P=GOAL?planPhases(GOAL_FIRM,GOAL_SIZE,BASE_INVERSION,GOAL):null;
+    return `<div class="mapv">
+      <div class="p-card">
+        <div class="c-t">¿Cuánto quieres retirar? <span class="room-agg">el número, no el sueño</span></div>
+        <p class="home-note" style="margin:0 0 14px">Toca un monto y te armo el plan por fases. Asume que empiezas con <b>$100</b> — una cuenta — y que reinviertes los primeros pagos para comprar más.</p>
+        ${bubbleField()}
+      </div>
+      ${!GOAL?"":fasesPlan(P)}
+    </div>`; }
+
+  /* Las fases con el mismo formato que la vista Plan: tarjeta por fase,
+     con su etiqueta, su número grande y sus renglones. */
+  function fasesPlan(P){
+    if(!P) return `<div class="p-card"><p class="home-note" style="margin:0">Ese plan no existe en ese tamaño.</p></div>`;
+    const r=P.r, $$=v=>"$"+Math.round(v).toLocaleString("en-US");
+    const avg=avgGreen();
+    const ses=v=>{ if(avg<=0)return ""; const k=Math.ceil(v/avg);
+      return `${k} ${k>1?"sesiones":"sesión"}`; };
+    const F=[];
+    F.push({tag:"Fase 1", t:"Pasar el examen", pay:P.n+(P.n>1?" cuentas":" cuenta"),
+      rows:[["Costo",P.costo!=null?$$(P.costo):"—"],
+            ["Objetivo por cuenta",r.evalTarget?$$(r.evalTarget):"—"],
+            ["Días mínimos",r.evalMinDays?String(r.evalMinDays):"sin mínimo"],
+            ["A tu ritmo",avg>0?ses(r.evalTarget||0):"—"],
+            ["Se cobra","no"]]});
+    F.push({tag:"Fase 2", t:r.buffer>0?"Construir el colchón":"Sin colchón", pay:r.buffer>0?$$(r.bufferTotal):"$0",
+      rows:[["Por cuenta",r.buffer>0?$$(r.buffer):"$0"],
+            ["Balance a alcanzar",r.buffer>0?$$(r.size+r.buffer):"—"],
+            ["Retiro mínimo",r.minPay?$$(r.minPay):"—"],
+            ["A tu ritmo",avg>0&&r.buffer?ses(r.buffer):"—"],
+            ["Se cobra","no todavía"]]});
+    if(r.steps){
+      const ver=Math.min(r.cycles,6);
+      for(let i=0;i<ver;i++){ const p=r.steps[i];
+        const rows=[["Cuentas",String(p.n)],["Por cuenta",$$(p.cap)],["Bruto",$$(p.bruto)]];
+        if(p.compra>0) rows.push(["Reinviertes",$$(p.gasto)+" → +"+p.compra]);
+        rows.push(["Acumulado",$$(p.acum)]);
+        F.push({tag:"Pago "+p.k, t:p.compra>0?`Cobras y compras ${p.compra} más`:(p.k===1?"Tu primer pago":"Otra vuelta"),
+          pay:$$(p.neto), rows, up:true}); }
+      if(r.cycles>ver) F.push({tag:"Pagos "+(ver+1)+"–"+r.cycles, t:"Repites el ciclo",
+        pay:$$(r.steps[ver].neto), up:true,
+        rows:[["Cuentas",String(r.steps[ver].n)],["Faltan",$$(Math.max(0,GOAL-r.steps[ver-1].acum))],
+              ["Pagos restantes",String(r.cycles-ver)],
+              ["Tope de la firma",r.maxPayouts?r.maxPayouts+" por cuenta":"sin tope"]]});
+    }
+    const cards=F.map((f,i)=>`<div class="p-card plan-phase${i===0?" now":""}">
+      <div class="pp-head"><div class="pp-tag">${esc(f.tag)}</div><div class="pp-pay ${f.up?"acc":""}">${f.pay}</div></div>
+      <h3>${esc(f.t)}</h3>
+      <div class="pp-rows">${f.rows.map(([k,v])=>`<div class="fr"><span>${esc(k)}</span><b>${v}</b></div>`).join("")}</div>
+    </div>`).join("");
+    return `<div class="plan-note">Plan para retirar <b>${goalFmt(GOAL)}</b> con <b>${esc(r.firm)} · ${esc(r.plan)}</b>, empezando con $100.
+      ${P.limitadoPor==="tu presupuesto"?`Con $100 arrancas con ${P.alcanzables||1} cuenta y las demás las compras con tus propios pagos.`:""}
+      ${r.missing.length?`<br><span style="color:#C9A24B">De este plan no pude verificar ${r.missing.join(" ni ")}.</span>`:""}</div>
+      <div class="plan-grid">${cards}</div>
+      ${r.note?`<p class="home-note" style="margin:14px 2px 0;opacity:.8">${esc(r.note)}</p>`:""}
+      <p class="home-note" style="margin:8px 2px 0;opacity:.6">Asume que pasas cada examen al primer intento y cobras el tope cada ciclo. Es el piso, no la expectativa.</p>`; }
+
   /* ---------- Plan · the scaling map (his real 4-phase plan) ---------- */
-  const PLAN_PHASES=[
-    {n:1,firm:"Tradeify",units:"×1 Red Pill",cost:1750,process:"3 days eval + 2 days buffer",target:"$1,000",pay:17500},
-    {n:2,firm:"Tradeify",units:"×5 Red Pills",cost:8800,process:"3 days eval + 2 days buffer",target:"$1,000 × 5",pay:80000},
-    {n:3,firm:"Apex",units:"×20 50Ks",cost:37500,process:"1–3 days eval + 2–5 days buffer",target:"$2,000 × 20",pay:700000},
-    {n:4,firm:"Tradeify · Lucid · Apex",units:"×30 50Ks",cost:55000,process:"1–3 days eval + 2–5 days buffer",target:"$2,000 × 50",pay:945000},
-  ];
+  /* ---- LA RUTA DE ESCALAMIENTO ----
+     Antes era una tabla escrita a mano con un producto que Tradeify ya no vende
+     ("Red Pill") y costos sin fuente. Ahora cada cifra se calcula del catálogo
+     verificado: precios reales, topes reales, y el máximo de cuentas que cada
+     firma permite de verdad. Si el catálogo cambia, estas fases cambian solas. */
+  function amrPhases(){
+    const mezcla=[
+      {n:1, etiqueta:"Una cuenta", partes:[["Tradeify|Select Daily (fondeada)",50000,1]]},
+      {n:2, etiqueta:"El máximo de una firma", partes:[["Tradeify|Select Daily (fondeada)",50000,5]]},
+      {n:3, etiqueta:"Segunda firma en paralelo",
+        partes:[["Tradeify|Select Daily (fondeada)",50000,5],["Apex Trader Funding|PA · Intraday Trail",50000,15]]},
+      {n:4, etiqueta:"Tres firmas al tope",
+        partes:[["Tradeify|Select Daily (fondeada)",50000,5],["Lucid Trading|LucidPro · Fondeada",50000,5],
+                ["Apex Trader Funding|PA · Intraday Trail",50000,20]]}
+    ];
+    return mezcla.map(f=>{
+      let costo=0, pago=0, cuentas=0, firmas=[], faltan=false;
+      for(const [key,size,n] of f.partes){
+        const P=PLAN_ROUTE[key], S=P&&P.sizes[size]; if(!P||!S){faltan=true;continue;}
+        const pr=priceOf(P,size,1), cap=capAt(S,1);
+        if(pr.total==null||cap==null){faltan=true;continue;}
+        costo+=pr.total*n; pago+=cap*n; cuentas+=n;
+        const nom=key.split("|")[0]; if(!firmas.includes(nom))firmas.push(nom);
+      }
+      return {n:f.n, etiqueta:f.etiqueta, firmas:firmas.join(" · "), cuentas,
+              costo:Math.round(costo), pago:Math.round(pago), faltan,
+              partes:f.partes.map(([k,size,n])=>({plan:k.split("|")[1], firma:k.split("|")[0], n, size}))};
+    });
+  }
+
   function planMode(){try{return localStorage.getItem("candado_planmode")||"amr";}catch(e){return "amr";}}
   function myPlanLoad(){try{return JSON.parse(localStorage.getItem("candado_myplan"))||{setup:"",phases:[{},{},{},{}]};}catch(e){return{setup:"",phases:[{},{},{},{}]};}}
   function myPlanSave(p){try{localStorage.setItem("candado_myplan",JSON.stringify(p));}catch(e){}}
-  function myPlanCopyAMR(){ const mp=myPlanLoad(); mp.phases=PLAN_PHASES.map(p=>({firm:p.firm,units:p.units,cost:String(p.cost),target:p.target,pay:String(p.pay)})); if(!mp.setup)mp.setup="Opening Range Breakout → liquidity"; myPlanSave(mp); mostrar("plan"); }
+  /* Los planes copiados antes de la verificación traen cifras inventadas
+     ("Red Pill", costos sin fuente). No las borro sin avisar: son datos del
+     usuario. Se marcan y se ofrece rehacerlas con el catálogo verificado. */
+  function myPlanRancio(){ const mp=myPlanLoad();
+    return !!(mp.phases||[]).some(p=>/red pill/i.test(p.units||"")||String(p.cost)==="1750"||String(p.pay)==="17500"); }
+  function myPlanAvisoRancio(){ if(!myPlanRancio())return "";
+    return `<div class="p-card" style="border-color:rgba(201,162,75,.45);background:rgba(201,162,75,.07)">
+      <div class="c-t" style="margin:0">Este plan trae cifras viejas</div>
+      <p class="home-note" style="margin:6px 0 0">Lo copiaste cuando la app usaba una tabla escrita a mano: menciona un producto que Tradeify ya no vende y costos que nunca tuvieron fuente. Ahora todo se calcula del catálogo verificado.</p>
+      <div class="re-btns"><button class="btn" data-a="copyamr" data-hover>Rehacerlo con los datos verificados</button></div>
+      <p class="home-note" style="margin:8px 0 0;opacity:.65">Si ya lo editaste a tu gusto, ignóralo — no toco tus números sin que lo pidas.</p></div>`; }
+
+  function myPlanCopyAMR(){ const mp=myPlanLoad(); mp.phases=amrPhases().map(p=>({firm:p.firmas,units:p.cuentas+(p.cuentas>1?" cuentas":" cuenta"),cost:String(p.costo),target:"$"+p.pago.toLocaleString("en-US"),pay:String(p.pago)})); if(!mp.setup)mp.setup="Opening Range Breakout → liquidity"; myPlanSave(mp); mostrar("plan"); }
   function amrPlanBody(){
     const accts=acctsLoad()||[], nA=accts.length, cashed=poutLoad().length;
     const cur=cashed===0?1:(nA>=30?4:nA>=20?3:nA>=5?2:1);
     const fmt=n=>"$"+n.toLocaleString("en-US");
-    const cards=PLAN_PHASES.map(p=>{const done=p.n<cur,now=p.n===cur;return `<div class="p-card plan-phase ${now?"now":""} ${done?"done":""}">
-      <div class="pp-head"><div class="pp-tag">Phase ${p.n}${now?" · you are here":done?" · ✓":""}</div><div class="pp-pay ${now?"acc":""}">${fmt(p.pay)}</div></div>
-      <h3>${p.firm}</h3>
+    const F=amrPhases();
+    const cards=F.map(p=>{const done=p.n<cur,now=p.n===cur;return `<div class="p-card plan-phase ${now?"now":""} ${done?"done":""}">
+      <div class="pp-head"><div class="pp-tag">Phase ${p.n}${now?" · you are here":done?" · ✓":""}</div><div class="pp-pay ${now?"acc":""}">${fmt(p.pago)}</div></div>
+      <h3>${esc(p.etiqueta)}</h3>
       <div class="pp-rows">
-        <div class="fr"><span>Accounts</span><b>${p.units}</b></div>
-        <div class="fr"><span>Cost</span><b>${fmt(p.cost)}</b></div>
-        <div class="fr"><span>Timeline</span><b>${p.process}</b></div>
-        <div class="fr"><span>Payout target</span><b>${p.target}</b></div>
-        <div class="fr"><span>First pay</span><b class="up">${fmt(p.pay)}</b></div>
-      </div></div>`;}).join("");
-    return `<div class="plan-note">This is <b>the path André (AMR) scaled with</b> — the mentor's plan. Follow it as-is, or build your own in <b>"My plan"</b>.</div>
+        <div class="fr"><span>Firms</span><b>${esc(p.firmas)}</b></div>
+        <div class="fr"><span>Accounts</span><b>${p.cuentas}</b></div>
+        <div class="fr"><span>Cost to enter</span><b>${fmt(p.costo)}</b></div>
+        <div class="fr"><span>Per payout</span><b class="up">${fmt(p.pago)}</b></div>
+      </div>
+      <div class="pp-mix">${p.partes.map(x=>`<span>${x.n}× ${esc(x.firma)} · ${esc(x.plan)}</span>`).join("")}</div>
+      ${p.faltan?`<p class="home-note" style="margin:8px 0 0;color:#C9A24B">De alguna de estas firmas falta un dato verificado, así que el total se queda corto.</p>`:""}
+      </div>`;}).join("");
+    return `<div class="plan-note">This is <b>the path André (AMR) scaled with</b> — the mentor's plan. Every figure below is computed from the <b>verified firm catalog</b>: real prices, real payout caps, and the real limit on how many funded accounts each firm allows. Follow it as-is, or build your own in <b>"My plan"</b>.</div>
       <div class="plan-grid">${cards}</div>
       <div class="p-card model-card"><div class="c-t">Execution model · proven ✓</div>
         <div class="model-in">
@@ -3305,7 +3613,7 @@
   }
   function myPlanBody(){
     const mp=myPlanLoad();
-    const ph=(i)=>{const p=mp.phases[i]||{}; return `<div class="p-card plan-phase"><div class="pp-head"><div class="pp-tag">Phase ${i+1}</div></div>
+    const ph=(i)=>{const p=mp.phases[i]||{}; return `${myPlanAvisoRancio()}<div class="p-card plan-phase"><div class="pp-head"><div class="pp-tag">Phase ${i+1}</div></div>
       <input class="mp-inp mp-firm" data-mp="${i}.firm" value="${esc(p.firm||"")}" placeholder="Your firm">
       <div class="pp-rows">
         <div class="fr"><span>Accounts</span><input class="mp-inp" data-mp="${i}.units" value="${esc(p.units||"")}" placeholder="×1"></div>
@@ -3449,6 +3757,7 @@
     coach:{t:"AI Coach",s:"what your data sees",f:viewCoach},
     progreso:{t:"Progress",s:"eval → funded → eden",f:viewProgress},
     cuentas:{t:"Accounts",s:"your funded accounts",f:viewAccounts},
+    mapa:{t:"Mapa",s:"de tu meta a la ruta",f:viewMap},
     plan:{t:"Plan",s:"the map to scale",f:viewPlan},
     payouts:{t:"Payouts",s:"payout management",f:viewPayouts},
     settings:{t:"Settings",s:"your platform",f:viewSettings},
@@ -3457,7 +3766,7 @@
     {r:"home",label:"Home"},{r:"course",label:"Course"},
     {group:"TRADE"},{r:"sesion",label:"Start Session"},{r:"training",label:"Training"},
     {group:"JOURNAL"},{r:"dashboard",label:"Dashboard"},{r:"trades",label:"Trades"},{r:"coach",label:"AI Coach"},{r:"progreso",label:"Progress"},{r:"cuentas",label:"Accounts"},
-    {group:"MONEY"},{r:"plan",label:"Plan"},{r:"payouts",label:"Payouts"},
+    {group:"MONEY"},{r:"mapa",label:"Mapa"},{r:"plan",label:"Plan"},{r:"payouts",label:"Payouts"},
   ];
   function renderSidebar(){
     const name=profileLoad().handle||"trader";
@@ -3508,6 +3817,8 @@
     const oe=e.target.closest("[data-onbexp]"); if(oe&&ONB){ONB.data.exp=oe.dataset.onbexp;renderOnb();return;}
     const go=e.target.closest("[data-go]"); if(go){mostrar(go.dataset.go);return;}
     const sm=e.target.closest("[data-sesmode]"); if(sm){sesModeSave(sm.dataset.sesmode);mostrar("sesion");return;}
+    const pp=e.target.closest("[data-planpick]"); if(pp){GOAL_FIRM=pp.dataset.planpick;const zs=routeSizes(GOAL_FIRM);if(!zs.includes(GOAL_SIZE))GOAL_SIZE=zs[0];mostrar("mapa");return;}
+    const gb=e.target.closest("[data-goal]"); if(gb){GOAL=+gb.dataset.goal;goalSave(GOAL);mostrar("mapa");return;}
     const ga=e.target.closest("[data-guardacct]"); if(ga){sesAcctsSave([ga.dataset.guardacct]);mostrar(vistaActual);return;}
     const smulti=e.target.closest("[data-sesmulti]"); if(smulti){ SES_MULTI=smulti.dataset.sesmulti==="1";
       if(!SES_MULTI){ const keep=sesAcctsLoad()[0]; sesAcctsSave(keep?[keep]:[]); }   // al salir de múltiple, queda la primera

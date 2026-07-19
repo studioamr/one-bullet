@@ -60,46 +60,63 @@
   .btn.lg{padding:17px 30px;font-size:13px}
 
 
-  /* ---- el momento: el producto en el hero ---- */
-  .hero-grid{display:grid;grid-template-columns:1fr;gap:clamp(38px,5vw,64px);align-items:center}
-  @media(min-width:1080px){ .hero-grid{grid-template-columns:minmax(0,1.05fr) minmax(340px,.85fr)} }
-  .hero-frame{position:relative;z-index:3;max-width:470px;justify-self:end;width:100%}
-  @media(max-width:1079px){.hero-frame{justify-self:start;max-width:440px}}
-  .hf-win{border:1px solid var(--line2);border-radius:14px;background:linear-gradient(180deg,rgba(14,14,18,.92),rgba(7,7,9,.92));
-    backdrop-filter:blur(3px);overflow:hidden;box-shadow:0 30px 80px -40px rgba(0,0,0,.9)}
-  .hf-bar{display:flex;align-items:center;gap:10px;padding:11px 15px;border-bottom:1px solid var(--line)}
-  .hf-eye{width:20px;height:20px;flex:none;color:var(--dim);animation:hfBlink 9s ease-in-out infinite;transform-origin:16px 16px}
-  @keyframes hfBlink{0%,86%{transform:scaleY(1)}88%{transform:scaleY(.08)}90%{transform:scaleY(1)}92%{transform:scaleY(.08)}94%,100%{transform:scaleY(1)}}
-  .hf-name{font-family:var(--mono);font-size:10px;letter-spacing:.30em;color:var(--dim)}
-  .hf-name i{font-style:normal;color:var(--acc);margin-left:5px}
-  .hf-dot{margin-left:auto;width:6px;height:6px;border-radius:50%;background:var(--dn);animation:pulse 1.8s infinite}
-  .hf-body{padding:16px 18px 20px;display:flex;flex-direction:column;gap:15px}
-  .hf-acct{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
-  .hf-chip{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
-    padding:5px 9px;border-radius:6px;border:1px solid rgba(74,144,217,.4);color:var(--acc);background:rgba(74,144,217,.08)}
-  .hf-plan{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
-  .hf-today{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
-  .hf-today b{color:var(--dn);font-variant-numeric:tabular-nums;margin-left:4px}
-  .hf-lock{display:flex;gap:13px;align-items:flex-start;padding:14px;border-radius:10px;
-    border:1px solid rgba(242,54,69,.4);background:rgba(242,54,69,.07)}
-  .hf-lockic{flex:none;width:26px;height:26px;color:var(--dn)}
-  .hf-lockic svg{width:100%;height:100%}
-  .hf-h{font-family:var(--sans);font-size:1rem;font-weight:600;letter-spacing:-.01em}
-  .hf-p{font-family:var(--sans);font-size:.84rem;color:var(--dim);margin:4px 0 0;line-height:1.5}
-  .hf-mtop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
-  .hf-mtop span{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
-  .hf-mtop b{font-family:var(--mono);font-size:11px;font-variant-numeric:tabular-nums;color:var(--dn)}
-  .hf-bar-track{height:5px;border-radius:3px;background:rgba(237,235,230,.08);overflow:hidden}
-  .hf-fill{display:block;height:100%;width:100%;background:var(--dn);transform-origin:left;
-    animation:hfDrain 3.4s cubic-bezier(.5,0,.2,1) .6s both}
-  @keyframes hfDrain{from{transform:scaleX(.35)}to{transform:scaleX(1)}}
-  .hf-btn{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
-    padding:13px;border-radius:9px;border:1px solid var(--line2);background:transparent;color:var(--dim);
-    opacity:.32;cursor:not-allowed;pointer-events:none;text-decoration:line-through}
-  .hf-cap{font-family:var(--sans);font-size:.9rem;color:var(--text);margin:18px 0 0;line-height:1.55;
-    padding:12px 14px;border-left:2px solid var(--acc);background:rgba(7,7,9,.72);backdrop-filter:blur(2px);border-radius:0 8px 8px 0}
-  .hf-cap span{color:var(--dim);font-size:.82rem;display:inline-block;margin-top:3px}
-  @media(prefers-reduced-motion:reduce){.hf-eye,.hf-fill,.hf-dot{animation:none}}
+
+  /* ---- la sesión: pantalla vista por Claude ---- */
+  .watch{padding:clamp(80px,10vw,140px) 0;position:relative;z-index:2}
+  .w-head{max-width:70ch;margin-bottom:clamp(30px,4vw,48px)}
+  .w-h{font-family:var(--serif);font-size:clamp(2.1rem,5vw,3.6rem);line-height:1.06;letter-spacing:-.02em;margin:14px 0 0}
+  .w-h em{font-style:italic;color:var(--acc)}
+  .w-sub{color:var(--dim);font-size:clamp(.98rem,1.5vw,1.13rem);line-height:1.65;margin-top:16px;max-width:62ch}
+  .w-stage{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:1000px){ .w-stage{grid-template-columns:minmax(0,1.62fr) minmax(280px,.7fr)} }
+
+  /* el naranja de Claude: el borde vivo que dice "esto lo está viendo" */
+  .w-screen{position:relative;padding:3px;border-radius:16px}
+  .w-glow{position:absolute;inset:0;border-radius:16px;padding:2px;pointer-events:none;
+    background:conic-gradient(from 0deg,rgba(217,119,87,0) 0deg,#D97757 70deg,#E8A87C 130deg,rgba(217,119,87,0) 210deg,rgba(217,119,87,0) 360deg);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+    animation:claudeSpin 6s linear infinite}
+  .w-screen::after{content:"";position:absolute;inset:-14px;border-radius:24px;pointer-events:none;
+    background:radial-gradient(60% 55% at 50% 50%,rgba(217,119,87,.16),transparent 72%);filter:blur(12px);z-index:-1}
+  @keyframes claudeSpin{to{transform:rotate(360deg)}}
+  @media(prefers-reduced-motion:reduce){.w-glow{animation:none;background:#D97757;opacity:.5}}
+  .w-win{position:relative;border-radius:13px;overflow:hidden;background:#0b0b0f;border:1px solid var(--line)}
+  .w-bar{display:flex;align-items:center;gap:14px;padding:10px 14px;border-bottom:1px solid var(--line)}
+  .w-sym{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--text)}
+  .w-live{margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9.5px;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--dn)}
+  .w-live i{width:6px;height:6px;border-radius:50%;background:var(--dn);animation:pulse 1.8s infinite}
+  .w-clock{font-family:var(--mono);font-size:10.5px;color:var(--dim);font-variant-numeric:tabular-nums}
+  .w-canvas{display:block;width:100%;height:auto;background:#0b0b0f}
+  .w-watch{position:absolute;left:16px;bottom:-13px;z-index:3;display:inline-flex;align-items:center;gap:9px;
+    padding:7px 13px;border-radius:999px;background:#0b0b0f;border:1px solid rgba(217,119,87,.55);
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#E8A87C}
+  .w-eye{width:15px;height:15px;color:#D97757;display:inline-block}
+  .w-eye svg{width:100%;height:100%}
+  .w-eye.sm{width:auto;font-size:9px}
+
+  /* el Spotter hablando */
+  .w-feed{border:1px solid var(--line);border-radius:14px;background:rgba(14,14,18,.72);backdrop-filter:blur(3px);
+    padding:14px;display:flex;flex-direction:column;min-height:340px}
+  .w-feed-h{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;
+    text-transform:uppercase;color:#E8A87C;padding-bottom:11px;border-bottom:1px solid var(--line);margin-bottom:4px}
+  .w-msgs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;justify-content:flex-end;flex:1}
+  .w-msg{opacity:0;transform:translateY(7px);transition:opacity .45s ease,transform .45s ease;padding:9px 2px}
+  .w-msg.in{opacity:1;transform:none}
+  .wm-t{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--dim)}
+  .w-msg p{margin:4px 0 0;font-family:var(--sans);font-size:.87rem;line-height:1.5;color:var(--text)}
+  .w-msg.tag-entrada p{color:var(--acc2)}
+  .w-msg.tag-salida p{color:var(--up)}
+  .w-msg.tag-alto{border-left:2px solid var(--dn);padding-left:10px}
+  .w-msg.tag-alto p{color:var(--dn)}
+
+  /* el producto de 0 a 10 */
+  .w-steps{list-style:none;margin:clamp(34px,4vw,52px) 0 0;padding:0;
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .w-steps li{background:var(--bg);padding:18px 18px 20px;display:flex;flex-direction:column;gap:5px}
+  .w-steps b{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:#D97757}
+  .w-steps span{font-family:var(--sans);font-size:.98rem;font-weight:600;letter-spacing:-.01em}
+  .w-steps i{font-style:normal;font-family:var(--sans);font-size:.83rem;color:var(--dim);line-height:1.5}
 
   /* ---- hero ---- */
   .hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:130px 0 70px;position:relative;z-index:2}
@@ -404,8 +421,7 @@
 </div></nav>
 
 <!-- HERO -->
-<header class="hero"><div class="wrap hero-grid">
- <div class="hero-copy">
+<header class="hero"><div class="wrap">
   <div class="eyebrow reveal"><span class="tick"></span>En vivo · cada mañana en la apertura de Nueva York · 7:00 AM</div>
   <h1 class="display reveal">Aprende.<br>Opera. <em>Cobra.</em></h1>
   <p class="hero-sub reveal">Aprende a operar futuros con el <b>dinero de empresas fondeadoras — no el tuyo</b>. Mentor en vivo, la plataforma <b>Spotter AI</b> y una comunidad activa. <b>Regístrate y descarga la app hoy</b> — te queda en el escritorio, lista para operar.</p>
@@ -414,45 +430,55 @@
   </div>
  </div>
 
- <!-- EL MOMENTO: no atmósfera, el producto haciendo lo suyo -->
- <aside class="hero-frame reveal" aria-label="La app cerrando el día">
-  <div class="hf-win">
-    <div class="hf-bar">
-      <svg class="hf-eye" viewBox="0 0 32 32" aria-hidden="true">
-        <polygon points="2.8,16 6.8,10.6 12.2,7.6 16,7 19.8,7.6 25.2,10.6 29.2,16 25.2,21.4 19.8,24.4 16,25 12.2,24.4 6.8,21.4" fill="none" stroke="currentColor" stroke-width="1.15" opacity=".5"/>
-        <polygon points="19.8,16 17.9,19.3 14.1,19.3 12.2,16 14.1,12.7 17.9,12.7" fill="none" stroke="var(--acc)" stroke-width="1.15"/>
-        <circle cx="16" cy="16" r="1.45" fill="var(--acc)"/>
-      </svg>
-      <span class="hf-name">SPOTTER<i>AI</i></span>
-      <span class="hf-dot" aria-hidden="true"></span>
-    </div>
-
-    <div class="hf-body">
-      <div class="hf-acct"><span class="hf-chip">Topstep · $50k</span><span class="hf-plan">Trading Combine</span>
-        <span class="hf-today">Today <b>−$2,100</b></span></div>
-      <div class="hf-lock">
-        <div class="hf-lockic" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M7 10V7.5a5 5 0 0 1 10 0V10" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="4.5" y="10" width="15" height="10.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="15.2" r="1.5" fill="currentColor"/></svg>
-        </div>
-        <div>
-          <div class="hf-h">Locked — the day is done</div>
-          <p class="hf-p">You're down $2,100 today and your limit is $2,000.</p>
-        </div>
-      </div>
-
-      <div class="hf-meter">
-        <div class="hf-mtop"><span>Drawdown floor</span><b>$0 above $50,000</b></div>
-        <div class="hf-bar-track"><span class="hf-fill"></span></div>
-      </div>
-
-      <button class="hf-btn" type="button" tabindex="-1" aria-hidden="true">Start session</button>
-    </div>
-  </div>
-  <p class="hf-cap">El software te cierra el día cuando tu límite dice basta.<br><span>Reglas reales de tu fondeadora — no un promedio inventado.</span></p>
- </aside>
 </div>
 <div class="hero-scroll">baja — te cuento cómo funciona</div>
 </header>
+
+<!-- LA SESIÓN: el producto trabajando -->
+<section class="watch" id="ensesion">
+ <div class="wrap">
+  <div class="w-head">
+    <span class="eyebrow"><span class="tick"></span>Apertura de Nueva York · 8:30 AM ET</span>
+    <h2 class="w-h">Así se siente <em>operar conmigo.</em></h2>
+    <p class="w-sub">Tú operas en tu plataforma de siempre. El Spotter ve tu pantalla, te habla, marca tus niveles y escribe tu diario. Esto es una sesión real, de principio a fin.</p>
+  </div>
+
+  <div class="w-stage">
+    <div class="w-screen">
+      <div class="w-glow" aria-hidden="true"></div>
+      <div class="w-win">
+        <div class="w-bar">
+          <span class="w-sym">BTCUSD · 1m</span>
+          <span class="w-live"><i></i> en vivo</span>
+          <span class="w-clock" id="wClock">08:30</span>
+        </div>
+        <canvas id="wChart" class="w-canvas" width="1200" height="620" aria-label="Gráfico de 1 minuto desde la apertura de Nueva York"></canvas>
+      </div>
+      <div class="w-watch"><span class="w-eye" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><polygon points="2.8,16 6.8,10.6 12.2,7.6 16,7 19.8,7.6 25.2,10.6 29.2,16 25.2,21.4 19.8,24.4 16,25 12.2,24.4 6.8,21.4" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".55"/><polygon points="19.8,16 17.9,19.3 14.1,19.3 12.2,16 14.1,12.7 17.9,12.7" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/></svg></span>
+        Claude está viendo tu pantalla</div>
+    </div>
+
+    <aside class="w-feed" aria-label="Mensajes del Spotter">
+      <div class="w-feed-h"><span class="w-eye sm" aria-hidden="true">◉</span> Spotter</div>
+      <ol class="w-msgs" id="wMsgs"></ol>
+    </aside>
+  </div>
+
+  <ol class="w-steps">
+    <li><b>01</b><span>Premarket contigo</span><i>Te lee el calendario, tu plan y tu peor fuga antes de que abra.</i></li>
+    <li><b>02</b><span>Marca tus niveles</span><i>El rango de la noche, el máximo previo, tu zona.</i></li>
+    <li><b>03</b><span>Te carga una bala</span><i>Una operación. La mejor del día, o ninguna.</i></li>
+    <li><b>04</b><span>Ve tu pantalla</span><i>Captura tus entradas y salidas sin que escribas nada.</i></li>
+    <li><b>05</b><span>Te habla en voz alta</span><i>No tienes que quitar la vista del gráfico.</i></li>
+    <li><b>06</b><span>Vigila tu límite</span><i>Con las reglas reales de tu fondeadora, no un promedio.</i></li>
+    <li><b>07</b><span>Te frena a media operación</span><i>Si vas por el segundo trade, te lo dice antes de que lo tomes.</i></li>
+    <li><b>08</b><span>Cierra el día</span><i>Toca tu límite y la app se bloquea. De verdad.</i></li>
+    <li><b>09</b><span>Escribe tu diario</span><i>Al cerrar, ya está lleno. Con números, no con recuerdos.</i></li>
+    <li><b>10</b><span>Te dice qué te cuesta dinero</span><i>Con datos de tus propias sesiones, no opiniones.</i></li>
+  </ol>
+ </div>
+</section>
 
 <!-- ETAPA 1 -->
 <section class="chapter" id="historia" data-ch="1" data-beat="1"><div class="ch-sticky"><div class="ch-inner">
@@ -638,12 +664,12 @@
     <div class="shot">
       <div class="bar"><i></i><i></i><i></i><span>Tu plan de crecimiento</span></div>
       <div class="body"><div class="mk-phases">
-        <div class="mk-ph on"><span><b>Fase 1</b> · tu primera cuenta</span><span class="amt">meta $1,750</span></div>
-        <div class="mk-ph"><span><b>Fase 2</b> · varias cuentas a la vez</span><span class="amt">meta $8,800</span></div>
-        <div class="mk-ph"><span><b>Fase 3</b> · escala en serio</span><span class="amt">meta $37,500</span></div>
-        <div class="mk-ph"><span><b>Fase 4</b> · nivel profesional</span><span class="amt">meta $55,000</span></div>
+        <div class="mk-ph on"><span><b>Fase 1</b> · 1 cuenta · entras con $99</span><span class="amt">$1,000 por pago</span></div>
+        <div class="mk-ph"><span><b>Fase 2</b> · 5 cuentas · entras con $495</span><span class="amt">$5,000 por pago</span></div>
+        <div class="mk-ph"><span><b>Fase 3</b> · 20 cuentas · dos firmas</span><span class="amt">$27,500 por pago</span></div>
+        <div class="mk-ph"><span><b>Fase 4</b> · 30 cuentas · tres firmas</span><span class="amt">$45,000 por pago</span></div>
       </div></div>
-      <div class="cap"><b>Un mapa, no una apuesta.</b> Sabes exactamente cuál es tu siguiente paso y cuánto falta. (Es el mapa del camino — no una promesa de resultados.)</div>
+      <div class="cap"><b>Un mapa, no una apuesta.</b> Cada cifra sale de los precios y topes de retiro reales de cada fondeadora, verificados en sus propias fuentes. Es el mapa del camino — no una promesa de resultados.</div>
     </div>
     <div class="shot">
       <div class="bar"><i></i><i></i><i></i><span>Tu pago, repartido</span></div>
@@ -1294,6 +1320,120 @@
       tape.style.opacity=Math.max(0,1-(d.scrollTop/((d.scrollHeight-innerHeight)||1))*1.2);},{passive:true});
   }
 })();
+
+/* ============ LA SESIÓN: el gráfico vivo y el Spotter hablando ==============
+   El gráfico no es aleatorio: cuenta la historia de una apertura de Nueva York
+   —rango, ruptura, pico, lavada, recuperación— y cada mensaje del Spotter cae
+   justo en la vela donde tiene sentido decirlo. */
+(function(){
+  const cv=document.getElementById("wChart"); if(!cv)return;
+  const ctx=cv.getContext("2d"), W=cv.width, H=cv.height;
+  const PAD={l:14,r:96,t:16,b:30};
+
+  /* la historia, en tramos: [nº velas, deriva por vela, volatilidad] */
+  const TRAMOS=[[16,-1.5,10],[22,2.2,11],[10,7.5,16],[6,26,26],[5,-34,30],[9,14,20],[10,4,12]];
+  let seed=20260718;
+  const rnd=()=>{ seed=(seed*1664525+1013904223)&0x7fffffff; return seed/0x7fffffff; };
+  const velas=[]; let p=63905;
+  for(const [n,drift,vol] of TRAMOS){
+    for(let i=0;i<n;i++){
+      const o=p, c=o+drift+(rnd()-.5)*vol*2;
+      const hi=Math.max(o,c)+rnd()*vol*.9, lo=Math.min(o,c)-rnd()*vol*.9;
+      velas.push({o,c,hi,lo}); p=c; } }
+  const N=velas.length;
+  const RANGO_ALTO=Math.max(...velas.slice(0,38).map(v=>v.hi));   // el techo del rango previo a la ruptura
+  const RANGO_BAJO=Math.min(...velas.slice(0,38).map(v=>v.lo));
+
+  const MSGS=[
+    {at:0,  t:"Buenos días. Faltan 5 minutos para la apertura. Tu plan de hoy: una operación, 1% de stop."},
+    {at:3,  t:"Tu peor fuga del mes fue la venganza después de una pérdida. Hoy la vigilo yo."},
+    {at:14, t:"Marqué el rango de la noche: 63,900 abajo, 64,000 arriba. Fuera de ahí no hay nada que hacer."},
+    {at:24, t:"Sigue dentro del rango. No es tu operación. Espera."},
+    {at:38, t:"Rompió arriba con volumen. Esta sí califica — es tu A+."},
+    {at:41, t:"Veo tu entrada en 64,020. Stop 63,980, objetivo 64,160. Riesgo $400.", tag:"entrada"},
+    {at:48, t:"Vas +$1,100. Estás en tu objetivo. La codicia empieza aquí."},
+    {at:54, t:"Saliste en 64,150. +$1,300. Operación limpia.", tag:"salida"},
+    {at:60, t:"Se está lavando. Si estuvieras adentro habrías devuelto todo — saliste bien."},
+    {at:66, t:"Te veo abriendo el DOM otra vez. Ya disparaste tu bala de hoy.", tag:"alto"},
+    {at:72, t:"Sesión sellada. Tu diario ya está escrito: 1 operación, +$1,300, sin venganza. Nos vemos mañana."}
+  ];
+
+  let frame=0, mostradas=0, cur=0, subCur=0, viva=false;
+  /* solo corre cuando la ves: así siempre la agarras desde el principio de la historia */
+  try{ new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting) viva=true; }); },
+    {threshold:.25}).observe(document.getElementById("ensesion")); }catch(e){ viva=true; }
+  const feed=document.getElementById("wMsgs"), clock=document.getElementById("wClock");
+  const hhmm=i=>{ const m=8*60+30+i; return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0"); };
+
+  function pintar(){
+    const vis=velas.slice(0,cur+1);
+    let hi=Math.max(...vis.map(v=>v.hi)), lo=Math.min(...vis.map(v=>v.lo));
+    const pad=(hi-lo)*.14||20; hi+=pad; lo-=pad;
+    const x=i=>PAD.l+(i+.5)*((W-PAD.l-PAD.r)/Math.max(N,1));
+    const y=v=>PAD.t+(hi-v)/(hi-lo)*(H-PAD.t-PAD.b);
+    const bw=Math.max(3,((W-PAD.l-PAD.r)/N)*.62);
+    ctx.clearRect(0,0,W,H);
+    // cajas de sesión: la noche y la de Nueva York
+    ctx.fillStyle="rgba(242,54,69,.055)"; ctx.fillRect(PAD.l,y(RANGO_ALTO),x(15)-PAD.l,y(RANGO_BAJO)-y(RANGO_ALTO));
+    if(cur>16){ ctx.fillStyle="rgba(74,144,217,.075)";
+      ctx.fillRect(x(16)-bw,y(RANGO_ALTO),Math.min(x(cur),x(38))-x(16)+bw,y(RANGO_BAJO)-y(RANGO_ALTO)); }
+    // niveles marcados por el Spotter
+    ctx.setLineDash([5,5]); ctx.lineWidth=1;
+    if(cur>=14){ ctx.strokeStyle="rgba(242,54,69,.5)"; ctx.beginPath(); ctx.moveTo(PAD.l,y(RANGO_ALTO)); ctx.lineTo(W-PAD.r,y(RANGO_ALTO)); ctx.stroke();
+      ctx.strokeStyle="rgba(237,235,230,.28)"; ctx.beginPath(); ctx.moveTo(PAD.l,y(RANGO_BAJO)); ctx.lineTo(W-PAD.r,y(RANGO_BAJO)); ctx.stroke(); }
+    ctx.setLineDash([]);
+    // la operación
+    if(cur>=41){ const e=velas[41].c, st=e-40, tp=e+140;
+      ctx.fillStyle="rgba(53,196,111,.08)"; ctx.fillRect(x(41),y(tp),Math.min(x(cur),x(54))-x(41),y(e)-y(tp));
+      ctx.fillStyle="rgba(242,54,69,.10)"; ctx.fillRect(x(41),y(e),Math.min(x(cur),x(54))-x(41),y(st)-y(e)); }
+    // velas
+    for(let i=0;i<vis.length;i++){ const v=vis[i], up=v.c>=v.o, X=x(i);
+      const col=up?"#089981":"#F23645";
+      ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(X,y(v.hi)); ctx.lineTo(X,y(v.lo)); ctx.stroke();
+      const yo=y(v.o), yc=y(v.c); ctx.fillRect(X-bw/2,Math.min(yo,yc),bw,Math.max(1.5,Math.abs(yc-yo))); }
+    // precio actual
+    const last=vis[vis.length-1];
+    ctx.strokeStyle="rgba(237,235,230,.35)"; ctx.setLineDash([2,4]); ctx.beginPath();
+    ctx.moveTo(PAD.l,y(last.c)); ctx.lineTo(W-PAD.r,y(last.c)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=last.c>=last.o?"#089981":"#F23645"; ctx.fillRect(W-PAD.r+4,y(last.c)-10,84,20);
+    ctx.fillStyle="#fff"; ctx.font="600 12px ui-monospace,Menlo,monospace"; ctx.textAlign="left";
+    ctx.fillText(Math.round(last.c).toLocaleString("en-US"),W-PAD.r+10,y(last.c)+4);
+    // eje
+    ctx.fillStyle="rgba(237,235,230,.34)"; ctx.font="11px ui-monospace,Menlo,monospace";
+    for(let k=0;k<5;k++){ const v=lo+(hi-lo)*(k/4);
+      ctx.fillText(Math.round(v).toLocaleString("en-US"),W-PAD.r+10,y(v)+4); }
+  }
+
+  function msg(m){
+    const li=document.createElement("li");
+    li.className="w-msg"+(m.tag?" tag-"+m.tag:"");
+    li.innerHTML=`<span class="wm-t">${hhmm(m.at)}</span><p>${m.t}</p>`;
+    feed.appendChild(li);
+    requestAnimationFrame(()=>li.classList.add("in"));
+    while(feed.children.length>5) feed.removeChild(feed.firstChild);
+  }
+
+  const ARRANQUE=14;   // nunca empezar en blanco: un gráfico vacío no parece un gráfico
+  function reset(){ cur=ARRANQUE; subCur=0; mostradas=0; feed.innerHTML="";
+    while(mostradas<MSGS.length&&MSGS[mostradas].at<=cur){ msg(MSGS[mostradas]); mostradas++; }
+    clock.textContent=hhmm(cur); }
+
+  reset();
+  (function loop(){
+    if(!viva){ requestAnimationFrame(loop); return; }
+    frame++;
+    if(frame%7===0){                                  // una vela nueva cada ~7 frames
+      cur++;
+      if(cur>=N){ setTimeout(reset,2600); cur=N-1; }
+      else { clock.textContent=hhmm(cur);
+        while(mostradas<MSGS.length&&MSGS[mostradas].at<=cur){ msg(MSGS[mostradas]); mostradas++; } }
+    }
+    pintar();
+    requestAnimationFrame(loop);
+  })();
+})();
+
 </script>
 </body>
 </html>
