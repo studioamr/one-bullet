@@ -61,6 +61,23 @@
   html.can-install .pwa-install{display:inline-flex}
   .sb-brand{display:flex;align-items:center;gap:11px;font-family:var(--sans);font-size:12.5px;letter-spacing:.22em;font-weight:600;padding:6px 8px 20px}
   .sb-brand i{color:var(--accent);font-style:normal}
+  /* tus cuentas, al abrir el dashboard */
+  .acct-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:16px}
+  .as-card{border:1px solid var(--line);border-radius:12px;background:var(--bg1);padding:13px 15px}
+  .as-top{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+  .as-name{font-family:var(--sans);font-size:.92rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .as-sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink2);margin-top:2px}
+  .as-nums{display:flex;gap:14px;flex-wrap:wrap}
+  .as-nums>div{display:flex;flex-direction:column;gap:2px;min-width:64px}
+  .as-nums span{font-family:var(--mono);font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink2)}
+  .as-nums b{font-family:var(--sans);font-size:1.02rem;font-weight:600;font-variant-numeric:tabular-nums}
+  .as-nums b.flat{color:var(--ink2)}
+  .as-nums i{font-family:var(--mono);font-size:9px;font-style:normal;color:var(--ink2);letter-spacing:.05em}
+  .as-card.on{border-color:var(--accent);background:rgba(61,134,207,.07)}
+  .as-card.dim{opacity:.42}
+  button.as-card{width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;transition:opacity .2s,border-color .2s,background .2s}
+  button.as-card:hover{opacity:1;border-color:var(--accent)}
+  .as-hint{grid-column:1/-1;font-family:var(--sans);font-size:.8rem;color:var(--ink2)}
   .rules-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
   .rules-edit{margin-top:10px;padding-top:12px;border-top:1px solid var(--line)}
   .re-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
@@ -1298,7 +1315,7 @@
       <p class="home-note">Show up too — they see your status the same way.</p></div>`;
   }
   /* Payout thermometer (Home): where you are on the eval → funded → payout path */
-  function payoutThermometer(){ const you=youRacer(), pos=racePos(you), acc=acctLoad()||{evalTarget:1000}, tgt=acc.evalTarget||1000, prof=totalProfit();
+  function payoutThermometer(){ const you=youRacer(), pos=racePos(you), acc=acctLoad()||{}, tgt=evalTargetNow(), prof=totalProfit();
     let headline, sub;
     if(you.phase==="eval"){ const toGo=Math.max(0,tgt-prof); headline=`$${toGo.toLocaleString("en-US")} to clear the eval`; sub="Phase 1 of 3 · then funded, then payout"; }
     else if(you.phase==="funded"){ headline="Funded — build the buffer"; sub="Your first payout opens Eden"; }
@@ -1356,7 +1373,7 @@
   /* ---------- events ---------- */
   document.addEventListener("click",e=>{
     const b=e.target.closest("button[data-a]");if(!b)return;
-    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,acctcancel:()=>{ACCT_EDIT=-1;mostrar("cuentas");},startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,shareshot:sealPoster,tradenew:tradeNew,tradesave:tradeSave,tradedel:tradeDelete,csvimport:csvImportClick,tfclear:()=>{TRADE_FILTER={result:"",setup:"",session:""};mostrar("trades");},buddyclear:()=>{try{localStorage.removeItem("candado_buddy");}catch(e){}mostrar("progreso");},exportdata:exportData,importdata:importDataClick,rulesedit:()=>{FIRM_EDIT=true;mostrar(vistaActual);},rulescancel:()=>{FIRM_EDIT=false;mostrar(vistaActual);},rulessave:firmRulesSave,guardreset:()=>{const a=acctLoad()||{};["target","dailyLoss","maxDD","consistency","minDays"].forEach(k=>delete a[k]);delete a.firmCustom;acctSave(a);FIRM_EDIT=false;mostrar(vistaActual);},pmspeak:()=>spkr(premarketText()),dismissnudge:()=>{TRADING_NUDGE="";statusPush(sessLoad().phase||"ready");mostrar(vistaActual);},replayonb:startOnb,practicenow:practiceNow,crewopen:crewOpen,crewjoin:crewJoin,crewleave:crewLeave,crewshare:crewShare,econedit:()=>{econEdit=true;mostrar("home");},econcancel:()=>{econEdit=false;mostrar("home");},econsave:()=>{const i=$("#econ-input");if(i)econSave(econParse(i.value));econEdit=false;mostrar("home");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,spkr:spkToggle,invite:()=>{try{window.open("https://wa.me/?text="+encodeURIComponent("Try SPOTTER AI with me — the trading platform built on discipline: https://studioamr.github.io/spotter-ai/landing.html"),"_blank");}catch(e){}},logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
+    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,addacctgo:()=>{addAccount();mostrar("cuentas");},acctcancel:()=>{ACCT_EDIT=-1;mostrar("cuentas");},startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,shareshot:sealPoster,tradenew:tradeNew,tradesave:tradeSave,tradedel:tradeDelete,csvimport:csvImportClick,tfclear:()=>{TRADE_FILTER={result:"",setup:"",session:""};mostrar("trades");},buddyclear:()=>{try{localStorage.removeItem("candado_buddy");}catch(e){}mostrar("progreso");},exportdata:exportData,importdata:importDataClick,rulesedit:()=>{FIRM_EDIT=true;mostrar(vistaActual);},rulesapply:()=>{const a=acctLoad()||{};const f=$("#re-firmsel"),p=$("#re-plansel");if(f)a.firm=f.value;if(p&&firmPlans(a.firm).includes(p.value))a.plan=p.value;else a.plan=firmPlans(a.firm)[0]||"";const zs=firmSizes(a.firm,a.plan);if(zs.length&&!zs.includes(a.size))a.size=zs[0];["target","dailyLoss","maxDD","consistency","minDays"].forEach(k=>delete a[k]);acctSave(a);mostrar(vistaActual);},rulescancel:()=>{FIRM_EDIT=false;mostrar(vistaActual);},rulessave:firmRulesSave,guardreset:()=>{const a=acctLoad()||{};["target","dailyLoss","maxDD","consistency","minDays"].forEach(k=>delete a[k]);delete a.firmCustom;acctSave(a);mostrar(vistaActual);},pmspeak:()=>spkr(premarketText()),dismissnudge:()=>{TRADING_NUDGE="";statusPush(sessLoad().phase||"ready");mostrar(vistaActual);},replayonb:startOnb,practicenow:practiceNow,crewopen:crewOpen,crewjoin:crewJoin,crewleave:crewLeave,crewshare:crewShare,econedit:()=>{econEdit=true;mostrar("home");},econcancel:()=>{econEdit=false;mostrar("home");},econsave:()=>{const i=$("#econ-input");if(i)econSave(econParse(i.value));econEdit=false;mostrar("home");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,spkr:spkToggle,invite:()=>{try{window.open("https://wa.me/?text="+encodeURIComponent("Try SPOTTER AI with me — the trading platform built on discipline: https://studioamr.github.io/spotter-ai/landing.html"),"_blank");}catch(e){}},logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
   });
   document.addEventListener("input",e=>{ if(!e.target)return;
     if(ONB&&e.target.id&&e.target.id.startsWith("onb-")){ const d=ONB.data, id=e.target.id, v=e.target.value;
@@ -1386,6 +1403,14 @@
       if(e.target.id==="guard-daily")a.dailyLoss=Math.max(0,v)/100; else if(e.target.id==="guard-maxdd")a.maxDD=Math.max(0,v)/100; else if(e.target.id==="guard-cons")a.consistency=Math.max(0,v)/100; else if(e.target.id==="guard-mindays")a.minDays=Math.max(0,Math.round(v));
       acctSave(a); }});
   document.addEventListener("change",e=>{ if(!e.target)return;
+    if(e.target.closest("[data-reapply]")){ const a=acctLoad()||{};
+      const f=$("#re-firmsel"), p=$("#re-plansel");
+      if(f)a.firm=f.value;
+      const pl=firmPlans(a.firm);
+      a.plan=(p&&pl.includes(p.value))?p.value:(pl[0]||"");
+      const zs=firmSizes(a.firm,a.plan); if(zs.length&&!zs.includes(a.size))a.size=zs[0];
+      ["target","dailyLoss","maxDD","consistency","minDays"].forEach(k=>delete a[k]); // vuelve a los oficiales
+      acctSave(a); mostrar(vistaActual); return; }
     if(e.target.id==="ses-setup"){sessRecord({setup:e.target.value||null});}
     else if(e.target.id==="ses-emotion"){sessRecord({emotion:e.target.value||null});}
     else if(e.target.id==="ses-session"){sessRecord({session:e.target.value||null});}
@@ -1440,7 +1465,7 @@
   function NPtrades(){ return histLoad().slice().reverse().map(x=>({
     id:x.id, fecha:x.fecha, pnl:(x.pnl==null?null:x.pnl),
     result:(x.pnl>0?"win":x.pnl<0?"loss":(x.outcome==="GANADA"?"win":"loss")),
-    durMin:x.durMin||0, revenges:x.revenges||0, setup:x.setup||null, emotion:x.emotion||null, session:x.session||null, account:x.account||null, notes:x.notes||"", outcome:x.outcome, sim:!!x.sim
+    durMin:x.durMin||0, revenges:x.revenges||0, setup:x.setup||null, emotion:x.emotion||null, session:x.session||null, account:x.account||null, accounts:Array.isArray(x.accounts)?x.accounts:null, notes:x.notes||"", outcome:x.outcome, sim:!!x.sim
   })); }
   function uid(){ return "t_"+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4); }
   function ensureTradeIds(){ const h=histLoad(); let ch=false; h.forEach(x=>{ if(!x.id){ x.id=uid(); ch=true; } }); if(ch)histSave(h); return h; }
@@ -1604,16 +1629,59 @@
   function dashFilterBar(allT){
     const simCount=allT.filter(t=>t.sim).length, liveCount=allT.length-simCount;
     const src=simCount>0?`<div class="src-toggle"><button class="onb-pill ${DASH_SRC==="live"?"on":""}" data-dashsrc="live" data-hover>Live${liveCount?" · "+liveCount:""}</button><button class="onb-pill ${DASH_SRC==="sim"?"on":""}" data-dashsrc="sim" data-hover>Practice · SIM${simCount?" · "+simCount:""}</button></div>`:"";
-    const scoped=allT.filter(t=>DASH_SRC==="sim"?t.sim:!t.sim), accts=[...new Set(scoped.map(t=>t.account).filter(Boolean))];
+    const scoped=allT.filter(t=>DASH_SRC==="sim"?t.sim:!t.sim);
+    /* todas tus cuentas son seleccionables, tengan operaciones o no — si eliges una vacía,
+       lo honesto es decírtelo, no ignorar el filtro en silencio. */
+    const accts=[...new Set([...acctList(), ...scoped.flatMap(t=>Array.isArray(t.accounts)&&t.accounts.length?t.accounts:[t.account]).filter(Boolean)])];
     const chips=accts.length>=2?`<div class="acct-chips"><button class="onb-pill ${!DASH_ACCT?"on":""}" data-dashacct="" data-hover>All</button>${accts.map(a=>`<button class="onb-pill ${DASH_ACCT===a?"on":""}" data-dashacct="${esc(a)}" data-hover>${esc(a)}</button>`).join("")}</div>`:"";
     return (src||chips)?`<div class="dash-filter">${src}${chips}</div>`:"";
   }
+  /* --- lo primero del dashboard: tus cuentas. Cuánto tienes y cómo vas HOY.
+     El balance es el que tú registras en Accounts; el P&L de hoy sale de tu diario. --- */
+  const tradeIn=(x,label)=>!label||x.account===label||(Array.isArray(x.accounts)&&x.accounts.includes(label));
+  function dayPnl(list,label){ const d=hoy();
+    return list.filter(x=>x.fecha===d&&x.pnl!=null&&tradeIn(x,label)).reduce((a,x)=>a+x.pnl,0); }
+  function dayCount(list,label){ const d=hoy();
+    return list.filter(x=>x.fecha===d&&x.pnl!=null&&tradeIn(x,label)).length; }
+  function asCard(name,sub,badge,badgeC,bal,today,n,total,pick){
+    const t=n>0?`<b class="${today>=0?"up":"down"}">${money(today)}</b>` : `<b class="flat">—</b>`;
+    const on=pick&&DASH_ACCT===pick, dim=pick&&DASH_ACCT&&!on;
+    return `<${pick?"button":"div"} class="as-card${on?" on":""}${dim?" dim":""}"${pick?` data-dashacct="${esc(on?"":pick)}" data-hover title="${on?"Show all accounts":"Show only this account"}"`:""}>
+      <div class="as-top"><span class="firm-logo">${initials(name)}</span>
+        <div style="flex:1;min-width:0"><div class="as-name">${esc(name)}</div><div class="as-sub">${esc(sub)}</div></div>
+        ${badge?`<span class="rl-badge" style="color:${badgeC};border-color:${badgeC}">${badge}</span>`:""}</div>
+      <div class="as-nums">
+        <div><span>Balance</span><b>$${Math.round(bal||0).toLocaleString("en-US")}</b></div>
+        <div><span>Today</span>${t}<i>${n?`${n} trade${n>1?"s":""}`:"no trades yet"}</i></div>
+        ${total!=null?`<div><span>Total P&amp;L</span><b class="${total>=0?"up":"down"}">${money(total)}</b></div>`:""}
+      </div></${pick?"button":"div"}>`; }
+  function dashAccounts(allT){
+    const PHB={eval:{l:"In evaluation",c:"#C9A24B"},funded:{l:"Funded",c:"var(--accent)"},payout:{l:"Payout ready",c:"#35c46f"}};
+    if(DASH_SRC==="sim"){ const st=allT.filter(t=>t.sim), p=simProfit();
+      return `<div class="acct-strip">${asCard("Practice account","$50,000 virtual · always yours","SIM","var(--ink2)",50000+p,dayPnl(st,null),dayCount(st,null),p)}</div>`; }
+    const live=allT.filter(t=>!t.sim), list=acctsLoad()||[];
+    if(!list.length){ // sin cuentas registradas: uso la del guardián, para no dejarte sin el dato
+      const g=guardLoad(), tot=currentProfit();
+      return `<div class="acct-strip">${asCard(g.firm,`$${(g.size||0).toLocaleString("en-US")} account · ${g.phaseLabel}`,"","",(g.size||0)+tot,dayPnl(live,null),dayCount(live,null),tot)}
+        <div class="as-hint">Add your accounts in <b>Accounts</b> and each one gets its own card here.</div></div>`; }
+    return `<div class="acct-strip">${list.map(x=>{ const ph=PHB[x.phase]||PHB.eval, lab=acctLabel(x);
+      const n=dayCount(live,lab);
+      return asCard(x.firm||"Account",`$${(x.size||0).toLocaleString("en-US")} account`,ph.l,ph.c,x.balance,dayPnl(live,lab),n,x.pnl||0,lab); }).join("")}</div>`; }
+
   function viewDashboard(){ const allT=NPtrades();
     if(!allT.length)return emptyState("No sealed trades yet. Close your first session and your real dashboard shows up here: equity, win rate, profit factor, expectancy — nothing made up.");
-    const bar=dashFilterBar(allT);
+    const bar=dashAccounts(allT)+dashFilterBar(allT);
     let all=allT.filter(t=>DASH_SRC==="sim"?t.sim:!t.sim);
-    if(DASH_ACCT&&all.some(t=>t.account===DASH_ACCT)) all=all.filter(t=>t.account===DASH_ACCT);
-    if(!all.length)return bar+emptyState(DASH_SRC==="sim"?"No practice sessions yet. Switch to Practice mode in Start Session.":"No live trades in this view yet.");
+    /* una operación puede venir de varias cuentas a la vez */
+    const inAcct=(t,lab)=>t.account===lab||(Array.isArray(t.accounts)&&t.accounts.includes(lab));
+    if(DASH_ACCT) all=all.filter(t=>inAcct(t,DASH_ACCT));
+    /* honestidad: una operación tomada en varias cuentas suma COMPLETA en cada una,
+       así que las partes no cuadran con el total. Hay que decirlo, no esconderlo. */
+    const multi=all.filter(t=>Array.isArray(t.accounts)&&t.accounts.length>1).length;
+    const multiNote=multi?`<p class="home-note" style="margin:-6px 0 14px">${multi} trade${multi>1?"s":""} here ${multi>1?"were":"was"} taken across several accounts at once — the P&L shown is the combined figure, so per-account totals won't add up to the overall number. Split them in the journal if you need it exact.</p>`:"";
+    if(!all.length)return bar+emptyState(DASH_ACCT
+      ?`No trades on ${DASH_ACCT} yet in this view. Pick another account, or All.`
+      :(DASH_SRC==="sim"?"No practice sessions yet. Switch to Practice mode in Start Session.":"No live trades in this view yet."));
     const st=NPstats(all),cum=NPcumulative(all),byday=all.filter(t=>t.pnl!=null).map(t=>t.pnl);
     const bs=bulletScore(st,all);
     const recent=all.slice(-5).reverse();
@@ -1634,7 +1702,7 @@
       <div class="p-card"><div class="c-t">Daily net cumulative P&L</div>${areaChart(cum,st.net>=0?"#35c46f":"#d6493f",185)}</div>
       <div class="p-card"><div class="c-t">Net daily P&L</div>${barChart(byday,185)}</div>
     </div>`;
-    return bar+tiles+mid+`<div style="margin-top:18px">${disciplineHeatmap()}</div>
+    return bar+multiNote+tiles+mid+`<div style="margin-top:18px">${disciplineHeatmap()}</div>
     <div class="p-card" style="margin-top:18px"><div class="c-t">${MONTHS[Number(calMonth.slice(5))-1]}</div>${calendarFull(calMonth)}</div>
     <div class="p-card" style="margin-top:18px"><div class="c-t">Recent trades</div>
       <table class="tbl"><thead><tr><th>Date</th><th>Result</th><th>Dur.</th><th>P&L</th><th>Setup</th></tr></thead><tbody>
@@ -1846,41 +1914,335 @@
   /* TYPICAL values as % of account size — editable; the user confirms with their firm */
   /* TYPICAL rules by firm and PHASE (% of account size) — evals and funded accounts
      have different rules; they auto-apply based on your phase. Editable, confirm with your plan. */
-  const FIRM_RULES={
-    "Tradeify":     { eval:{dailyLoss:0,    maxDD:0.06,  consistency:0,    minDays:0, target:0.06},
-                      funded:{dailyLoss:0,    maxDD:0.06,  consistency:0.20, minDays:0} },
-    "Lucid":        { eval:{dailyLoss:0.03, maxDD:0.045, consistency:0,    minDays:0, target:0.09},
-                      funded:{dailyLoss:0.03, maxDD:0.045, consistency:0.30, minDays:0} },
-    "Lucid Trading":{ eval:{dailyLoss:0.03, maxDD:0.045, consistency:0,    minDays:0, target:0.09},
-                      funded:{dailyLoss:0.03, maxDD:0.045, consistency:0.30, minDays:0} },
-    "Apex":         { eval:{dailyLoss:0,    maxDD:0.05,  consistency:0,    minDays:1, target:0.06},
-                      funded:{dailyLoss:0,    maxDD:0.05,  consistency:0.30, minDays:0} },
-    "Topstep":      { eval:{dailyLoss:0.02, maxDD:0.04,  consistency:0,    minDays:0, target:0.06},
-                      funded:{dailyLoss:0.02, maxDD:0.04,  consistency:0.50, minDays:5} },
-    "_default":     { eval:{dailyLoss:0.03, maxDD:0.06,  consistency:0,    minDays:0, target:0.08},
-                      funded:{dailyLoss:0.03, maxDD:0.06,  consistency:0.30, minDays:0} }
+  /* ============================================================================
+     CATÁLOGO DE REGLAS DE FONDEADORAS — SPOTTER AI
+     Investigado el 2026-07-18 leyendo ÚNICAMENTE las fuentes oficiales de cada
+     firma (centros de ayuda propios). Cero blogs de afiliados, cero YouTube,
+     cero sitios de reseñas: son la causa número uno de números equivocados.
+
+     REGLAS DE ESTE ARCHIVO:
+     · Todo va en DÓLARES por tamaño de cuenta. Los porcentajes mienten: el
+       drawdown de una cuenta de 100k casi nunca es el doble que el de 50k.
+     · Cada plan lleva su fuente y su fecha. Si no pudimos verificar algo, se
+       marca null y la app lo dice — nunca se rellena con un número plausible.
+     · Estas reglas CAMBIAN seguido. Son un punto de partida; manda tu contrato.
+     ========================================================================= */
+  const FIRM_CATALOG = {
+
+    /* ---------------------------------------------------------------- TOPSTEP */
+    "Topstep": {
+      src: "help.topstep.com", checked: "2026-07-18",
+      plans: {
+        "Trading Combine (evaluación)": {
+          phase:"eval", ddType:"eod", lockAtProfit:0,   // el MLL se congela al llegar al balance inicial
+          consistency:0.50, consistencyRaisesTarget:true, minDays:2, dllOptional:true,
+          sizes:{ 50000:{target:3000, dailyLoss:1000, maxDD:2000},
+                  100000:{target:6000, dailyLoss:2000, maxDD:3000},
+                  150000:{target:9000, dailyLoss:3000, maxDD:4500} },
+          note:"El límite diario es OPCIONAL, no automático. La consistencia no te reprueba: te SUBE el objetivo (mejor día ÷ 0.50 = total necesario). La ruptura del MLL se detecta intradía e incluye P&L no realizado."
+        },
+        "Express Funded · Standard": {
+          phase:"funded", ddType:"eod", lockAtProfit:0,
+          consistency:0, minDays:5, dllOptional:true,
+          sizes:{ 50000:{target:0, dailyLoss:1000, maxDD:2000},
+                  100000:{target:0, dailyLoss:2000, maxDD:3000},
+                  150000:{target:0, dailyLoss:3000, maxDD:4500} },
+          note:"Sin regla de consistencia. Payout tras 5 días ganadores de $150+. Tras el primer payout el MLL queda en $0 permanente. Reparto 90/10."
+        },
+        "Express Funded · Consistency": {
+          phase:"funded", ddType:"eod", lockAtProfit:0,
+          consistency:0.40, minDays:3, dllOptional:true,
+          sizes:{ 50000:{target:0, dailyLoss:1000, maxDD:2000},
+                  100000:{target:0, dailyLoss:2000, maxDD:3000},
+                  150000:{target:0, dailyLoss:3000, maxDD:4500} },
+          note:"Consistencia 40% (mayor día ÷ ganancia total), no se redondea. Se elige Standard o Consistency al activar y es IRREVERSIBLE."
+        }
+      }
+    },
+
+    /* ------------------------------------------------------------------- APEX */
+    "Apex Trader Funding": {
+      src: "apextraderfunding.com/help-center", checked: "2026-07-18",
+      plans: {
+        "Evaluación · Intraday Trail": {
+          phase:"eval", ddType:"intraday", lockAtProfitFromTarget:true,
+          consistency:0, minDays:0,
+          sizes:{ 25000:{target:1500, dailyLoss:0, maxDD:1000},
+                  50000:{target:3000, dailyLoss:0, maxDD:2000},
+                  100000:{target:6000, dailyLoss:0, maxDD:3000},
+                  150000:{target:9000, dailyLoss:0, maxDD:4000} },
+          note:"SIN límite diario. El umbral se congela al llegar al balance objetivo (inicial + objetivo) — PERO SOLO en Rithmic y WealthCharts. En TRADOVATE NUNCA deja de trailear: misma cuenta, mucho más difícil. El pico incluye P&L no realizado."
+        },
+        "Evaluación · EOD Trail": {
+          phase:"eval", ddType:"eod", lockAtProfitFromTarget:true,
+          consistency:0, minDays:0,
+          sizes:{ 25000:{target:1500, dailyLoss:500, maxDD:1000},
+                  50000:{target:3000, dailyLoss:1000, maxDD:2000},
+                  100000:{target:6000, dailyLoss:1500, maxDD:3000},
+                  150000:{target:9000, dailyLoss:2000, maxDD:4000} },
+          note:"Esta línea SÍ tiene límite diario. Tocarlo pausa la sesión, no truena la cuenta."
+        },
+        "Performance Account (fondeada)": {
+          phase:"funded", ddType:"intraday", lockAtProfit:100,
+          consistency:0.50, minDays:5,
+          sizes:{ 25000:{target:0, dailyLoss:0, maxDD:1000},
+                  50000:{target:0, dailyLoss:0, maxDD:2000},
+                  100000:{target:0, dailyLoss:0, maxDD:3000},
+                  150000:{target:0, dailyLoss:0, maxDD:4000} },
+          note:"Consistencia 50% (el 30% es del programa Legacy, retirado el 1-mar-2026). Se mide sobre ganancia NETA al pedir payout: los días perdedores cuentan en tu contra. El límite diario en fondeada es POR NIVEL y sube con la ganancia — confírmalo en tu tablero. Reparto 100%. Máximo 6 payouts por cuenta."
+        }
+      }
+    },
+
+    /* --------------------------------------------------------------- TRADEIFY */
+    "Tradeify": {
+      src: "help.tradeify.co", checked: "2026-07-18",
+      plans: {
+        "Growth Evaluation": {
+          phase:"eval", ddType:"eod", lockAtProfit:null,   // no congela en evaluación
+          consistency:0, minDays:1,
+          sizes:{ 50000:{target:3000, dailyLoss:1250, maxDD:2000},
+                  100000:{target:6000, dailyLoss:2500, maxDD:3500},
+                  150000:{target:9000, dailyLoss:3750, maxDD:5000} },
+          note:"Sin consistencia: se puede pasar en 1 día. El límite diario es blando (pausa el día, no truena). En evaluación el drawdown NO se congela."
+        },
+        "Growth Sim Funded": {
+          phase:"funded", ddType:"eod", lockAtProfit:100,
+          consistency:0.35, minDays:5,
+          sizes:{ 50000:{target:0, dailyLoss:1250, maxDD:2000},
+                  100000:{target:0, dailyLoss:2500, maxDD:3500},
+                  150000:{target:0, dailyLoss:3750, maxDD:5000} },
+          note:"Consistencia 35%. Payout con 5 días de ganancia > $150/$200/$250 y balance mínimo. El límite diario SUBE al llegar a 6% de ganancia. Drawdown se congela en inicio + $100."
+        },
+        "Select Evaluation": {
+          phase:"eval", ddType:"eod", lockAtProfit:null,
+          consistency:0.40, minDays:3,
+          sizes:{ 50000:{target:3000, dailyLoss:0, maxDD:2000},
+                  100000:{target:6000, dailyLoss:0, maxDD:3000},
+                  150000:{target:9000, dailyLoss:0, maxDD:4500} },
+          note:"SIN límite diario en evaluación. Consistencia 40% obliga a un mínimo de 3 días. Drawdown más apretado que Growth en 100k/150k."
+        },
+        "Select Flex (fondeada)": {
+          phase:"funded", ddType:"eod", lockAtProfit:100,
+          consistency:0, minDays:5,
+          sizes:{ 50000:{target:0, dailyLoss:0, maxDD:2000},
+                  100000:{target:0, dailyLoss:0, maxDD:3000},
+                  150000:{target:0, dailyLoss:0, maxDD:4500} },
+          note:"Sin límite diario y SIN consistencia. Payout con 5 días ganadores. OJO: los contratos NO empiezan al máximo — una cuenta de 100k arranca en 3 minis, no 8, y escala con la ganancia."
+        },
+        "Select Daily (fondeada)": {
+          phase:"funded", ddType:"eod", lockAtProfit:100,
+          consistency:0, minDays:0,
+          sizes:{ 50000:{target:0, dailyLoss:1000, maxDD:2000},
+                  100000:{target:0, dailyLoss:1250, maxDD:2500},
+                  150000:{target:0, dailyLoss:1750, maxDD:3500} },
+          note:"El drawdown más apretado de todo Tradeify en 100k/150k. Payout diario: 2× la ganancia desde el último, con tope. La elección entre Flex y Daily es PERMANENTE por cuenta."
+        },
+        "Lightning Funded": {
+          phase:"funded", ddType:"eod", lockAtProfit:100,
+          consistency:0.20, minDays:0,
+          sizes:{ 50000:{target:3000, dailyLoss:1250, maxDD:2000},
+                  100000:{target:6000, dailyLoss:2500, maxDD:4000},
+                  150000:{target:9000, dailyLoss:3000, maxDD:5250} },
+          note:"Fondeo directo, sin evaluación. La consistencia SUBE por payout: 20% → 25% → 30%. El 'objetivo' aquí desbloquea el payout, NO es lo que puedes retirar: en 150k llegas a $9,000 y retiras máximo $3,000. Sin resets: hay que recomprar."
+        }
+      }
+    },
+
+    /* ------------------------------------------------------------------ LUCID */
+    "Lucid Trading": {
+      src: "support.lucidtrading.com", checked: "2026-07-18",
+      plans: {
+        "LucidPro · Evaluación": {
+          phase:"eval", ddType:"eod", lockAtProfit:100,
+          consistency:0, minDays:0,
+          sizes:{ 50000:{target:3000, dailyLoss:1200, maxDD:2000},
+                  100000:{target:6000, dailyLoss:1800, maxDD:3000},
+                  150000:{target:9000, dailyLoss:2700, maxDD:4500} },
+          note:"Sin consistencia: se puede pasar en un día. El límite diario es blando (te bloquea la sesión, no truena la cuenta); el MLL es el duro."
+        },
+        "LucidPro · Fondeada": {
+          phase:"funded", ddType:"eod", lockAtProfit:100,
+          consistency:0.40, minDays:0,
+          sizes:{ 50000:{target:0, dailyLoss:1200, maxDD:2000},
+                  100000:{target:0, dailyLoss:1800, maxDD:3000},
+                  150000:{target:0, dailyLoss:2700, maxDD:4500} },
+          note:"Consistencia 40% para cuentas compradas o reseteadas desde el 28-nov-2025; antes de esa fecha es 35%. Un simple reset te mueve a los términos nuevos. Arriba del trail el límite diario pasa a 60% del pico de balance de cierre."
+        },
+        "LucidFlex · Evaluación": {
+          phase:"eval", ddType:"eod", lockAtProfit:100,
+          consistency:0.50, minDays:2,
+          sizes:{ 50000:{target:3000, dailyLoss:0, maxDD:2000},
+                  100000:{target:6000, dailyLoss:0, maxDD:3000},
+                  150000:{target:9000, dailyLoss:0, maxDD:4500} },
+          note:"SIN límite diario. La consistencia de 50% obliga matemáticamente a 2 días mínimo."
+        },
+        "LucidFlex · Fondeada": {
+          phase:"funded", ddType:"eod", lockAtProfit:100,
+          consistency:0, minDays:5,
+          sizes:{ 50000:{target:0, dailyLoss:0, maxDD:2000},
+                  100000:{target:0, dailyLoss:0, maxDD:3000},
+                  150000:{target:0, dailyLoss:0, maxDD:4500} },
+          note:"Sin límite diario y SIN consistencia. Payout con 5 días de ganancia > $150/$200/$250. Al pedir un payout el MLL salta de inmediato al balance bloqueado."
+        },
+        "LucidDirect (fondeo directo)": {
+          phase:"funded", ddType:"eod", lockAtProfit:100,
+          consistency:0.20, minDays:0,
+          sizes:{ 50000:{target:3000, dailyLoss:1200, maxDD:2000},
+                  100000:{target:6000, dailyLoss:2100, maxDD:3500},
+                  150000:{target:9000, dailyLoss:3000, maxDD:5000} },
+          note:"Consistencia 20%. Drawdown MÁS AMPLIO que Pro/Flex en 100k y 150k. El sitio dice 5 días mínimos para payout pero el artículo oficial no lo menciona — verifícalo con soporte."
+        }
+      }
+    },
+    /* ------------------------------------------------------ MYFUNDEDFUTURES */
+    "MyFundedFutures": {
+      src: "help.myfundedfutures.com", checked: "2026-07-18",
+      plans: {
+        "Rapid · Evaluación": {
+          phase:"eval", ddType:"eod", lockAtProfit:null,
+          consistency:0.50, consistencyRaisesTarget:true, minDays:2,
+          sizes:{ 50000:{target:3000, dailyLoss:0, maxDD:2000},
+                  100000:{target:6000, dailyLoss:0, maxDD:3000},
+                  150000:{target:9000, dailyLoss:0, maxDD:4500} },
+          note:"Sin límite diario. Consistencia 50% (objetivo ÷ 2 = máximo por día); no te reprueba, te obliga a operar más días."
+        },
+        "Rapid · Sim Funded": {
+          phase:"funded", ddType:"intraday", lockAtProfit:100,
+          consistency:0, minDays:0,
+          sizes:{ 50000:{target:0, dailyLoss:0, maxDD:2000},
+                  100000:{target:0, dailyLoss:0, maxDD:3000},
+                  150000:{target:0, dailyLoss:0, maxDD:4500} },
+          note:"CUIDADO: el drawdown CAMBIA de cierre de día a INTRADÍA al pasar a fondeada — se aprieta justo cuando ya tienes la cuenta, e incluye P&L no realizado. Payouts diarios, reparto 90/10, sin consistencia."
+        },
+        "Pro · Evaluación": {
+          phase:"eval", ddType:"eod", lockAtProfit:null,
+          consistency:0.50, consistencyRaisesTarget:true, minDays:2,
+          sizes:{ 50000:{target:3000, dailyLoss:0, maxDD:2000},
+                  100000:{target:6000, dailyLoss:0, maxDD:3000},
+                  150000:{target:9000, dailyLoss:0, maxDD:4500} },
+          note:"Sin límite diario. Consistencia 50% solo en evaluación."
+        },
+        "Pro · Sim Funded": {
+          phase:"funded", ddType:"eod", lockAtProfit:100,
+          consistency:0, minDays:0,
+          sizes:{ 50000:{target:0, dailyLoss:0, maxDD:2000},
+                  100000:{target:0, dailyLoss:0, maxDD:3000},
+                  150000:{target:0, dailyLoss:0, maxDD:4500} },
+          note:"Reparto 80/20. Payout cada 14 días desde tu primera operación, tras limpiar el colchón. Las pérdidas de equity abierta cuentan para el drawdown."
+        },
+        "Builder · 50K (solo ese tamaño)": {
+          phase:"eval", ddType:"eod", lockAtProfit:null,
+          consistency:0, minDays:1,
+          sizes:{ 50000:{target:3000, dailyLoss:1000, maxDD:2000} },
+          note:"Solo existe en 50K. Límite diario blando (pausa, no truena). Sin consistencia en evaluación, pero 50% para pedir payout. Reparto 80/20."
+        }
+      }
+    },
+
+    /* ---------------------------------------------------- TAKE PROFIT TRADER */
+    "Take Profit Trader": {
+      src: "takeprofittraderhelp.zendesk.com", checked: "2026-07-18",
+      plans: {
+        "Test (evaluación)": {
+          phase:"eval", ddType:"eod", lockAtProfit:0,
+          consistency:0.50, consistencyRaisesTarget:true, minDays:5,
+          sizes:{ 25000:{target:1500, dailyLoss:0, maxDD:1500},
+                  50000:{target:3000, dailyLoss:0, maxDD:2000},
+                  75000:{target:4500, dailyLoss:0, maxDD:2500},
+                  100000:{target:6000, dailyLoss:0, maxDD:3000},
+                  150000:{target:9000, dailyLoss:0, maxDD:4500} },
+          note:"El límite diario fue ELIMINADO — las cifras viejas que circulan ya no aplican. Mínimo 5 días aunque llegues al objetivo en 2. La consistencia no reprueba: sube el objetivo (nuevo objetivo = neto × 2)."
+        },
+        "PRO (fondeada)": {
+          phase:"funded", ddType:"intraday", lockAtProfit:0,
+          consistency:0, minDays:0,
+          sizes:{ 25000:{target:0, dailyLoss:0, maxDD:1500},
+                  50000:{target:0, dailyLoss:0, maxDD:2000},
+                  75000:{target:0, dailyLoss:0, maxDD:2500},
+                  100000:{target:0, dailyLoss:0, maxDD:3000},
+                  150000:{target:0, dailyLoss:0, maxDD:4500} },
+          note:"El drawdown pasa a INTRADÍA (incluye no realizado) y se congela en tu balance INICIAL, no en inicial+$100. Retiros diarios desde el día uno, pero primero hay que limpiar el colchón (= tu drawdown). Ojo: la ganancia dentro del colchón solo se cobra al cerrar la cuenta, y si duró 60 días o menos solo recibes el 50%. Reparto 80/20."
+        }
+      }
+    }
+
   };
-  function firmRules(firm,phase){ const f=FIRM_RULES[firm]||FIRM_RULES._default; return f[phase]||f.eval; }
-  // phase for the rules: manual if you set it, otherwise inferred from your progress (eval → funded once you pass)
+
+  /* Resuelve un plan concreto para un tamaño de cuenta. Devuelve el piso de
+     congelamiento ya calculado, que es el número que de verdad truena cuentas. */
+  function planResolve(firmName,planName,size){
+    const F=FIRM_CATALOG[firmName]; if(!F)return null;
+    const P=F.plans[planName]; if(!P)return null;
+    const sz=P.sizes[size]; if(!sz)return null;
+    let lockFloor=null;
+    if(P.lockAtProfitFromTarget) lockFloor=size+(sz.target||0);
+    else if(P.lockAtProfit!=null) lockFloor=size+P.lockAtProfit;
+    return { target:sz.target, dailyLoss:sz.dailyLoss, maxDD:sz.maxDD,
+             ddType:P.ddType, lockFloor, consistency:P.consistency, minDays:P.minDays,
+             phase:P.phase, dllOptional:!!P.dllOptional,
+             consistencyRaisesTarget:!!P.consistencyRaisesTarget,
+             note:P.note, src:F.src, checked:F.checked }; }
+  function firmSizes(firmName,planName){ const F=FIRM_CATALOG[firmName]; if(!F)return [];
+    const P=F.plans[planName]; return P?Object.keys(P.sizes).map(Number).sort((a,b)=>a-b):[]; }
+  function firmPlans(firmName){ const F=FIRM_CATALOG[firmName]; return F?Object.keys(F.plans):[]; }
+
+  /* EL PISO REAL. No es "tamaño menos drawdown": depende del TIPO de trailing
+     (intradía vs cierre de día) y de si ya se congeló. Usar el tipo equivocado
+     te dice que tienes margen cuando ya no lo tienes. */
+  function ddFloorNow(size,trades,R){
+    let eq=size, peak=size, eodPeak=size, curDay=null, dayEnd=size;
+    const base=size-(R.maxDD||0);
+    if(!R.maxDD) return {eq:size+trades.reduce((a,t)=>a+(t.pnl||0),0), floor:null, room:null, locked:false};
+    for(const t of trades){
+      if(curDay!==null&&t.fecha!==curDay&&dayEnd>eodPeak) eodPeak=dayEnd;
+      curDay=t.fecha; eq+=(t.pnl||0); dayEnd=eq; if(eq>peak) peak=eq;
+    }
+    let floor, locked=false;
+    if(R.ddType==="static") floor=base;
+    else { const basis=R.ddType==="eod"?Math.max(eodPeak,size):peak;
+           floor=Math.max(base,basis-R.maxDD);
+           if(R.lockFloor!=null&&floor>=R.lockFloor){ floor=R.lockFloor; locked=true; } }
+    return {eq,floor,room:eq-floor,locked}; }
+  const DD_LABEL={intraday:"trailing intradía (sigue tu pico, incluye no realizado)",
+                  eod:"trailing de cierre de día (sube con tu balance de cierre)",
+                  static:"estático (el piso nunca se mueve)"};
+
   function guardPhase(){ const a=acctLoad()||{}; if(a.guardPhase==="eval"||a.guardPhase==="funded")return a.guardPhase; return youRacer().phase==="eval"?"eval":"funded"; }
-  function guardLoad(){ const a=acctLoad()||{}, ph=guardPhase(), r=firmRules(a.firm,ph);
-    return { firm:a.firm||"your firm", size:a.size||50000, phase:ph, phaseLabel:ph==="eval"?"Evaluation":"Funded account", target:(a.target!=null?a.target:(r.target||0)),
-      dailyLoss:(a.dailyLoss!=null?a.dailyLoss:r.dailyLoss),
-      maxDD:(a.maxDD!=null?a.maxDD:r.maxDD),
-      consistency:(a.consistency!=null?a.consistency:r.consistency),
-      minDays:(a.minDays!=null?a.minDays:r.minDays) }; }
+  function guardLoad(){ const a=acctLoad()||{};
+    const size=a.size||50000, firm=a.firm||"", plan=a.plan||"";
+    const R=planResolve(firm,plan,size);
+    const ph=R?R.phase:guardPhase();
+    const base=R||{target:0,dailyLoss:0,maxDD:0,ddType:"eod",lockFloor:null,consistency:0,minDays:0,
+                   note:null,src:null,checked:null,dllOptional:false,consistencyRaisesTarget:false};
+    // lo que tú escribas manda sobre el catálogo; el catálogo manda sobre nada
+    const ov=k=>(a[k]!=null?a[k]:base[k]);
+    return { firm:firm||"your firm", plan:plan||"", size, phase:ph,
+      phaseLabel: ph==="eval"?"Evaluation":"Funded account",
+      target:ov("target"), dailyLoss:ov("dailyLoss"), maxDD:ov("maxDD"),
+      consistency:ov("consistency"), minDays:ov("minDays"),
+      ddType:base.ddType, lockFloor:base.lockFloor, dllOptional:base.dllOptional,
+      consistencyRaisesTarget:base.consistencyRaisesTarget,
+      note:base.note, src:base.src, checked:base.checked, known:!!R,
+      custom:["target","dailyLoss","maxDD","consistency","minDays"].some(k=>a[k]!=null) }; }
+
   function guardStats(){ const g=guardLoad(), size=g.size;
-    const h=currentTrades(); // solo la cuenta VIVA: al pasar el eval la cuenta reinicia en el tamaño base
-    let eq=size, peak=size; const dayPnl={};
-    h.forEach(x=>{ eq+=x.pnl; if(eq>peak)peak=eq; dayPnl[x.fecha]=(dayPnl[x.fecha]||0)+x.pnl; });
-    const dd=Math.max(0,peak-eq), todayPnl=dayPnl[hoy()]||0, days=Object.keys(dayPnl).length;
-    const totalProfit=eq-size, bestDay=Object.values(dayPnl).reduce((m,v)=>Math.max(m,v),0);
-    return { g, size, eq, peak, dd, todayPnl, days, totalProfit, bestDay,
-      dailyLoss$:Math.round(size*g.dailyLoss), maxDD$:Math.round(size*g.maxDD) }; }
+    const h=currentTrades();
+    const dayPnlMap={}; h.forEach(x=>{ dayPnlMap[x.fecha]=(dayPnlMap[x.fecha]||0)+(x.pnl||0); });
+    /* el piso real depende del TIPO de trailing y de si ya se congeló —
+       no es "tamaño menos drawdown" */
+    const dd=ddFloorNow(size,h,{maxDD:g.maxDD,ddType:g.ddType,lockFloor:g.lockFloor});
+    const eq=dd.eq, floor=dd.floor, room=dd.room;
+    const todayPnl=dayPnlMap[hoy()]||0, days=Object.keys(dayPnlMap).length;
+    const totalProfit=eq-size, bestDay=Object.values(dayPnlMap).reduce((m,v)=>Math.max(m,v),0);
+    const used=floor!=null?Math.max(0,(size-floor)+ (0)) : 0;
+    return { g, size, eq, floor, room, locked:dd.locked, todayPnl, days, totalProfit, bestDay,
+      dailyLoss$:Math.round(g.dailyLoss||0), maxDD$:Math.round(g.maxDD||0) }; }
   // returns the rule CLOSEST to breaking (for the in-session warning)
   function guardClosest(){ const s=guardStats(), risks=[];
     if(s.dailyLoss$>0){ const used=Math.max(0,-s.todayPnl), frac=used/s.dailyLoss$; risks.push({k:"daily",frac,room:s.dailyLoss$-used,txt:"daily limit"}); }
-    if(s.maxDD$>0){ const frac=s.dd/s.maxDD$; risks.push({k:"dd",frac,room:s.maxDD$-s.dd,txt:"max drawdown"}); }
+    if(s.maxDD$>0&&s.room!=null){ const frac=1-Math.max(0,Math.min(1,s.room/s.maxDD$));
+      risks.push({k:"dd",frac,room:s.room,txt:"drawdown floor"}); }
     risks.sort((a,b)=>b.frac-a.frac); return risks[0]||null; }
   function guardWarning(){ const r=guardClosest(); if(!r||r.frac<0.6)return ""; const red=r.frac>=0.85;
     return `<div class="p-card tilt-warn"${red?"":` style="background:rgba(201,162,75,.09);border-color:rgba(201,162,75,.45)"`}><b${red?"":' style="color:#C9A24B"'}>⚠ ${red?"Careful":"Heads up"} on your ${r.txt}.</b> You have <b>$${Math.max(0,Math.round(r.room)).toLocaleString("en-US")}</b> of room left. ${red?"One more trade and you can break the account — close.":"Lower your size and be selective."}</div>`; }
@@ -1891,41 +2253,55 @@
   /* --- reglas editables: cada fondeadora tiene las suyas, y cambian. Los presets son
      un punto de partida, no la verdad. Lo que escribas aquí manda sobre el preset. --- */
   let FIRM_EDIT=false;
-  const FRF=[["target","Eval profit target","%",1],["dailyLoss","Daily loss limit","%",1],
-            ["maxDD","Max drawdown","%",1],["consistency","Consistency cap","%",1],
+  const FRF=[["target","Eval profit target","$",1],["dailyLoss","Daily loss limit","$",1],
+            ["maxDD","Max drawdown","$",1],["consistency","Consistency cap","%",1],
             ["minDays","Minimum trading days","days",0]];
-  function firmRulesEditor(){ const a=acctLoad()||{}, g=guardLoad(), size=g.size;
-    const val=k=>{ const v=(a[k]!=null?a[k]:g[k]); return k==="minDays"?(v||0):Math.round((v||0)*1000)/10; };
-    const custom=FRF.some(([k])=>a[k]!=null)||a.firmCustom;
+  function firmRulesEditor(){ const a=acctLoad()||{}, g=guardLoad();
+    const firms=Object.keys(FIRM_CATALOG), plans=firmPlans(a.firm||""), sizes=firmSizes(a.firm||"",a.plan||"");
     if(!FIRM_EDIT) return `<div class="rules-foot">
-      <span class="home-note">Rules from <b>${esc(g.firm)}</b>${custom?` · <span style="color:var(--accent)">customized</span>`:` · preset`}</span>
-      <button class="btn ghost sm" data-a="rulesedit" data-hover>Edit rules</button></div>`;
+      <span class="home-note">${g.known
+        ? `<b>${esc(g.firm)}</b> · ${esc(g.plan)} · $${(g.size||0).toLocaleString("en-US")}${g.custom?` · <span style="color:var(--accent)">customized</span>`:""}<br>
+           <span style="opacity:.75">${esc(DD_LABEL[g.ddType]||"")}${g.lockFloor!=null?` · se congela en $${g.lockFloor.toLocaleString("en-US")}`:" · nunca se congela"}</span>`
+        : `No firm plan selected — the guard can't measure your real limits yet.`}</span>
+      <button class="btn ghost sm" data-a="rulesedit" data-hover>${g.known?"Edit rules":"Pick your firm"}</button></div>
+      ${g.known&&g.note?`<p class="home-note" style="margin:8px 0 0;opacity:.8">${esc(g.note)}</p>`:""}
+      ${g.known?`<p class="home-note" style="margin:6px 0 0;opacity:.6">Source: ${esc(g.src)} · checked ${esc(g.checked)}. Firms change rules often — confirm against your contract.</p>`:""}`;
     return `<div class="rules-edit">
       <div class="re-grid">
-        <label>Firm<input id="re-firm" value="${esc(a.firm||g.firm||"")}" placeholder="your firm"></label>
-        <label>Account size<input id="re-size" type="number" step="1000" value="${size}"></label>
-        ${FRF.map(([k,l,u])=>`<label>${l}${u==="%"?" (%)":" (days)"}<input id="re-${k}" type="number" step="${u==="%"?".1":"1"}" value="${val(k)}"></label>`).join("")}
+        <label>Firm<select id="re-firmsel" data-reapply="1">${firms.map(f=>`<option value="${esc(f)}"${a.firm===f?" selected":""}>${esc(f)}</option>`).join("")}<option value=""${!FIRM_CATALOG[a.firm]?" selected":""}>Other / not listed</option></select></label>
+        ${plans.length?`<label>Plan<select id="re-plansel" data-reapply="1">${plans.map(p=>`<option value="${esc(p)}"${a.plan===p?" selected":""}>${esc(p)}</option>`).join("")}</select></label>`:""}
+        ${sizes.length?`<label>Account size<select id="re-sizesel">${sizes.map(z=>`<option value="${z}"${(a.size||0)===z?" selected":""}>$${z.toLocaleString("en-US")}</option>`).join("")}</select></label>`
+                      :`<label>Account size<input id="re-size" type="number" step="1000" value="${g.size}"></label>`}
       </div>
-      <p class="home-note">Percentages are of your account size. Put <b>0</b> in any rule your firm doesn't have — it disappears from the guard.</p>
-      <div class="re-btns"><button class="btn" data-a="rulessave" data-hover>Save rules</button>
+      <p class="home-note" style="margin:10px 0 4px">Values below come from the firm's official rules. Change any of them only if your contract says otherwise — what you type wins.</p>
+      <div class="re-grid">
+        ${FRF.map(([k,l,u])=>`<label>${l}${u==="%"?" (%)":(k==="minDays"?" (days)":" ($)")}<input id="re-${k}" type="number" step="${u==="%"?".1":"1"}" value="${k==="minDays"?(g[k]||0):(u==="%"?Math.round((g[k]||0)*1000)/10:Math.round(g[k]||0))}"></label>`).join("")}
+      </div>
+      <p class="home-note" style="margin:8px 0 0">Put <b>0</b> in any rule your plan doesn't have — it disappears from the guard.</p>
+      <div class="re-btns"><button class="btn" data-a="rulessave" data-hover>Save</button>
         <button class="btn ghost" data-a="rulescancel" data-hover>Cancel</button>
-        <button class="btn ghost" data-a="guardreset" data-hover>Back to preset</button></div></div>`; }
+        <button class="btn ghost" data-a="guardreset" data-hover>Back to official values</button></div></div>`; }
+
   function firmRulesSave(){ const a=acctLoad()||{};
-    const gv=id=>{ const el=$("#re-"+id); return el?el.value.trim():""; };
-    const f=gv("firm"); if(f){ a.firm=f; a.firmCustom=!FIRM_RULES[f]; }
-    const sz=parseFloat(gv("size")); if(sz>0)a.size=Math.round(sz);
-    FRF.forEach(([k,l,u])=>{ const raw=gv(k); if(raw===""){ delete a[k]; return; }
+    const gv=id=>{ const el=$("#"+id); return el?String(el.value).trim():null; };
+    const f=gv("re-firmsel"); if(f!==null) a.firm=f;
+    const p=gv("re-plansel"); if(p!==null) a.plan=p;
+    const zs=gv("re-sizesel"), zi=gv("re-size");
+    const z=parseFloat(zs!=null?zs:zi); if(!isNaN(z)&&z>0) a.size=Math.round(z);
+    FRF.forEach(([k,l,u])=>{ const raw=gv("re-"+k); if(raw===null)return;
+      if(raw===""){ delete a[k]; return; }
       const n=parseFloat(raw); if(isNaN(n)||n<0)return;
       a[k]= u==="%" ? n/100 : Math.round(n); });
     acctSave(a); FIRM_EDIT=false; mostrar(vistaActual); }
 
   function guardCard(){ const s=guardStats(), g=s.g, rows=[];
-    if(g.phase==="eval"&&g.target>0){ const tgt$=Math.round(s.size*g.target), room=Math.max(0,tgt$-Math.max(0,s.totalProfit));
+    if(g.phase==="eval"&&g.target>0){ const tgt$=Math.round(g.target), room=Math.max(0,tgt$-Math.max(0,s.totalProfit));
       rows.push(guardMeter("Eval target",Math.max(0,s.totalProfit)/tgt$,room>0?`$${room.toLocaleString("en-US")} to go · target $${tgt$.toLocaleString("en-US")}`:`target reached ✓`,true)); }
     if(s.dailyLoss$>0){ const used=Math.max(0,-s.todayPnl), room=s.dailyLoss$-used;
       rows.push(guardMeter("Daily loss limit",used/s.dailyLoss$,`$${Math.max(0,Math.round(room)).toLocaleString("en-US")} of room today · max $${s.dailyLoss$.toLocaleString("en-US")}`)); }
-    if(s.maxDD$>0){ const room=s.maxDD$-s.dd;
-      rows.push(guardMeter("Drawdown (distance to blow-up)",s.dd/s.maxDD$,`$${Math.max(0,Math.round(room)).toLocaleString("en-US")} before you break it · max $${s.maxDD$.toLocaleString("en-US")}`)); }
+    if(s.maxDD$>0&&s.floor!=null){ const frac=1-Math.max(0,Math.min(1,s.room/s.maxDD$));
+      rows.push(guardMeter("Drawdown floor"+(s.locked?" · locked":""),frac,
+        `$${Math.max(0,Math.round(s.room)).toLocaleString("en-US")} above your floor of $${Math.round(s.floor).toLocaleString("en-US")}`)); }
     if(g.consistency>0&&s.totalProfit>0){ const share=s.bestDay/s.totalProfit;
       rows.push(guardMeter("Consistency rule",share/g.consistency,`your best day = ${Math.round(share*100)}% of total · max ${Math.round(g.consistency*100)}%`)); }
     if(g.minDays>0){ rows.push(guardMeter("Minimum trading days",s.days/g.minDays,`${s.days} of ${g.minDays} days`,true)); }
@@ -1998,13 +2374,25 @@
   function totalProfit(){ return NPtrades().filter(t=>t.pnl!=null&&!t.sim).reduce((a,t)=>a+t.pnl,0); }
   /* REGLA REAL: al pasar el eval, la cuenta fondeada ARRANCA otra vez en el tamaño base
      (los $50k) — el profit del eval no se hereda. Partimos el journal en ese punto. */
+  /* El objetivo del examen sale del catálogo oficial. El campo viejo evalTarget
+     quedó en 1,000 por defecto y hacía creer que ya habías pasado con $1,000. */
+  function evalTargetNow(){ const a=acctLoad()||{};
+    const R=planResolve(a.firm||"",a.plan||"",a.size||50000);
+    if(a.target!=null) return a.target;
+    if(R&&R.target) return R.target;
+    return a.evalTarget||1000; }
   function evalPassSplit(){
-    const acc=acctLoad()||{}, tgt=acc.evalTarget||1000;
     const h=histLoad().filter(x=>!x.sim&&x.pnl!=null).slice().sort((a,b)=>(a.fecha||"").localeCompare(b.fecha||""));
+    const a=acctLoad()||{}, R=planResolve(a.firm||"",a.plan||"",a.size||50000);
+    /* En un plan FONDEADO no hay examen que pasar: la cuenta ya es esa.
+       Aplicar aquí el reinicio de evaluación descartaba operaciones reales. */
+    if(R&&R.phase==="funded") return { all:h, passed:false, evalTrades:h, fundedTrades:h };
+    const tgt=evalTargetNow();
     let cum=0, idx=-1;
     for(let i=0;i<h.length;i++){ cum+=h[i].pnl||0; if(cum>=tgt){ idx=i; break; } }
     return { all:h, passed:idx>=0, evalTrades:idx>=0?h.slice(0,idx+1):h, fundedTrades:idx>=0?h.slice(idx+1):[] };
   }
+
   function currentTrades(){ const s=evalPassSplit(); return s.passed?s.fundedTrades:s.evalTrades; } // la cuenta VIVA
   function currentProfit(){ return currentTrades().reduce((a,t)=>a+(t.pnl||0),0); }
   function avgGreen(){ const w=NPtrades().filter(t=>t.pnl>0&&!t.sim); return w.length?w.reduce((a,t)=>a+t.pnl,0)/w.length:0; }
@@ -2013,7 +2401,7 @@
   function logPayout(){ const inp=$("#pout-amount"); const v=parseFloat(inp&&inp.value); if(!v||v<=0)return; const p=poutLoad(); p.unshift({date:hoy(),amount:Math.round(v)}); poutSave(p); if(vistaActual==="payouts")mostrar("payouts"); }
   function viewPayout(){
     const a=acctLoad()||{firm:"Tradeify",size:50000,evalTarget:1000,why:""};
-    const profit=totalProfit(), target=a.evalTarget||1000, pct=Math.max(0,Math.min(100,Math.round(profit/target*100))), toGo=Math.max(0,target-profit), avg=avgGreen(), left=avg>0?Math.ceil(toGo/avg):null, passed=profit>=target;
+    const profit=totalProfit(), target=evalTargetNow(), pct=Math.max(0,Math.min(100,Math.round(profit/target*100))), toGo=Math.max(0,target-profit), avg=avgGreen(), left=avg>0?Math.ceil(toGo/avg):null, passed=profit>=target;
     const st=stats(), payouts=poutLoad(), cashed=payouts.reduce((s,p)=>s+p.amount,0), pledged=localStorage.getItem("candado_pledge"), stage=passed?2:0;
     return `<div class="payout-hero">
       <div class="ph-l">The path to your payout${passed?" · funded":" · phase 1 of 3"}</div>
@@ -2064,7 +2452,7 @@
     : 68+Math.min(29,(m.payouts||1)*6);
   function youRacer(){
     const name=profileLoad().handle||"trader";
-    const prof=totalProfit(), acc=acctLoad()||{evalTarget:1000,size:50000}, tgt=acc.evalTarget||1000, size=acc.size||50000, cashedN=poutLoad().length;
+    const prof=totalProfit(), acc=acctLoad()||{size:50000}, tgt=evalTargetNow(), size=acc.size||50000, cashedN=poutLoad().length;
     const live=currentProfit(); // al pasar el eval la cuenta reinicia en el tamaño base: el balance cuenta desde ahí
     if(cashedN>0) return {u:name,you:true,phase:"payout",balance:size+live,payouts:cashedN};
     if(prof>=tgt) return {u:name,you:true,phase:"funded",balance:size+live,bufferPct:Math.min(100,Math.round(Math.max(0,live)/(tgt*0.6)*100))};
@@ -2197,7 +2585,7 @@
   function sessRecord(patch){ // upsert today's trade into the journal — SIM and LIVE keep separate records
     const sim=!!sessLoad().sim;
     const h=histLoad(); let rec=h.find(x=>x.fecha===hoy()&&!!x.sim===sim);
-    if(!rec){ rec={fecha:hoy(),outcome:null,revenges:0,durMin:null,pnl:null,setup:null,emotion:null,session:null,account:(sim?null:(sesAcctLoad()||null)),notes:"",sim}; h.unshift(rec); }
+    if(!rec){ rec={fecha:hoy(),outcome:null,revenges:0,durMin:null,pnl:null,setup:null,emotion:null,session:null,account:(sesAcctLoad()||null),accounts:sesAcctsLoad(),notes:"",sim}; h.unshift(rec); }  /* la cuenta se guarda también en SIM: sirve saber cuál entrenabas */
     Object.assign(rec,patch); histSave(h);
   }
   // the Spotter writes a short review in the notes (only if empty; editable)
@@ -2273,8 +2661,18 @@
           <button class="onb-pill ${mode==="live"?"on":""}" data-sesmode="live" data-hover>Live · ${esc(a.firm||"account")}</button>
           <button class="onb-pill ${mode==="sim"?"on":""}" data-sesmode="sim" data-hover>Practice · SIM</button>
         </div>
-        ${(()=>{ const L=acctList(); if(mode!=="live"||L.length<2)return ""; const cur=sesAcctLoad()||L[0];
-          return `<div class="ses-acct"><span class="sa-k">Account</span><div class="onb-row">${L.map(x=>`<button class="onb-pill ${cur===x?"on":""}" data-sesacct="${esc(x)}" data-hover>${esc(x)}</button>`).join("")}</div></div>`; })()}
+        ${(()=>{ /* también en práctica: un eval de fondeadora ES una cuenta simulada — entrenas contra esa cuenta */
+          const L=acctList();
+          if(!L.length) return `<div class="ses-acct empty"><span class="sa-k">Account</span>
+            <p class="home-note" style="margin:0 0 8px">You haven't added an account yet, so there's nothing to pick. Add the one you trade — firm, size and phase — and it shows up here.</p>
+            <button class="btn ghost sm" data-a="addacctgo" data-hover>+ Add an account</button></div>`;
+          const sel=sesAcctsLoad().filter(x=>L.includes(x));
+          return `<div class="ses-acct"><span class="sa-k">${mode==="sim"?"Practice on":"Trading with"}${sel.length>1?` · ${sel.length} accounts`:""}</span>
+            <div class="onb-row">${L.map(x=>`<button class="onb-pill ${sel.includes(x)?"on":""}" data-sesacct="${esc(x)}" data-hover>${sel.includes(x)?"✓ ":""}${esc(x)}</button>`).join("")}</div>
+            ${L.length>1?`<div class="onb-row" style="margin-top:6px"><button class="onb-pill sm" data-sesacctall="1" data-hover>Select all</button>${sel.length?`<button class="onb-pill sm" data-sesacctall="0" data-hover>Clear</button>`:""}</div>`:""}
+            ${sel.length>1?`<p class="home-note" style="margin:6px 0 0">One trade, ${sel.length} accounts. The P&amp;L you log at the end is the <b>combined</b> figure — split it per account in the journal if you need it exact.</p>`:""}
+            ${mode==="sim"?`<p class="home-note" style="margin:6px 0 0">Trains the routine against ${sel.length>1?"these accounts":"this account"} — it stays out of your live stats and your payout progress.</p>`:""}
+          </div>`; })()}
         <button class="btn fill lg" data-a="startsession" data-hover>▶ Start ${mode==="sim"?"practice ":""}session</button>
       </div>
       <div class="p-card"><div class="c-t">Session rules <span class="room-agg">yours — set them before the open</span></div>
@@ -2361,8 +2759,24 @@
   function acctsSave(a){try{localStorage.setItem("candado_accounts",JSON.stringify(a));}catch(e){}}
   function acctLabel(a){ return (a.firm||"Account")+(a.size?" · $"+Math.round(a.size/1000)+"k":""); }
   function acctList(){ return (acctsLoad()||[]).map(acctLabel); }
-  function sesAcctLoad(){ try{return localStorage.getItem("candado_sesacct")||"";}catch(e){return "";} }
-  function sesAcctSave(v){ try{localStorage.setItem("candado_sesacct",v||"");}catch(e){} }
+  /* Puedes entrar con una cuenta o con varias a la vez (copiar la misma operación
+     entre cuentas fondeadas es la rutina normal). Se guarda una lista; la clave vieja
+     de una sola cuenta se migra sola. */
+  function sesAcctsLoad(){ try{
+      const raw=localStorage.getItem("candado_sesaccts");
+      if(raw){ const a=JSON.parse(raw); if(Array.isArray(a))return a.filter(Boolean); }
+      const one=localStorage.getItem("candado_sesacct"); return one?[one]:[];
+    }catch(e){ return []; } }
+  function sesAcctsSave(list){ try{
+      const a=(list||[]).filter(Boolean);
+      localStorage.setItem("candado_sesaccts",JSON.stringify(a));
+      localStorage.setItem("candado_sesacct",a[0]||"");   // la principal, para lo que aún lee una sola
+    }catch(e){} }
+  function sesAcctToggle(label){ const a=sesAcctsLoad(), i=a.indexOf(label);
+    if(i>=0)a.splice(i,1); else a.push(label);
+    sesAcctsSave(a); }
+  function sesAcctLoad(){ return sesAcctsLoad()[0]||""; }        // la principal
+  function sesAcctSave(v){ sesAcctsSave(v?[v]:[]); }
   function addAccount(){const a=acctsLoad()||[];a.push({firm:"New firm",size:50000,phase:"eval",balance:50000,pnl:0});acctsSave(a);ACCT_EDIT=a.length-1;/* nace en edición: nadie quiere una cuenta llamada "New firm" */if(vistaActual==="cuentas")mostrar("cuentas");}
   function acctEditSave(i){ const a=acctsLoad()||[]; const x=a[i]; if(!x)return;
     const gv=id=>{const el=$("#ae-"+id);return el?el.value.trim():"";};
@@ -2518,7 +2932,7 @@
   function viewProgress(){
     const you=youRacer(), pos=racePos(you), ph=PH_RACE[you.phase]||PH_RACE.eval;
     const a=acctLoad()||{firm:"Tradeify",size:50000,evalTarget:1000,why:""};
-    const profit=totalProfit(), target=a.evalTarget||1000, toGo=Math.max(0,target-profit);
+    const profit=totalProfit(), target=evalTargetNow(), toGo=Math.max(0,target-profit);
     const nst=NPstats(NPtrades()), s2=stats(), payouts=poutLoad(), cashed=payouts.reduce((s,p)=>s+p.amount,0);
     const pledged=localStorage.getItem("candado_pledge");
     const accts=acctsLoad()||[];
@@ -2793,7 +3207,8 @@
     const oe=e.target.closest("[data-onbexp]"); if(oe&&ONB){ONB.data.exp=oe.dataset.onbexp;renderOnb();return;}
     const go=e.target.closest("[data-go]"); if(go){mostrar(go.dataset.go);return;}
     const sm=e.target.closest("[data-sesmode]"); if(sm){sesModeSave(sm.dataset.sesmode);mostrar("sesion");return;}
-    const sa=e.target.closest("[data-sesacct]"); if(sa){sesAcctSave(sa.dataset.sesacct);mostrar("sesion");return;}
+    const sa=e.target.closest("[data-sesacct]"); if(sa){sesAcctToggle(sa.dataset.sesacct);mostrar("sesion");return;}
+    const saa=e.target.closest("[data-sesacctall]"); if(saa){sesAcctsSave(saa.dataset.sesacctall==="1"?acctList():[]);mostrar("sesion");return;}
     const ae=e.target.closest("[data-acedit]"); if(ae){ACCT_EDIT=+ae.dataset.acedit;mostrar("cuentas");return;}
     const as=e.target.closest("[data-acsave]"); if(as){acctEditSave(+as.dataset.acsave);return;}
     const ad=e.target.closest("[data-acdel]"); if(ad){const a=acctsLoad()||[];a.splice(+ad.dataset.acdel,1);acctsSave(a);ACCT_EDIT=-1;mostrar("cuentas");return;}
