@@ -1104,6 +1104,11 @@
   .th-tick{position:absolute;top:-3px;width:1px;height:16px;background:var(--line)}
   .th-marker{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:var(--ink);border:3px solid var(--bg);transform:translate(-50%,-50%);box-shadow:0 0 0 1px var(--line)}
   .thermo-labels{display:flex;justify-content:space-between;font-size:.74rem;color:var(--ink2)}.thermo-labels .on{color:var(--ink);font-weight:600}
+  .acct-card.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .ac-active{margin-top:10px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+  .ac-use{margin-top:10px;width:100%}
+  .tr-del{cursor:pointer;color:var(--ink1);text-align:center;width:30px;transition:color .15s}
+  .tr-del:hover{color:#e5484d}
   .tr-edit{cursor:pointer;color:var(--ink1);text-align:center;width:34px;transition:color .15s}.tr-edit:hover{color:var(--accent)}
   .trade-card{max-width:520px}
   .trade-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
@@ -1410,7 +1415,8 @@
   function payoutThermometer(){ const you=youRacer(), pos=racePos(you), acc=acctLoad()||{}, tgt=evalTargetNow(), prof=totalProfit();
     let headline, sub;
     if(you.phase==="eval"){ const toGo=Math.max(0,tgt-prof); headline=`$${toGo.toLocaleString("en-US")} to clear the eval`; sub="Phase 1 of 3 · then funded, then payout"; }
-    else if(you.phase==="funded"){ headline="Funded — build the buffer"; sub="Your first payout opens Eden"; }
+    else if(you.phase==="funded"){ headline = you.rebuilding ? "Funded — rebuilding the buffer" : "Funded — build the buffer";
+      sub = you.rebuilding ? `You've cashed ${you.payouts} — get back in the green to cash again` : "Your first payout opens Eden"; }
     else { headline="Cashing · in Eden"; sub=`${you.payouts} payout${you.payouts!==1?"s":""} · keep the discipline`; }
     return `<div class="p-card thermo-card"><div class="thermo-k">Path to payout</div><h3 class="thermo-h">${headline}</h3><div class="thermo-sub">${sub}</div>
       <div class="thermo-track"><span class="th-tick" style="left:33%"></span><span class="th-tick" style="left:66%"></span><span class="th-fill" style="width:${pos.toFixed(1)}%"></span><span class="th-marker" style="left:${pos.toFixed(1)}%"></span></div>
@@ -1459,7 +1465,7 @@
   /* ---------- events ---------- */
   document.addEventListener("click",e=>{
     const b=e.target.closest("button[data-a]");if(!b)return;
-    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,duelcreate:duelCreate,dueljoin:duelJoin,duelleave:duelLeave,duelshare:duelShare,duelpull:duelPull,lockoverride:lockOverride,addacctgo:()=>{addAccount();mostrar("cuentas");},acctcancel:()=>{ACCT_EDIT=-1;mostrar("cuentas");},startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,shareshot:sealPoster,tradenew:tradeNew,tradesave:tradeSave,tradedel:tradeDelete,csvimport:csvImportClick,tfclear:()=>{TRADE_FILTER={result:"",setup:"",session:""};mostrar("trades");},buddyclear:()=>{try{localStorage.removeItem("candado_buddy");}catch(e){}mostrar("progreso");},exportdata:exportData,importdata:importDataClick,rulesedit:()=>{FIRM_EDIT=true;mostrar(vistaActual);},rulesapply:()=>{const a=acctLoad()||{};const f=$("#re-firmsel"),p=$("#re-plansel");if(f)a.firm=f.value;if(p&&firmPlans(a.firm).includes(p.value))a.plan=p.value;else a.plan=firmPlans(a.firm)[0]||"";const zs=firmSizes(a.firm,a.plan);if(zs.length&&!zs.includes(a.size))a.size=zs[0];["target","dailyLoss","maxDD","consistency","minDays"].forEach(k=>delete a[k]);acctSave(a);mostrar(vistaActual);},rulescancel:()=>{FIRM_EDIT=false;mostrar(vistaActual);},rulessave:firmRulesSave,guardreset:()=>{const A=activeAcct(),a=A||acctLoad()||{},L=acctsLoad();["target","dailyLoss","maxDD","consistency","minDays"].forEach(k=>delete a[k]);delete a.firmCustom;if(A&&L)acctsSave(L);else acctSave(a);mostrar(vistaActual);},pmspeak:()=>spkr(premarketText()),dismissnudge:()=>{TRADING_NUDGE="";statusPush(sessLoad().phase||"ready");mostrar(vistaActual);},replayonb:startOnb,practicenow:practiceNow,crewopen:crewOpen,crewjoin:crewJoin,crewleave:crewLeave,crewshare:crewShare,econedit:()=>{econEdit=true;mostrar("home");},econcancel:()=>{econEdit=false;mostrar("home");},econsave:()=>{const i=$("#econ-input");if(i)econSave(econParse(i.value));econEdit=false;mostrar("home");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,spkr:spkToggle,invite:()=>{try{window.open("https://wa.me/?text="+encodeURIComponent("Try SPOTTER AI with me — the trading platform built on discipline: https://studioamr.github.io/spotter-ai/landing.html"),"_blank");}catch(e){}},logout:()=>{if(confirm("Log out? Your journal stays on this device."))(localStorage.removeItem("candado_user"),location.reload());}}[b.dataset.a]||function(){})();
+    ({sign:firmar,logpayout:logPayout,togglenav:toggleNav,addacct:addAccount,duelcreate:duelCreate,dueljoin:duelJoin,duelleave:duelLeave,duelshare:duelShare,duelpull:duelPull,lockoverride:lockOverride,addacctgo:()=>{addAccount();mostrar("cuentas");},acctcancel:()=>{ACCT_EDIT=-1;mostrar("cuentas");},startsession:startSession,endsession:endSession,newsession:newSession,fire:fireBullet,won:wonSession,lost:lostSession,shareshot:sealPoster,tradenew:tradeNew,tradesave:tradeSave,tradedel:tradeDelete,csvimport:csvImportClick,tfclear:()=>{TRADE_FILTER={result:"",setup:"",session:""};mostrar("trades");},buddyclear:()=>{try{localStorage.removeItem("candado_buddy");}catch(e){}mostrar("progreso");},exportdata:exportData,importdata:importDataClick,rulesedit:()=>{FIRM_EDIT=true;mostrar(vistaActual);},rulesapply:()=>{const a=acctLoad()||{};const f=$("#re-firmsel"),p=$("#re-plansel");if(f)a.firm=f.value;if(p&&firmPlans(a.firm).includes(p.value))a.plan=p.value;else a.plan=firmPlans(a.firm)[0]||"";const zs=firmSizes(a.firm,a.plan);if(zs.length&&!zs.includes(a.size))a.size=zs[0];["target","dailyLoss","maxDD","consistency","minDays"].forEach(k=>delete a[k]);acctSave(a);mostrar(vistaActual);},rulescancel:()=>{FIRM_EDIT=false;mostrar(vistaActual);},rulessave:firmRulesSave,guardreset:()=>{const A=activeAcct(),a=A||acctLoad()||{},L=acctsLoad();["target","dailyLoss","maxDD","consistency","minDays"].forEach(k=>delete a[k]);delete a.firmCustom;if(A&&L)acctsSave(L);else acctSave(a);mostrar(vistaActual);},pmspeak:()=>spkr(premarketText()),dismissnudge:()=>{TRADING_NUDGE="";statusPush(sessLoad().phase||"ready");mostrar(vistaActual);},replayonb:startOnb,practicenow:practiceNow,crewopen:crewOpen,crewjoin:crewJoin,crewleave:crewLeave,crewshare:crewShare,econedit:()=>{econEdit=true;mostrar("home");},econcancel:()=>{econEdit=false;mostrar("home");},econsave:()=>{const i=$("#econ-input");if(i)econSave(econParse(i.value));econEdit=false;mostrar("home");},trainstart:trainStart,trainend:trainEnd,trainwon:()=>trainSeal("won"),trainlost:()=>trainSeal("lost"),copyamr:myPlanCopyAMR,spkr:spkToggle,invite:()=>{try{window.open("https://wa.me/?text="+encodeURIComponent("Try SPOTTER AI with me — the trading platform built on discipline: https://studioamr.github.io/spotter-ai/landing.html"),"_blank");}catch(e){}},logout:()=>{if(confirm("¿Cerrar sesión? Tu diario y tus cuentas se quedan en este dispositivo; solo vuelves a la pantalla de entrada."))(localStorage.removeItem("candado_user"),localStorage.removeItem("candado_onboarded"),location.reload());}}[b.dataset.a]||function(){})();
   });
   document.addEventListener("input",e=>{ if(!e.target)return;
     if(ONB&&e.target.id&&e.target.id.startsWith("onb-")){ const d=ONB.data, id=e.target.id, v=e.target.value;
@@ -1819,8 +1825,8 @@
       <select id="tf-setup"><option value="">Setup</option>${Object.keys(SETUPS_L).map(k=>opt(k,SETUPS_L[k],F.setup)).join("")}</select>
       <select id="tf-session"><option value="">Session</option>${Object.keys(SESSIONS_L).map(k=>opt(k,SESSIONS_L[k],F.session)).join("")}</select>
       ${active?`<span class="tf-count">${filtered.length} of ${all.length}</span><button class="btn ghost" data-a="tfclear" data-hover>Clear</button>`:""}</div>`;
-    const rows=filtered.length?filtered.map(t=>`<tr><td class="strong">${(t.fecha||"").slice(5).replace("-","/")||"—"}${t.sim?' <span class="sim-badge">SIM</span>':""}</td><td><span class="pill ${t.result}">${t.result==="win"?"Won":"Lost"}</span></td><td>${t.durMin?t.durMin+"m":"—"}</td><td class="${t.pnl>0?'up':t.pnl<0?'down':''}">${t.pnl!=null?money(t.pnl):"—"}</td><td>${t.setup?(SETUPS_L[t.setup]||t.setup):"—"}</td><td>${t.emotion?(EMO_L[t.emotion]||t.emotion):"—"}</td><td>${t.revenges?'<span class="down">'+t.revenges+'</span>':"·"}</td><td>${spotCell(t.fecha)}</td><td class="tr-edit" data-tedit="${esc(t.id||"")}" title="Edit / delete">✎</td></tr>`).join(""):`<tr><td colspan="9" class="tf-empty">No trades match those filters.</td></tr>`;
-    return head+filterBar+`<table class="tbl"><thead><tr><th>Date</th><th>Result</th><th>Dur.</th><th>P&L</th><th>Setup</th><th>Emotion</th><th>Rev.</th><th>Spotter</th><th></th></tr></thead><tbody>`+rows+`</tbody></table>${modals}`; }
+    const rows=filtered.length?filtered.map(t=>`<tr><td class="strong">${(t.fecha||"").slice(5).replace("-","/")||"—"}${t.sim?' <span class="sim-badge">SIM</span>':""}</td><td><span class="pill ${t.result}">${t.result==="win"?"Won":"Lost"}</span></td><td>${t.durMin?t.durMin+"m":"—"}</td><td class="${t.pnl>0?'up':t.pnl<0?'down':''}">${t.pnl!=null?money(t.pnl):"—"}</td><td>${t.setup?(SETUPS_L[t.setup]||t.setup):"—"}</td><td>${t.emotion?(EMO_L[t.emotion]||t.emotion):"—"}</td><td>${t.revenges?'<span class="down">'+t.revenges+'</span>':"·"}</td><td>${spotCell(t.fecha)}</td><td class="tr-edit" data-tedit="${esc(t.id||"")}" title="Edit">✎</td><td class="tr-del" data-tdel="${esc(t.id||"")}" title="Delete trade">✕</td></tr>`).join(""):`<tr><td colspan="9" class="tf-empty">No trades match those filters.</td></tr>`;
+    return head+filterBar+`<table class="tbl"><thead><tr><th>Date</th><th>Result</th><th>Dur.</th><th>P&L</th><th>Setup</th><th>Emotion</th><th>Rev.</th><th>Spotter</th><th></th><th></th></tr></thead><tbody>`+rows+`</tbody></table>${modals}`; }
 
   /* AI Coach · NorthPoint logic: memory hero + KPIs + insights w/ rules + breakdowns */
   function coachGroup(arr,keyFn,labelFn){ const m={};
@@ -2928,7 +2934,11 @@
     const name=profileLoad().handle||"trader";
     const prof=totalProfit(), acc=acctLoad()||{size:50000}, tgt=evalTargetNow(), size=acc.size||50000, cashedN=poutLoad().length;
     const live=currentProfit(); // al pasar el eval la cuenta reinicia en el tamaño base: el balance cuenta desde ahí
-    if(cashedN>0) return {u:name,you:true,phase:"payout",balance:size+live,payouts:cashedN};
+    // Edén (payout) solo si YA cobraste Y ahora mismo vas EN VERDE. Si cobraste pero estás
+    // en cero o en rojo, no estás en Edén: reconstruyes el colchón (funded). Un -100 no es el paraíso.
+    if(cashedN>0 && live>0) return {u:name,you:true,phase:"payout",balance:size+live,payouts:cashedN};
+    if(cashedN>0) return {u:name,you:true,phase:"funded",balance:size+live,payouts:cashedN,
+      bufferPct:Math.min(100,Math.round(Math.max(0,live)/(tgt*0.6)*100)),rebuilding:true};
     if(prof>=tgt) return {u:name,you:true,phase:"funded",balance:size+live,bufferPct:Math.min(100,Math.round(Math.max(0,live)/(tgt*0.6)*100))};
     return {u:name,you:true,phase:"eval",balance:size+prof,evalPct:Math.max(0,Math.min(100,Math.round(prof/tgt*100)))};
   }
@@ -3272,6 +3282,7 @@
   let ACCT_EDIT=-1;
   function viewAccounts(){
     let a=acctsLoad()||[]; // a new profile starts with no funded accounts
+    const activeLabel=activeAcctLabel();   // cuál cuenta está en uso ahora
     const PH={eval:{l:"In evaluation",c:"#C9A24B"},funded:{l:"Funded",c:"var(--accent)"},payout:{l:"Payout ready",c:"#35c46f"}};
     const total=a.reduce((s,x)=>s+(x.pnl||0),0);
     return `<div class="accts">
@@ -3289,11 +3300,12 @@
         <div class="re-btns"><button class="btn" data-acsave="${i}" data-hover>Save</button>
           <button class="btn ghost" data-a="acctcancel" data-hover>Cancel</button>
           <button class="btn ghost" data-acdel="${i}" data-hover>Remove</button></div></div>`
-        :`<div class="p-card acct-card">
+        :`<div class="p-card acct-card${acctLabel(x)===activeLabel?" active":""}">
         <button class="ac-x" data-acedit="${i}" title="Edit account" data-hover>✎</button>
         <div class="ac-head"><span class="firm-logo">${initials(x.firm)}</span><div style="flex:1"><div class="firm-name">${esc(x.firm)}</div><div class="ac-size">$${(x.size||0).toLocaleString("en-US")} account</div></div>
           <span class="rl-badge" style="color:${ph.c};border-color:${ph.c}">${ph.l}</span></div>
-        <div class="ac-stats"><div><span>Balance</span><b>$${(x.balance||0).toLocaleString("en-US")}</b></div><div><span>P&amp;L</span><b class="${(x.pnl||0)>=0?"up":"down"}">${money(x.pnl||0)}</b></div></div></div>`}`;}).join("")}
+        <div class="ac-stats"><div><span>Balance</span><b>$${(x.balance||0).toLocaleString("en-US")}</b></div><div><span>P&amp;L</span><b class="${(x.pnl||0)>=0?"up":"down"}">${money(x.pnl||0)}</b></div></div>
+        ${acctLabel(x)===activeLabel?`<div class="ac-active">● Usando esta cuenta</div>`:`<button class="btn ghost sm ac-use" data-acuse="${i}" data-hover>Usar esta cuenta</button>`}</div>`}`;}).join("")}
         <div class="p-card acct-card sim-card">
           <div class="ac-head"><span class="firm-logo sim">◎</span><div style="flex:1"><div class="firm-name">Practice account</div><div class="ac-size">$50,000 virtual · always yours</div></div>
             <span class="rl-badge" style="color:var(--ink1);border-color:var(--ink2)">SIM</span></div>
@@ -3508,7 +3520,6 @@
       ${guardCard()}
       ${adjTargetCard()}
       ${sizeCard()}
-      ${survivalCard()}
       ${equityCard()}
       ${seasonCard()}
       ${(()=>{ if(you.phase!=="eval")return""; const avg=avgGreen(), left=avg>0?Math.ceil(toGo/avg):null;
@@ -3516,21 +3527,12 @@
         <div class="pace-row"><div class="pace-big">${left!=null?left:"—"}<small>${left!=null?(left===1?"session won":"sessions won"):"no data yet"}</small></div>
           <div class="pace-meta"><div><b>$${toGo.toLocaleString("en-US")}</b> to clear the eval</div><div>Average per win: <b class="up">${avg>0?money(Math.round(avg)):"—"}</b></div></div></div>
         <p class="home-note">${left!=null?"Honest estimate from your average win — not a guarantee. Keep the discipline and the number drops on its own.":"Seal a few winning sessions and the Spotter estimates your pace to pass."}</p></div>`; })()}
-      ${roomCard()}
-      ${buddyCard()}
       <div class="p-card"><div class="c-t">The room race</div>${buildRace()}</div>
       <div class="kpis">
         <div class="kpi"><div class="k-l">Accounts</div><div class="k-v">${accts.length||1}</div></div>
         <div class="kpi"><div class="k-l">Profit</div><div class="k-v ${profit>=0?"up":"down"}">${money(profit)}</div></div>
         <div class="kpi"><div class="k-l">Win rate</div><div class="k-v">${nst.winRate}%</div></div>
         <div class="kpi"><div class="k-l">Cashed</div><div class="k-v up">$${cashed.toLocaleString("en-US")}</div></div>
-      </div>
-      <div class="p-grid">
-        <div class="p-card"><div class="c-t">The contract</div><p class="pledge-txt">${PLEDGE}</p>
-          ${pledged?`<div class="signed">✓ Signed · ${pledged}</div>`:`<button class="btn fill" data-a="sign" data-hover>Sign the contract</button>`}</div>
-        <div class="p-card"><div class="c-t">Tu meta</div>
-          <p class="home-note" style="margin:0 0 10px">${goalLoad()?`Vas por <b>${goalFmt(goalLoad())}</b>. El Mapa te dice cuántos ciclos y cuántas cuentas hacen falta.`:"Todavía no eliges un monto. Un número concreto sirve; una lista de compras no."}</p>
-          <button class="btn ghost sm" data-route="mapa" data-hover>${goalLoad()?"Ver mi ruta →":"Elegir mi meta →"}</button></div>
       </div>
     </div>`;
   }
@@ -3899,6 +3901,8 @@
     const ds=e.target.closest("[data-dashsrc]"); if(ds){DASH_SRC=ds.dataset.dashsrc;DASH_ACCT="";mostrar("dashboard");return;}
     const da=e.target.closest("[data-dashacct]"); if(da){DASH_ACCT=da.dataset.dashacct||"";mostrar("dashboard");return;}
     const te=e.target.closest("[data-tedit]"); if(te){tradeEdit(te.dataset.tedit);return;}
+    const td=e.target.closest("[data-tdel]"); if(td){ const id=td.dataset.tdel;
+      if(id && confirm("¿Borrar este trade? No se puede deshacer.")){ histSave(histLoad().filter(x=>x.id!==id)); supaUpsert(); mostrar("trades"); } return;}
     if(e.target.closest("[data-tradeclose]")||e.target.id==="trade-modal"){closeTradeModal();return;}
     if(e.target.closest("[data-crewclose]")||e.target.id==="crew-modal"){closeCrewModal();return;}
     const fp=e.target.closest("[data-firmpreset]"); if(fp){const a=acctLoad()||{size:50000,evalTarget:1000};a.firm=fp.dataset.firmpreset;delete a.dailyLoss;delete a.maxDD;delete a.consistency;delete a.minDays;acctSave(a);mostrar("settings");return;} // firm → automatic rules by phase
@@ -3931,7 +3935,8 @@
     const saa=e.target.closest("[data-sesacctall]"); if(saa){sesAcctsSave(acctList());mostrar("sesion");return;}
     const ae=e.target.closest("[data-acedit]"); if(ae){ACCT_EDIT=+ae.dataset.acedit;mostrar("cuentas");return;}
     const as=e.target.closest("[data-acsave]"); if(as){acctEditSave(+as.dataset.acsave);return;}
-    const ad=e.target.closest("[data-acdel]"); if(ad){const a=acctsLoad()||[];a.splice(+ad.dataset.acdel,1);acctsSave(a);ACCT_EDIT=-1;mostrar("cuentas");return;}
+    const ad=e.target.closest("[data-acdel]"); if(ad){const a=acctsLoad()||[];if(confirm("¿Eliminar esta cuenta? No se puede deshacer.")){a.splice(+ad.dataset.acdel,1);acctsSave(a);ACCT_EDIT=-1;mostrar("cuentas");}return;}
+    const au=e.target.closest("[data-acuse]"); if(au){const a=acctsLoad()||[],x=a[+au.dataset.acuse];if(x){sesAcctPick(acctLabel(x));mostrar("cuentas");}return;}
     const cb=e.target.closest("[data-cal]"); if(cb){ let [y,m]=calMonth.split("-").map(Number); m+=(+cb.dataset.cal); if(m<1){m=12;y--;} if(m>12){m=1;y++;} calMonth=y+"-"+String(m).padStart(2,"0"); mostrar(vistaActual); } });
 
   /* ---------- User · silent profile (no gate, free entry) ---------- */
@@ -3973,6 +3978,7 @@
     acctSave(acc);
     rulesSave({trades:d.trades||1,risk:d.risk||1,sess:d.sess||1.5,target:d.ptarget||2});
     try{localStorage.setItem("candado_onboarded","1");}catch(e){}
+    try{userSave({handle:p.handle,at:Date.now()});}catch(e){}   // marca la sesión iniciada
     ONB=null; const o=document.getElementById("onb"); if(o)o.remove();
     supaUpsert(); renderSidebar(); mostrar("home");
   }
